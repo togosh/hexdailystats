@@ -1,8 +1,8 @@
 # hexdailystats
 
-Website:  https://HEXDailyStats.com  
-Telegram: https://t.me/HEXDailyStats  
-Twitter:  https://twitter.com/HEXDailyStats  
+Website --- https://HEXDailyStats.com   
+Telegram -- https://t.me/HEXDailyStats  
+Twitter ----- https://twitter.com/HEXDailyStats  
 
 Purpose:   
 To provide historical records of the hex ecosystem in daily snapshots throughout time.   
@@ -13,6 +13,18 @@ https://api.thegraph.com/subgraphs/name/codeakk/hex
 https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2  
 https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3  
 https://etherscan.io/apis  
+
+=
+
+Core Data:
+- CurrentDay
+- Staked and Circulating Supply
+- Tshare Rate
+- Total Tshares
+- Average Stake Length
+- Daily Payout
+- Daily Penalties
+- Uniswap V2 & V3, USDC & WETH pair liquidity
 
 =  
 

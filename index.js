@@ -6,6 +6,9 @@ const HEX_CONTRACT_ADDRESS = "0x2b591e99afe9f32eaa6214f7b7629768c40eeb39";
 const HEX_CONTRACT_CURRENTDAY = "0x5c9302c9";
 const HEX_CONTRACT_GLOBALINFO = "0xf04b5fa0";
 
+const UNISWAP_V2_HEXETH = "0x55d5c232d921b9eaa6b37b5845e439acd04b4dba";
+const UNISWAP_V2_HEXUSDC = "0xf6dcdce0ac3001b2f67f750bc64ea5beb37b5824";
+
 const hostname = '127.0.0.1';
 const port = 3000;
 
@@ -19,12 +22,99 @@ server.listen(port, hostname, () => {
   console.log(`Server running at http://${hostname}:${port}/`);
 
   //getCurrentDay();
-  getGlobalInfo();
-
+  //getGlobalInfo();
+  
   //get_shareRateChange();
   //get_dailyDataUpdate();
+
   //get_averageStakeLength();
+  //get_dailyPenalties();
+
+  //getUniswapV2();
+  getUniswapV2HEXUSDC();
+  getUniswapV2HEXETH();
+  getUniswapV3();
 });
+
+
+//////////////////////////////////////
+//// HELPER 
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function chunkSubstr(str, size) {
+  const numChunks = Math.ceil(str.length / size);
+  const chunks = new Array(numChunks);
+
+  for (let i = 0, o = 0; i < numChunks; ++i, o += size) {
+    chunks[i] = str.substr(o, size);
+  }
+
+  return chunks;
+}
+
+
+
+//////////////////////////////////////
+//// ETHERSCAN
+
+async function getCurrentDay(){
+  var etherScanURL = 
+  "https://api.etherscan.io/api?" +
+  "module=proxy&action=eth_call" +
+  "&to=" + HEX_CONTRACT_ADDRESS +
+  "&data=" + HEX_CONTRACT_CURRENTDAY +
+  "&apikey=" + CONFIG.etherscan.apiKey;
+
+  return await fetch(etherScanURL, {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' }
+  })
+  .then(res => res.json())
+  .then(res => {
+    var currentDay = parseInt(res.result, 16);
+    console.log("currentDay: " + currentDay);
+  });
+}
+
+async function getGlobalInfo(){
+  var etherScanURL = 
+  "https://api.etherscan.io/api?" +
+  "module=proxy&action=eth_call" +
+  "&to=" + HEX_CONTRACT_ADDRESS +
+  "&data=" + HEX_CONTRACT_GLOBALINFO +
+  "&apikey=" + CONFIG.etherscan.apiKey;
+
+  return await fetch(etherScanURL, {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' }
+  })
+  .then(res => res.json())
+  .then(res => {
+    var chunks = chunkSubstr(res.result.substring(2), 64);
+    console.log("globalInfo:");
+    console.log(chunks);
+
+    var circulatingSupply = parseInt(chunks[11], 16).toString();
+    circulatingSupply = circulatingSupply.substring(0, circulatingSupply.length - 8);
+    console.log("Total HEX:      " + circulatingSupply);
+
+    var lockedHEX = parseInt(chunks[0], 16).toString();
+    lockedHEX = lockedHEX.substring(0, lockedHEX.length - 8);
+    console.log("Staked HEX:     " + lockedHEX);
+
+    var percentStaked = ((lockedHEX / circulatingSupply) * 100);
+    console.log("Percent Staked: " + percentStaked + "%");
+
+    var stakePenaltyPool = parseInt(chunks[3], 16).toString();
+    console.log(stakePenaltyPool);
+    stakePenaltyPool = stakePenaltyPool.substring(0, stakePenaltyPool.length - 8);
+    console.log("Stake Penalty:  " + stakePenaltyPool);
+  });
+}
+
 
 function get_shareRateChange(){
   fetch('https://api.thegraph.com/subgraphs/name/codeakk/hex', {
@@ -152,81 +242,321 @@ async function get_stakeStarts($lastStakeId){
 }
 
 
+async function get_dailyPenalties(){
 
-//////////////////////////////////////
-//// HELPER 
+  var $lastStakeId = 0;
+  var penaltiesSum = 0;
+  var stakeCount = 0;
+  var count = 0;
 
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
+  var start = new Date();
+  start.setUTCHours(0, 0, 0, 0);
+  start.setDate(start.getDate()-1);
+  var unixTimestamp = (start.valueOf() / 1000);
+  console.log(start);
 
-function chunkSubstr(str, size) {
-  const numChunks = Math.ceil(str.length / size);
-  const chunks = new Array(numChunks);
+  var end = new Date();
+  end.setUTCHours(23, 59, 59, 999);
+  end.setDate(end.getDate()-1);
+  var unixTimestampEnd = (end.valueOf() / 1000);
+  console.log(end);
 
-  for (let i = 0, o = 0; i < numChunks; ++i, o += size) {
-    chunks[i] = str.substr(o, size);
+  while (true) {
+    var data = await get_stakeEnds($lastStakeId, unixTimestamp, unixTimestampEnd);
+    if (data.count <= 0) { break; }
+    stakeCount += data.count;
+    penaltiesSum += data.penalty;
+    $lastStakeId = data.lastStakeId;
+
+    console.log(count);
+    count += 1;
+    await sleep(500);
   }
 
-  return chunks;
+  var $lastStakeId = 0;
+
+  while (true) {
+    var data = await get_stakeGoodAccountings($lastStakeId, unixTimestamp, unixTimestampEnd);
+    if (data.count <= 0) { break; }
+    stakeCount += data.count;
+    penaltiesSum += data.penalty;
+    $lastStakeId = data.lastStakeId;
+
+    console.log(count + " get_stakeGoodAccountings");
+    count += 1;
+    await sleep(500);
+  }
+
+  var penaltyString = parseInt(penaltiesSum, 10).toString();
+  penaltiesSum = penaltyString.substring(0, penaltyString.length - 8);
+
+  console.log("=== SUMMARY")
+  console.log("Stake Count -------- " + stakeCount);
+  console.log("Sum Penalties ------ " + penaltiesSum);
+  console.log("Last Stake ID ------ " + $lastStakeId);
 }
 
-
-
-//////////////////////////////////////
-//// ETHERSCAN
-
-async function getCurrentDay(){
-  var etherScanURL = 
-  "https://api.etherscan.io/api?" +
-  "module=proxy&action=eth_call" +
-  "&to=" + HEX_CONTRACT_ADDRESS +
-  "&data=" + HEX_CONTRACT_CURRENTDAY +
-  "&apikey=" + CONFIG.etherscan.apiKey;
-
-  return await fetch(etherScanURL, {
-    method: 'GET',
-    headers: { 'Content-Type': 'application/json' }
+async function get_stakeEnds($lastStakeId, unixTimestamp, unixTimestampEnd){
+  return await fetch('https://api.thegraph.com/subgraphs/name/codeakk/hex', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query: `
+      query {
+        stakeEnds(first: 1000, orderBy: stakeId, 
+          where: { 
+            stakeId_gt: "` + $lastStakeId + `",
+            timestamp_gt: ` + unixTimestamp + `,
+            timestamp_lt: ` + unixTimestampEnd + `,
+            penalty_gt: 0
+          }
+        ) {
+          stakeId
+          penalty
+        }
+      }` 
+    }),
   })
   .then(res => res.json())
   .then(res => {
-    var currentDay = parseInt(res.result, 16);
-    console.log("currentDay: " + currentDay);
+    var stakeCount = Object.keys(res.data.stakeEnds).length;
+
+    if (stakeCount <= 0) {
+      return {  
+        count: 0
+      };
+    } 
+    else {
+    var dataReduced = res.data.stakeEnds.reduce(function(previousValue, currentValue) {
+      return {
+        penalty: parseInt(previousValue.penalty, 10) + parseInt(currentValue.penalty, 10),
+      }
+    });
+
+    var lastStakeId = res.data.stakeEnds[(stakeCount - 1)].stakeId;
+
+    var data = {  
+      count: stakeCount, 
+      penalty: dataReduced.penalty,
+      lastStakeId: lastStakeId
+    };
+
+    return data;
+  }});
+}
+
+async function get_stakeGoodAccountings($lastStakeId, unixTimestamp, unixTimestampEnd){
+  return await fetch('https://api.thegraph.com/subgraphs/name/codeakk/hex', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query: `
+      query {
+        stakeGoodAccountings(first: 1000, orderBy: stakeId, 
+          where: { 
+            stakeId_gt: "` + $lastStakeId + `",
+            timestamp_gt: ` + unixTimestamp + `,
+            timestamp_lt: ` + unixTimestampEnd + `,
+            penalty_gt: 0
+          }
+        ) {
+          stakeId
+          penalty
+        }
+      }` 
+    }),
+  })
+  .then(res => res.json())
+  .then(res => {
+    var stakeCount = Object.keys(res.data.stakeGoodAccountings).length;
+
+    if (stakeCount <= 0) {
+      return {  
+        count: 0
+      };
+    } 
+    else {
+    var dataReduced = res.data.stakeGoodAccountings.reduce(function(previousValue, currentValue) {
+      return {
+        penalty: parseInt(previousValue.penalty, 10) + parseInt(currentValue.penalty, 10),
+      }
+    });
+
+    var lastStakeId = res.data.stakeGoodAccountings[(stakeCount - 1)].stakeId;
+
+    var data = {  
+      count: stakeCount, 
+      penalty: dataReduced.penalty,
+      lastStakeId: lastStakeId
+    };
+
+    return data;
+  }});
+}
+
+
+/////////////////////////////////////////////
+//// UNISWAP
+
+function getUniswapV2() {
+  fetch('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query: `
+      query {
+        tokenDayDatas (
+          first: 1
+          orderBy: date, 
+          orderDirection: desc,
+          where: {
+            token: "` + HEX_CONTRACT_ADDRESS + `"
+          }
+        ) {
+          priceUSD
+          totalLiquidityToken
+          totalLiquidityUSD
+          totalLiquidityETH
+          mostLiquidPairs { id }
+        }
+      }` 
+    }),
+  })
+  .then(res => res.json())
+  .then(res => console.log(res.data));
+}
+
+function getUniswapV2HEXETH(){
+  fetch('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query: `
+      query {
+        pairDayDatas (
+          orderBy: id, orderDirection: desc, first: 1,
+          where: {pairAddress: "` + UNISWAP_V2_HEXETH + `"}){
+         token0 {
+           symbol
+         }
+          token1 {
+            symbol
+          }
+          pairAddress
+          reserve0
+          reserve1
+        }
+      }` 
+    }),
+  })
+  .then(res => res.json())
+  .then(res => {
+    var pairDayData = res.data.pairDayDatas[0];
+    console.log("=== V2");
+    console.log(pairDayData.token0.symbol + " - " + pairDayData.reserve0);
+    console.log(pairDayData.token1.symbol + " - " + pairDayData.reserve1);
   });
 }
 
-async function getGlobalInfo(){
-  var etherScanURL = 
-  "https://api.etherscan.io/api?" +
-  "module=proxy&action=eth_call" +
-  "&to=" + HEX_CONTRACT_ADDRESS +
-  "&data=" + HEX_CONTRACT_GLOBALINFO +
-  "&apikey=" + CONFIG.etherscan.apiKey;
-
-  return await fetch(etherScanURL, {
-    method: 'GET',
-    headers: { 'Content-Type': 'application/json' }
+function getUniswapV2HEXUSDC(){
+  fetch('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query: `
+      query {
+        pairDayDatas (
+          orderBy: id, orderDirection: desc, first: 1,
+          where: {pairAddress: "` + UNISWAP_V2_HEXUSDC + `"}){
+         token0 {
+           symbol
+         }
+          token1 {
+            symbol
+          }
+          pairAddress
+          reserve0
+          reserve1
+        }
+      }` 
+    }),
   })
   .then(res => res.json())
   .then(res => {
-    var chunks = chunkSubstr(res.result.substring(2), 64);
-    console.log("globalInfo:");
-    console.log(chunks);
+    var pairDayData = res.data.pairDayDatas[0];
+    console.log("=== V2");
+    console.log(pairDayData.token0.symbol + " - " + pairDayData.reserve0);
+    console.log(pairDayData.token1.symbol + " - " + pairDayData.reserve1);
+  });
+}
 
-    var circulatingSupply = parseInt(chunks[11], 16).toString();
-    circulatingSupply = circulatingSupply.substring(0, circulatingSupply.length - 8);
-    console.log("Total HEX:      " + circulatingSupply);
+async function getUniswapV3Pools() {
+  return await fetch('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query: `
+      query {
+        token (id: "` + HEX_CONTRACT_ADDRESS + `") {
+          id
+          symbol
+          name
+          whitelistPools {
+            id
+          }
+        }
+      }` 
+    }),
+  })
+  .then(res => res.json())
+  .then(res => {
+    pools = res.data.token.whitelistPools.map(function (obj) {
+      return obj.id;
+    });
 
-    var lockedHEX = parseInt(chunks[0], 16).toString();
-    lockedHEX = lockedHEX.substring(0, lockedHEX.length - 8);
-    console.log("Staked HEX:     " + lockedHEX);
+    return pools;
+  });
+}
 
-    var percentStaked = ((lockedHEX / circulatingSupply) * 100);
-    console.log("Percent Staked: " + percentStaked + "%");
+async function getUniswapV3() {
+  var pools = await getUniswapV3Pools();
+  sleep(500);
 
-    var stakePenaltyPool = parseInt(chunks[3], 16).toString();
-    console.log(stakePenaltyPool);
-    stakePenaltyPool = stakePenaltyPool.substring(0, stakePenaltyPool.length - 8);
-    console.log("Stake Penalty:  " + stakePenaltyPool);
+  if (pools == undefined) {return;}
+
+  await fetch('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query: `
+      query {
+        pools (
+          orderBy: volumeUSD, orderDirection: desc,
+          where: {id_in: ` + JSON.stringify(pools) + `}
+        ){
+          id
+          token0 { name }
+          token1 { name }
+          liquidity
+          totalValueLockedToken0
+          totalValueLockedToken1
+          volumeUSD
+        }
+      }` 
+    }),
+  })
+  .then(res => res.json())
+  .then(res => {
+    for(var i = 0; i < res.data.pools.length; i++) {
+      var token0Name = res.data.pools[i].token0.name;
+      var token1Name = res.data.pools[i].token1.name;
+      var token0TVL = res.data.pools[i].totalValueLockedToken0;
+      var token1TVL = res.data.pools[i].totalValueLockedToken1;
+
+      if (token0Name == "HEX" && token1Name == "USD Coin") {
+        console.log("== V3");
+        console.log(token0Name + " - " + token0TVL);
+        console.log(token1Name + " - " + token1TVL);
+      } 
+      
+      if (token0Name == "HEX" && token1Name == "Wrapped Ether") {
+        console.log("== V3");
+        console.log(token0Name + " - " + token0TVL);
+        console.log(token1Name + " - " + token1TVL);
+      }
+    }
   });
 }

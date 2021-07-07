@@ -21,21 +21,24 @@ const server = http.createServer((req, res) => {
 server.listen(port, hostname, () => {
   console.log(`Server running at http://${hostname}:${port}/`);
 
-  //getCurrentDay();
-  //getGlobalInfo();
-  
-  //get_shareRateChange();
-  //get_dailyDataUpdate();
-
-  //get_averageStakeLength();
-  //get_dailyPenalties();
-
-  //getUniswapV2();
-  getUniswapV2HEXUSDC();
-  getUniswapV2HEXETH();
-  getUniswapV3();
+  getData();
 });
 
+async function getData() {
+  await getCurrentDay();
+  await getGlobalInfo();
+  
+  await get_shareRateChange();
+  await get_dailyDataUpdate();
+
+  await get_averageStakeLength();
+  await get_dailyPenalties();
+
+  ////await getUniswapV2();
+  await getUniswapV2HEXUSDC();
+  await getUniswapV2HEXETH();
+  await getUniswapV3();
+}
 
 //////////////////////////////////////
 //// HELPER 
@@ -94,8 +97,8 @@ async function getGlobalInfo(){
   .then(res => res.json())
   .then(res => {
     var chunks = chunkSubstr(res.result.substring(2), 64);
-    console.log("globalInfo:");
-    console.log(chunks);
+    console.log("=== globalInfo");
+    //console.log(chunks);
 
     var circulatingSupply = parseInt(chunks[11], 16).toString();
     circulatingSupply = circulatingSupply.substring(0, circulatingSupply.length - 8);
@@ -108,16 +111,15 @@ async function getGlobalInfo(){
     var percentStaked = ((lockedHEX / circulatingSupply) * 100);
     console.log("Percent Staked: " + percentStaked + "%");
 
-    var stakePenaltyPool = parseInt(chunks[3], 16).toString();
-    console.log(stakePenaltyPool);
-    stakePenaltyPool = stakePenaltyPool.substring(0, stakePenaltyPool.length - 8);
-    console.log("Stake Penalty:  " + stakePenaltyPool);
+    //var stakePenaltyPool = parseInt(chunks[3], 16).toString();
+    //console.log(stakePenaltyPool);
+    //stakePenaltyPool = stakePenaltyPool.substring(0, stakePenaltyPool.length - 8);
+    //console.log("Stake Penalty:  " + stakePenaltyPool);
   });
 }
 
-
-function get_shareRateChange(){
-  fetch('https://api.thegraph.com/subgraphs/name/codeakk/hex', {
+async function get_shareRateChange(){
+  return await fetch('https://api.thegraph.com/subgraphs/name/codeakk/hex', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ query: `
@@ -135,12 +137,15 @@ function get_shareRateChange(){
     }),
   })
   .then(res => res.json())
-  .then(res => console.log(res.data));
+  .then(res => {
+    console.log("=== shareRateChange");
+    console.log("Tshare Rate (HEX): " + res.data.shareRateChanges[0].tShareRateHex);
+  });
 }
 // tShareRateHEX === Tshare Rate (HEX)
 
-function get_dailyDataUpdate(){
-  fetch('https://api.thegraph.com/subgraphs/name/codeakk/hex', {
+async function get_dailyDataUpdate(){
+  return await fetch('https://api.thegraph.com/subgraphs/name/codeakk/hex', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ query: `
@@ -160,7 +165,17 @@ function get_dailyDataUpdate(){
     }),
   })
   .then(res => res.json())
-  .then(res => console.log(res.data));
+  .then(res => {
+    console.log("=== dailyDataUpdate");
+
+    var payout = res.data.dailyDataUpdates[0].payout;
+    payout = payout.substring(0, payout.length - 8);
+    console.log("Daily Payout: " + payout);
+
+    var totalTshares = res.data.dailyDataUpdates[0].shares;
+    totalTshares = totalTshares.substring(0, totalTshares.length - 12);
+    console.log("Total Tshares: " + totalTshares);
+  });
 }
 // payout === Daily Payout
 // shares === Total Tshares
@@ -181,17 +196,19 @@ async function get_averageStakeLength(){
     stakedDaysSum += data.stakedDaysSum;
     $lastStakeId = data.lastStakeId;
 
-    console.log(count);
+    //console.log(count);
     count += 1;
-    await sleep(500);
+    await sleep(100);
   }
 
   var averageStakeLength = stakedDaysSum/stakedCount;
+  var averageStakeLengthYears = averageStakeLength / 365.0;
 
-  console.log("=== SUMMARY")
+  console.log("=== stakeStarts")
   console.log("Stake Count -------- " + stakedCount);
   console.log("Avg Stake (Days) --- " + averageStakeLength);
-  console.log("Last Stake ID ------ " + $lastStakeId);
+  console.log("Avg Stake (Years) -- " + averageStakeLengthYears);
+  //console.log("Last Stake ID ------ " + $lastStakeId);
 }
 
 async function get_stakeStarts($lastStakeId){
@@ -242,7 +259,7 @@ async function get_stakeStarts($lastStakeId){
 }
 
 
-async function get_dailyPenalties(){
+async function get_dailyPenalties(yesterday = true){
 
   var $lastStakeId = 0;
   var penaltiesSum = 0;
@@ -251,15 +268,15 @@ async function get_dailyPenalties(){
 
   var start = new Date();
   start.setUTCHours(0, 0, 0, 0);
-  start.setDate(start.getDate()-1);
+  if (yesterday) { start.setDate(start.getDate()-1); }
   var unixTimestamp = (start.valueOf() / 1000);
-  console.log(start);
+  //console.log(start);
 
   var end = new Date();
   end.setUTCHours(23, 59, 59, 999);
-  end.setDate(end.getDate()-1);
+  if (yesterday) { end.setDate(end.getDate()-1); }
   var unixTimestampEnd = (end.valueOf() / 1000);
-  console.log(end);
+  //console.log(end);
 
   while (true) {
     var data = await get_stakeEnds($lastStakeId, unixTimestamp, unixTimestampEnd);
@@ -268,9 +285,9 @@ async function get_dailyPenalties(){
     penaltiesSum += data.penalty;
     $lastStakeId = data.lastStakeId;
 
-    console.log(count);
+    //console.log(count);
     count += 1;
-    await sleep(500);
+    await sleep(100);
   }
 
   var $lastStakeId = 0;
@@ -282,18 +299,18 @@ async function get_dailyPenalties(){
     penaltiesSum += data.penalty;
     $lastStakeId = data.lastStakeId;
 
-    console.log(count + " get_stakeGoodAccountings");
+    //console.log(count + " get_stakeGoodAccountings");
     count += 1;
-    await sleep(500);
+    await sleep(100);
   }
 
   var penaltyString = parseInt(penaltiesSum, 10).toString();
   penaltiesSum = penaltyString.substring(0, penaltyString.length - 8);
 
-  console.log("=== SUMMARY")
+  console.log("=== stakeEnds stakeGoodAccountings")
   console.log("Stake Count -------- " + stakeCount);
   console.log("Sum Penalties ------ " + penaltiesSum);
-  console.log("Last Stake ID ------ " + $lastStakeId);
+  //console.log("Last Stake ID ------ " + $lastStakeId);
 }
 
 async function get_stakeEnds($lastStakeId, unixTimestamp, unixTimestampEnd){
@@ -396,8 +413,8 @@ async function get_stakeGoodAccountings($lastStakeId, unixTimestamp, unixTimesta
 /////////////////////////////////////////////
 //// UNISWAP
 
-function getUniswapV2() {
-  fetch('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2', {
+async function getUniswapV2() {
+  return await fetch('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ query: `
@@ -423,8 +440,8 @@ function getUniswapV2() {
   .then(res => console.log(res.data));
 }
 
-function getUniswapV2HEXETH(){
-  fetch('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2', {
+async function getUniswapV2HEXETH(){
+  return await fetch('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ query: `
@@ -454,8 +471,8 @@ function getUniswapV2HEXETH(){
   });
 }
 
-function getUniswapV2HEXUSDC(){
-  fetch('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2', {
+async function getUniswapV2HEXUSDC(){
+  return await fetch('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ query: `
@@ -514,11 +531,11 @@ async function getUniswapV3Pools() {
 
 async function getUniswapV3() {
   var pools = await getUniswapV3Pools();
-  sleep(500);
+  sleep(200);
 
   if (pools == undefined) {return;}
 
-  await fetch('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3', {
+  return await fetch('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ query: `

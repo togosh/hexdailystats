@@ -33,11 +33,22 @@ How to Run:
 A. Install Node  
 https://nodejs.org/en/download/  
 
-B. Type Commands:  
+B. Request Etherscan API Key    
+https://etherscan.io/apis 
+
+C. Clone Code & Install Packages     
 ```
 git clone https://github.com/togoshige/hexdailystats.git
 cd hexdailystats
 npm install
+```
+
+D. Setup Config   
+- Rename "config-default.json" to "config.json"
+- Replace Etherescan API Key
+
+E. Start Server:  
+```
 node index.js
 ```
 

@@ -98,7 +98,6 @@ async function getGlobalInfo(){
   .then(res => {
     var chunks = chunkSubstr(res.result.substring(2), 64);
     console.log("=== globalInfo");
-    //console.log(chunks);
 
     var circulatingSupply = parseInt(chunks[11], 16).toString();
     circulatingSupply = circulatingSupply.substring(0, circulatingSupply.length - 8);
@@ -110,11 +109,6 @@ async function getGlobalInfo(){
 
     var percentStaked = ((lockedHEX / circulatingSupply) * 100);
     console.log("Percent Staked: " + percentStaked + "%");
-
-    //var stakePenaltyPool = parseInt(chunks[3], 16).toString();
-    //console.log(stakePenaltyPool);
-    //stakePenaltyPool = stakePenaltyPool.substring(0, stakePenaltyPool.length - 8);
-    //console.log("Stake Penalty:  " + stakePenaltyPool);
   });
 }
 
@@ -142,7 +136,6 @@ async function get_shareRateChange(){
     console.log("Tshare Rate (HEX): " + res.data.shareRateChanges[0].tShareRateHex);
   });
 }
-// tShareRateHEX === Tshare Rate (HEX)
 
 async function get_dailyDataUpdate(){
   return await fetch('https://api.thegraph.com/subgraphs/name/codeakk/hex', {
@@ -177,10 +170,7 @@ async function get_dailyDataUpdate(){
     console.log("Total Tshares: " + totalTshares);
   });
 }
-// payout === Daily Payout
-// shares === Total Tshares
 
-// === Average Stake Length
 async function get_averageStakeLength(){
 
   var $lastStakeId = 0;
@@ -196,7 +186,6 @@ async function get_averageStakeLength(){
     stakedDaysSum += data.stakedDaysSum;
     $lastStakeId = data.lastStakeId;
 
-    //console.log(count);
     count += 1;
     await sleep(100);
   }
@@ -258,7 +247,6 @@ async function get_stakeStarts($lastStakeId){
   }});
 }
 
-
 async function get_dailyPenalties(yesterday = true){
 
   var $lastStakeId = 0;
@@ -285,7 +273,6 @@ async function get_dailyPenalties(yesterday = true){
     penaltiesSum += data.penalty;
     $lastStakeId = data.lastStakeId;
 
-    //console.log(count);
     count += 1;
     await sleep(100);
   }
@@ -298,8 +285,7 @@ async function get_dailyPenalties(yesterday = true){
     stakeCount += data.count;
     penaltiesSum += data.penalty;
     $lastStakeId = data.lastStakeId;
-
-    //console.log(count + " get_stakeGoodAccountings");
+    
     count += 1;
     await sleep(100);
   }

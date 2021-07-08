@@ -6,8 +6,11 @@ const HEX_CONTRACT_ADDRESS = "0x2b591e99afe9f32eaa6214f7b7629768c40eeb39";
 const HEX_CONTRACT_CURRENTDAY = "0x5c9302c9";
 const HEX_CONTRACT_GLOBALINFO = "0xf04b5fa0";
 
-const UNISWAP_V2_HEXETH = "0x55d5c232d921b9eaa6b37b5845e439acd04b4dba";
 const UNISWAP_V2_HEXUSDC = "0xf6dcdce0ac3001b2f67f750bc64ea5beb37b5824";
+const UNISWAP_V2_HEXETH = "0x55d5c232d921b9eaa6b37b5845e439acd04b4dba";
+
+const UNISWAP_V3_HEXUSDC = "0x69d91b94f0aaf8e8a2586909fa77a5c2c89818d5";
+const UNISWAP_V3_HEXETH = "0x9e0905249ceefffb9605e034b534544684a58be6";
 
 const hostname = '127.0.0.1';
 const port = 3000;
@@ -34,11 +37,17 @@ async function getData() {
   await get_averageStakeLength();
   await get_dailyPenalties();
 
+  await getUniswapV2HEXDailyPrice();
+  await getUniswapV3HEXDailyPrice();
+
   ////await getUniswapV2();
   await getUniswapV2HEXUSDC();
   await getUniswapV2HEXETH();
+
   await getUniswapV3();
 }
+
+
 
 //////////////////////////////////////
 //// HELPER 
@@ -452,8 +461,8 @@ async function getUniswapV2HEXETH(){
   .then(res => {
     var pairDayData = res.data.pairDayDatas[0];
     console.log("=== V2");
-    console.log(pairDayData.token0.symbol + " - " + pairDayData.reserve0);
-    console.log(pairDayData.token1.symbol + " - " + pairDayData.reserve1);
+    console.log("Liquid " + pairDayData.token0.symbol + " - " + pairDayData.reserve0);
+    console.log("Liquid " + pairDayData.token1.symbol + " - " + pairDayData.reserve1);
   });
 }
 
@@ -483,8 +492,66 @@ async function getUniswapV2HEXUSDC(){
   .then(res => {
     var pairDayData = res.data.pairDayDatas[0];
     console.log("=== V2");
-    console.log(pairDayData.token0.symbol + " - " + pairDayData.reserve0);
-    console.log(pairDayData.token1.symbol + " - " + pairDayData.reserve1);
+    console.log("Liquid " + pairDayData.token0.symbol + " - " + pairDayData.reserve0);
+    console.log("Liquid " + pairDayData.token1.symbol + " - " + pairDayData.reserve1);
+  });
+}
+
+async function getUniswapV2HEXDailyPrice(){
+  return await fetch('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query: `
+      query {
+        tokenDayDatas (
+          first: 1, 
+          orderBy: date, 
+          orderDirection: desc, 
+          where: { 
+            token: "` + HEX_CONTRACT_ADDRESS + `"
+          }) 
+            { 
+              date
+              token { symbol }
+              priceUSD 
+            }
+      }` 
+    }),
+  })
+  .then(res => res.json())
+  .then(res => {
+    var tokenDayData = res.data.tokenDayDatas[0];
+    console.log("=== V2");
+    console.log("HEX Price (USD) - " + tokenDayData.priceUSD);
+  });
+}
+
+async function getUniswapV3HEXDailyPrice(){
+  return await fetch('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query: `
+      query {
+        tokenDayDatas (
+          first: 1, 
+          orderBy: date, 
+          orderDirection: desc, 
+          where: { 
+            token: "` + HEX_CONTRACT_ADDRESS + `"
+          }) 
+            { 
+              date
+              token { symbol }
+              priceUSD 
+            }
+      }` 
+    }),
+  })
+  .then(res => res.json())
+  .then(res => {
+    var tokenDayData = res.data.tokenDayDatas[0];
+    console.log("=== V3");
+    console.log("HEX Price (USD) - " + tokenDayData.priceUSD);
   });
 }
 
@@ -516,8 +583,12 @@ async function getUniswapV3Pools() {
 }
 
 async function getUniswapV3() {
-  var pools = await getUniswapV3Pools();
-  sleep(200);
+  //var pools = await getUniswapV3Pools();
+  //await sleep(200);
+  var pools = [ 
+    UNISWAP_V3_HEXUSDC,
+    UNISWAP_V3_HEXETH
+  ]
 
   if (pools == undefined) {return;}
 
@@ -550,15 +621,15 @@ async function getUniswapV3() {
       var token1TVL = res.data.pools[i].totalValueLockedToken1;
 
       if (token0Name == "HEX" && token1Name == "USD Coin") {
-        console.log("== V3");
-        console.log(token0Name + " - " + token0TVL);
-        console.log(token1Name + " - " + token1TVL);
+        console.log("=== V3");
+        console.log("Liquid " + token0Name + " - " + token0TVL);
+        console.log("Liquid " + token1Name + " - " + token1TVL);
       } 
       
       if (token0Name == "HEX" && token1Name == "Wrapped Ether") {
-        console.log("== V3");
-        console.log(token0Name + " - " + token0TVL);
-        console.log(token1Name + " - " + token1TVL);
+        console.log("=== V3");
+        console.log("Liquid " + token0Name + " - " + token0TVL);
+        console.log("Liquid " + token1Name + " - " + token1TVL);
       }
     }
   });

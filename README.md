@@ -57,6 +57,12 @@ node index.js
 HEXCryptoDev Chat  
 https://t.me/HEXcryptoDEV  
 
+HEX Dev   
+https://hex.com/dev/   
+
+HEX Community   
+https://github.com/HexCommunity   
+
 HEX REST APIs (Firebun)  
 https://github.com/HexCommunity/HEX-APIs  
 
@@ -103,6 +109,7 @@ https://api.nomics.com/v1/currencies/ticker?key=XXX&ids=HEX
 
 ===  
 
+https://staker.app/   
 https://hex.vision/  
 https://apphex.win/charts/  
 https://hexgraphs.com/  

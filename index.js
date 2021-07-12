@@ -1,3 +1,4 @@
+var DEBUG = false;
 var CONFIG = require('./config.json');
 const http = require('http');
 require('isomorphic-fetch');
@@ -21,7 +22,8 @@ const UNISWAP_V3_HEXETH = "0x9e0905249ceefffb9605e034b534544684a58be6";
 var rowData = undefined;
 
 const hostname = '127.0.0.1';
-const port = 3000;
+var httpPort = 80; 
+if (DEBUG){ httpPort = 3000; }
 
 const app = express();
 const httpServer = http.createServer(app);

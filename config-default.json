@@ -1,4 +1,6 @@
 {
+	"hostname": "AAA",
+
   "etherscan": {
 		"apiKey": "AAA"
 	}

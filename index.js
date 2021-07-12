@@ -21,7 +21,9 @@ const UNISWAP_V3_HEXETH = "0x9e0905249ceefffb9605e034b534544684a58be6";
 
 var rowData = undefined;
 
-const hostname = '127.0.0.1';
+var hostname = CONFIG.hostname;
+if (DEBUG){ hostname = '127.0.0.1' }
+
 var httpPort = 80; 
 if (DEBUG){ httpPort = 3000; }
 
@@ -32,8 +34,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.get("/", function(req, res){ res.sendFile('/index.html', {root: __dirname}); });
 
-httpServer.listen(port, hostname, () => {
-  console.log(`Server running at http://${hostname}:${port}/`);
+httpServer.listen(httpPort, hostname, () => {
+  console.log(`Server running at http://${hostname}:${httpPort}/`);
 
   if (!getDataRunning){getData();}
 });

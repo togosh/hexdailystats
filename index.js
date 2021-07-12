@@ -20,6 +20,7 @@ const UNISWAP_V3_HEXUSDC = "0x69d91b94f0aaf8e8a2586909fa77a5c2c89818d5";
 const UNISWAP_V3_HEXETH = "0x9e0905249ceefffb9605e034b534544684a58be6";
 
 var rowData = undefined;
+var getDataRunning = false;
 
 var hostname = CONFIG.hostname;
 if (DEBUG){ hostname = '127.0.0.1' }
@@ -47,8 +48,6 @@ io.on('connection', (socket) => {
 	if (rowData) {socket.emit("rowData", rowData)};
   if (!getDataRunning){getData();}
 });
-
-var getDataRunning = false;
 
 async function getData() {
   

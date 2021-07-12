@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>HEXDailyStats</title> 
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.25/b-1.7.1/b-html5-1.7.1/b-print-1.7.1/date-1.1.0/fh-3.1.9/kt-2.6.2/datatables.min.css"/>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/v/dt/dt-1.10.25/b-1.7.1/b-html5-1.7.1/b-print-1.7.1/date-1.1.0/fh-3.1.9/kt-2.6.2/datatables.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+
+    <script>
+        var socket = io.connect();
+
+        socket.on('rowData', function (data) {
+            $('#dataTable').DataTable({
+                data: data,
+                columns: [
+                    { title: "Current Day" },
+                    { title: "Total HEX" },
+                    { title: "Staked HEX" },
+                    { title: "Tshare Rate HEX" },
+                    { title: "Daily Payout" },
+                    { title: "Total Tshares" },
+                    { title: "Average Stake Length" },
+                    { title: "Total Penalties" },
+                    { title: "Price UniswapV2" },
+                    { title: "Price UniswapV2" },
+                    { title: "Liquidity UniswapV2 USDC" },
+                    { title: "Liquidity UniswapV2 ETH" },
+                    { title: "Liquidity UniswapV3 USDC" },
+                    { title: "Liquidity UniswapV3 ETH" }
+                ]
+            });
+        });
+    </script>
+</head>
+<body>
+<div>
+    <div id="mainSection">
+        <div class="section-title">HEXDailyStats</div>
+        <table id="dataTable" class="display" width="100%"></table>
+    </div>
+</div>

@@ -1,6 +1,12 @@
 var CONFIG = require('./config.json');
 const http = require('http');
 require('isomorphic-fetch');
+const express = require('express');
+const path = require('path');
+
+const { JSDOM } = require( "jsdom" );
+const { window } = new JSDOM( "" );
+const $ = require( "jquery" )( window );
 
 const HEX_CONTRACT_ADDRESS = "0x2b591e99afe9f32eaa6214f7b7629768c40eeb39";
 const HEX_CONTRACT_CURRENTDAY = "0x5c9302c9";
@@ -12,39 +18,102 @@ const UNISWAP_V2_HEXETH = "0x55d5c232d921b9eaa6b37b5845e439acd04b4dba";
 const UNISWAP_V3_HEXUSDC = "0x69d91b94f0aaf8e8a2586909fa77a5c2c89818d5";
 const UNISWAP_V3_HEXETH = "0x9e0905249ceefffb9605e034b534544684a58be6";
 
+var rowData = undefined;
+
 const hostname = '127.0.0.1';
 const port = 3000;
 
-const server = http.createServer((req, res) => {
-  res.statusCode = 200;
-  res.setHeader('Content-Type', 'text/plain');
-  res.end('Hello World');
-});
+const app = express();
+const httpServer = http.createServer(app);
 
-server.listen(port, hostname, () => {
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.get("/", function(req, res){ res.sendFile('/index.html', {root: __dirname}); });
+
+httpServer.listen(port, hostname, () => {
   console.log(`Server running at http://${hostname}:${port}/`);
 
-  getData();
+  if (!getDataRunning){getData();}
 });
 
+var io = require('socket.io')(httpServer);
+
+io.on('connection', (socket) => {
+	console.log('SOCKET -- ************* CONNECTED: ' + socket.id + ' *************');
+	if (rowData) {socket.emit("rowData", rowData)};
+});
+
+var getDataRunning = false;
+
 async function getData() {
-  await getCurrentDay();
-  await getGlobalInfo();
   
-  await get_shareRateChange();
-  await get_dailyDataUpdate();
+  getDataRunning = true;
+  console.log("getData()");
+  try {
+  var currentDay = await getCurrentDay();
+  var { totalHEX, stakedHEX } = await getGlobalInfo();
+  
+  var tshareRateHEX = await get_shareRateChange();
+  var { dailyPayoutHEX, totalTshares } = await get_dailyDataUpdate();
 
-  await get_averageStakeLength();
-  await get_dailyPenalties();
+  var averageStakeLength = await get_averageStakeLength();
+  var penaltiesHEX = await get_dailyPenalties();
 
-  await getUniswapV2HEXDailyPrice();
-  await getUniswapV3HEXDailyPrice();
+  var priceUV2 = await getUniswapV2HEXDailyPrice();
+  var priceUV3 = await getUniswapV3HEXDailyPrice();
 
-  ////await getUniswapV2();
-  await getUniswapV2HEXUSDC();
-  await getUniswapV2HEXETH();
+  var liquidityUV2_USDC = await getUniswapV2HEXUSDC();
+  var liquidityUV2_ETH = await getUniswapV2HEXETH();
 
-  await getUniswapV3();
+  var { liquidityUV3_USDC, liquidityUV3_ETH } = await getUniswapV3();
+
+  console.log("Current Day      " + currentDay);
+  console.log("Total HEX        " + totalHEX);
+  console.log("Staked HEX       " + stakedHEX);
+  console.log("Tshare Rate HEX  " + tshareRateHEX);
+  console.log("Daily Payout     " + dailyPayoutHEX);
+  console.log("Total Tshares    " + totalTshares);
+  console.log("Avg Stake (Days) " + averageStakeLength);
+  console.log("Total Penalties  " + penaltiesHEX);
+  console.log("HEX Price UV2    " + priceUV2);
+  console.log("HEX Price UV3    " + priceUV3);
+  console.log("Liquid USDC UV2  " + liquidityUV2_USDC);
+  console.log("Liquid ETH  UV2  " + liquidityUV2_ETH);
+  console.log("Liquid USDC UV3  " + liquidityUV3_USDC);
+  console.log("Liquid ETH  UV3  " + liquidityUV3_ETH);
+
+  var printData = "" +
+  "Current Day      " + currentDay + "\n" +
+  "Total HEX        " + totalHEX + "\n" +
+  "Staked HEX       " + stakedHEX + "\n" +
+  "Tshare Rate HEX  " + tshareRateHEX + "\n" +
+  "Daily Payout     " + dailyPayoutHEX + "\n" +
+  "Total Tshares    " + totalTshares + "\n" +
+  "Avg Stake Length " + averageStakeLength + "\n" +
+  "Total Penalties  " + penaltiesHEX + "\n" +
+  "HEX Price UV2    " + priceUV2 + "\n" +
+  "HEX Price UV3    " + priceUV3 + "\n" +
+  "Liquid USDC UV2  " + liquidityUV2_USDC + "\n" +
+  "Liquid ETH  UV2  " + liquidityUV2_ETH + "\n" +
+  "Liquid USDC UV3  " + liquidityUV3_USDC + "\n" +
+  "Liquid ETH  UV3  " + liquidityUV3_ETH;
+
+  var listData = [[currentDay, totalHEX, stakedHEX, tshareRateHEX, 
+    dailyPayoutHEX, totalTshares, averageStakeLength, penaltiesHEX, 
+    priceUV2, priceUV3, liquidityUV2_USDC, liquidityUV2_ETH,
+    liquidityUV3_USDC, liquidityUV3_ETH]];
+
+  if (rowData === undefined || rowData !== printData) {
+    rowData = listData;
+		console.log('SOCKET -- ****EMIT: rowData');
+		io.emit("rowData", rowData);
+	}
+
+  getDataRunning = false;
+  return printData;
+  }catch (e){
+    getDataRunning = false;
+  }
 }
 
 
@@ -87,7 +156,7 @@ async function getCurrentDay(){
   .then(res => res.json())
   .then(res => {
     var currentDay = parseInt(res.result, 16);
-    console.log("currentDay: " + currentDay);
+    return currentDay;
   });
 }
 
@@ -106,18 +175,19 @@ async function getGlobalInfo(){
   .then(res => res.json())
   .then(res => {
     var chunks = chunkSubstr(res.result.substring(2), 64);
-    console.log("=== globalInfo");
 
     var circulatingSupply = parseInt(chunks[11], 16).toString();
     circulatingSupply = circulatingSupply.substring(0, circulatingSupply.length - 8);
-    console.log("Total HEX:      " + circulatingSupply);
 
     var lockedHEX = parseInt(chunks[0], 16).toString();
     lockedHEX = lockedHEX.substring(0, lockedHEX.length - 8);
-    console.log("Staked HEX:     " + lockedHEX);
 
-    var percentStaked = ((lockedHEX / circulatingSupply) * 100);
-    console.log("Percent Staked: " + percentStaked + "%");
+    //var percentStaked = ((lockedHEX / circulatingSupply) * 100);
+
+    return {
+      totalHEX: circulatingSupply,
+      stakedHEX: lockedHEX
+    };
   });
 }
 
@@ -141,8 +211,10 @@ async function get_shareRateChange(){
   })
   .then(res => res.json())
   .then(res => {
-    console.log("=== shareRateChange");
-    console.log("Tshare Rate (HEX): " + res.data.shareRateChanges[0].tShareRateHex);
+
+    var tShareRateHEX = res.data.shareRateChanges[0].tShareRateHex;
+
+    return tShareRateHEX;
   });
 }
 
@@ -168,15 +240,17 @@ async function get_dailyDataUpdate(){
   })
   .then(res => res.json())
   .then(res => {
-    console.log("=== dailyDataUpdate");
 
     var payout = res.data.dailyDataUpdates[0].payout;
     payout = payout.substring(0, payout.length - 8);
-    console.log("Daily Payout: " + payout);
 
     var totalTshares = res.data.dailyDataUpdates[0].shares;
     totalTshares = totalTshares.substring(0, totalTshares.length - 12);
-    console.log("Total Tshares: " + totalTshares);
+
+    return {
+      dailyPayoutHEX: payout,
+      totalTshares: totalTshares
+    }
   });
 }
 
@@ -202,11 +276,7 @@ async function get_averageStakeLength(){
   var averageStakeLength = stakedDaysSum/stakedCount;
   var averageStakeLengthYears = averageStakeLength / 365.0;
 
-  console.log("=== stakeStarts")
-  console.log("Stake Count -------- " + stakedCount);
-  console.log("Avg Stake (Days) --- " + averageStakeLength);
-  console.log("Avg Stake (Years) -- " + averageStakeLengthYears);
-  //console.log("Last Stake ID ------ " + $lastStakeId);
+  return parseFloat(averageStakeLengthYears.toFixed(4));
 }
 
 async function get_stakeStarts($lastStakeId){
@@ -302,10 +372,7 @@ async function get_dailyPenalties(yesterday = true){
   var penaltyString = parseInt(penaltiesSum, 10).toString();
   penaltiesSum = penaltyString.substring(0, penaltyString.length - 8);
 
-  console.log("=== stakeEnds stakeGoodAccountings")
-  console.log("Stake Count -------- " + stakeCount);
-  console.log("Sum Penalties ------ " + penaltiesSum);
-  //console.log("Last Stake ID ------ " + $lastStakeId);
+  return penaltiesSum;
 }
 
 async function get_stakeEnds($lastStakeId, unixTimestamp, unixTimestampEnd){
@@ -460,9 +527,7 @@ async function getUniswapV2HEXETH(){
   .then(res => res.json())
   .then(res => {
     var pairDayData = res.data.pairDayDatas[0];
-    console.log("=== V2");
-    console.log("Liquid " + pairDayData.token0.symbol + " - " + pairDayData.reserve0);
-    console.log("Liquid " + pairDayData.token1.symbol + " - " + pairDayData.reserve1);
+    return parseFloat(pairDayData.reserve1).toFixed(4);
   });
 }
 
@@ -491,9 +556,7 @@ async function getUniswapV2HEXUSDC(){
   .then(res => res.json())
   .then(res => {
     var pairDayData = res.data.pairDayDatas[0];
-    console.log("=== V2");
-    console.log("Liquid " + pairDayData.token0.symbol + " - " + pairDayData.reserve0);
-    console.log("Liquid " + pairDayData.token1.symbol + " - " + pairDayData.reserve1);
+    return parseFloat(pairDayData.reserve1).toFixed(4);
   });
 }
 
@@ -521,8 +584,7 @@ async function getUniswapV2HEXDailyPrice(){
   .then(res => res.json())
   .then(res => {
     var tokenDayData = res.data.tokenDayDatas[0];
-    console.log("=== V2");
-    console.log("HEX Price (USD) - " + tokenDayData.priceUSD);
+    return parseFloat(tokenDayData.priceUSD).toFixed(8);
   });
 }
 
@@ -550,8 +612,7 @@ async function getUniswapV3HEXDailyPrice(){
   .then(res => res.json())
   .then(res => {
     var tokenDayData = res.data.tokenDayDatas[0];
-    console.log("=== V3");
-    console.log("HEX Price (USD) - " + tokenDayData.priceUSD);
+    return parseFloat(tokenDayData.priceUSD).toFixed(8);
   });
 }
 
@@ -614,6 +675,8 @@ async function getUniswapV3() {
   })
   .then(res => res.json())
   .then(res => {
+    var liquidityUV3_USDC = 0;
+    var liquidityUV3_ETH = 0;
     for(var i = 0; i < res.data.pools.length; i++) {
       var token0Name = res.data.pools[i].token0.name;
       var token1Name = res.data.pools[i].token1.name;
@@ -621,16 +684,17 @@ async function getUniswapV3() {
       var token1TVL = res.data.pools[i].totalValueLockedToken1;
 
       if (token0Name == "HEX" && token1Name == "USD Coin") {
-        console.log("=== V3");
-        console.log("Liquid " + token0Name + " - " + token0TVL);
-        console.log("Liquid " + token1Name + " - " + token1TVL);
+        liquidityUV3_USDC = token1TVL;
       } 
       
       if (token0Name == "HEX" && token1Name == "Wrapped Ether") {
-        console.log("=== V3");
-        console.log("Liquid " + token0Name + " - " + token0TVL);
-        console.log("Liquid " + token1Name + " - " + token1TVL);
+        liquidityUV3_ETH = token1TVL;
       }
+    }
+
+    return {
+      liquidityUV3_USDC: parseFloat(liquidityUV3_USDC).toFixed(4),
+      liquidityUV3_ETH: parseFloat(liquidityUV3_ETH).toFixed(4)
     }
   });
 }

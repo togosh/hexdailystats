@@ -45,6 +45,7 @@ var io = require('socket.io')(httpServer);
 io.on('connection', (socket) => {
 	console.log('SOCKET -- ************* CONNECTED: ' + socket.id + ' *************');
 	if (rowData) {socket.emit("rowData", rowData)};
+  if (!getDataRunning){getData();}
 });
 
 var getDataRunning = false;

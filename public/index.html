@@ -13,6 +13,7 @@
 
         socket.on('rowData', function (data) {
             $('#dataTable').DataTable({
+                destroy: true,
                 data: data,
                 columns: [
                     { title: "Current Day" },

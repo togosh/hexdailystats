@@ -4,6 +4,7 @@ const http = require('http');
 require('isomorphic-fetch');
 const express = require('express');
 const path = require('path');
+const fs = require('fs');
 
 const { JSDOM } = require( "jsdom" );
 const { window } = new JSDOM( "" );

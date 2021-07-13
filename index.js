@@ -5,6 +5,7 @@ require('isomorphic-fetch');
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
+const https = require('https');
 
 const { JSDOM } = require( "jsdom" );
 const { window } = new JSDOM( "" );

@@ -11,6 +11,9 @@ const { JSDOM } = require( "jsdom" );
 const { window } = new JSDOM( "" );
 const $ = require( "jquery" )( window );
 
+var mongoose = require('mongoose');
+var Schema = mongoose.Schema;
+
 const HEX_CONTRACT_ADDRESS = "0x2b591e99afe9f32eaa6214f7b7629768c40eeb39";
 const HEX_CONTRACT_CURRENTDAY = "0x5c9302c9";
 const HEX_CONTRACT_GLOBALINFO = "0xf04b5fa0";
@@ -23,6 +26,7 @@ const UNISWAP_V3_HEXETH = "0x9e0905249ceefffb9605e034b534544684a58be6";
 
 var rowData = undefined;
 var getDataRunning = false;
+var connections = {};
 
 var hostname = CONFIG.hostname;
 if (DEBUG){ hostname = '127.0.0.1'; }
@@ -38,36 +42,82 @@ if(!DEBUG){ httpsOptions = {
 	key: fs.readFileSync(CONFIG.https.key)
 };}
 
+var ConnectionSchema = new Schema({
+	created: {
+    type: Date, 
+    required: true
+  },
+	ipaddress: {
+    type: String, 
+    required: true
+  }
+});
+
+const Connection = mongoose.model('Connection', ConnectionSchema);
+
 const app = express();
+
+app.use(function(req, res, next) {
+	try {
+	if (req.path === "/" && req.ip){
+		connections[req.ip] = Date.now();
+
+		const connection = new Connection({ 
+			created: Date.now(),
+			ipaddress: req.ip
+		});
+
+		connection.save(function (err) {
+			if (err) return log(err);
+		});
+	}
+	} catch (error) {
+		log('APP ----- Connection ' + error);
+	}
+
+	next();
+});
+
 const httpServer = http.createServer(app);
 var httpsServer = undefined;
 if(!DEBUG){ httpsServer = https.createServer(httpsOptions, app);}
 
-// Redirect http to https
-//if(!DEBUG){ app.use((req, res, next) => 
-//{
-//  if(req.protocol === 'http') { 
-//    res.redirect(301, 'https://' + hostname); 
-//  }
-//  next(); 
-//}); }
+if(!DEBUG){ app.use((req, res, next) => 
+{
+  if(req.protocol === 'http') { 
+    res.redirect(301, 'https://' + hostname); 
+  }
+  next(); 
+}); }
 
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get("/", function(req, res){ res.sendFile('/index.html', {root: __dirname}); });
 
-httpServer.listen(httpPort, hostname, () => { console.log(`Server running at http://${hostname}:${httpPort}/`);});
-if(!DEBUG){ httpsServer.listen(httpsPort, hostname, () => { console.log('listening on *:' + httpsPort); }); }
+httpServer.listen(httpPort, hostname, () => { log(`Server running at http://${hostname}:${httpPort}/`);});
+if(!DEBUG){ httpsServer.listen(httpsPort, hostname, () => { log('listening on *:' + httpsPort); }); }
 
 var io = undefined;
 if(DEBUG){ io = require('socket.io')(httpServer);
 } else { io = require('socket.io')(httpsServer, {secure: true}); }
 
 io.on('connection', (socket) => {
-	console.log('SOCKET -- ************* CONNECTED: ' + socket.id + ' *************');
+	log('SOCKET -- ************* CONNECTED: ' + socket.id + ' *************');
 	if (rowData) {socket.emit("rowData", rowData)};
   if (!getDataRunning){getData();}
 });
+
+
+//////////////////////
+// DATABASE & STREAM MODEL
+
+var mongoDB = CONFIG.mongodb.connectionString;
+mongoose.connect(mongoDB, {useNewUrlParser: true, useUnifiedTopology: true}).then(() => {
+		log("Mongo Connected!");
+});
+
+var db = mongoose.connection;
+db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
 async function getData() {
   
@@ -129,7 +179,7 @@ async function getData() {
 
   if (rowData === undefined || rowData !== printData) {
     rowData = listData;
-		console.log('SOCKET -- ****EMIT: rowData');
+		log('SOCKET -- ****EMIT: rowData');
 		io.emit("rowData", rowData);
 	}
 
@@ -160,6 +210,9 @@ function chunkSubstr(str, size) {
   return chunks;
 }
 
+function log(message){
+	console.log(new Date().toISOString() + ", " + message);
+}
 
 
 //////////////////////////////////////

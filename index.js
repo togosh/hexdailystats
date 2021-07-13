@@ -23,25 +23,43 @@ var rowData = undefined;
 var getDataRunning = false;
 
 var hostname = CONFIG.hostname;
-if (DEBUG){ hostname = '127.0.0.1' }
+if (DEBUG){ hostname = '127.0.0.1'; }
 
 var httpPort = 80; 
 if (DEBUG){ httpPort = 3000; }
+const httpsPort = 443;
+
+var httpsOptions = undefined;
+if(!DEBUG){ httpsOptions = {
+	cert: fs.readFileSync(CONFIG.https.cert),
+	ca: fs.readFileSync(CONFIG.https.ca),
+	key: fs.readFileSync(CONFIG.https.key)
+};}
 
 const app = express();
 const httpServer = http.createServer(app);
+var httpsServer = undefined;
+if(!DEBUG){ httpsServer = https.createServer(httpsOptions, app);}
+
+// Redirect http to https
+//if(!DEBUG){ app.use((req, res, next) => 
+//{
+//  if(req.protocol === 'http') { 
+//    res.redirect(301, 'https://' + hostname); 
+//  }
+//  next(); 
+//}); }
 
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get("/", function(req, res){ res.sendFile('/index.html', {root: __dirname}); });
 
-httpServer.listen(httpPort, hostname, () => {
-  console.log(`Server running at http://${hostname}:${httpPort}/`);
+httpServer.listen(httpPort, hostname, () => { console.log(`Server running at http://${hostname}:${httpPort}/`);});
+if(!DEBUG){ httpsServer.listen(httpsPort, hostname, () => { console.log('listening on *:' + httpsPort); }); }
 
-  if (!getDataRunning){getData();}
-});
-
-var io = require('socket.io')(httpServer);
+var io = undefined;
+if(DEBUG){ io = require('socket.io')(httpServer);
+} else { io = require('socket.io')(httpsServer, {secure: true}); }
 
 io.on('connection', (socket) => {
 	console.log('SOCKET -- ************* CONNECTED: ' + socket.id + ' *************');

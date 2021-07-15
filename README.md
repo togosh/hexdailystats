@@ -107,6 +107,9 @@ https://gist.github.com/kbahr/f0eb6724e518c5616e8aff4b110cb8bc#file-basicutiliti
 Nomics Price API  
 https://api.nomics.com/v1/currencies/ticker?key=XXX&ids=HEX  
 
+Infura API   
+https://infura.io/   
+
 ===  
 
 https://staker.app/   

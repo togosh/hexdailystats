@@ -15,24 +15,43 @@
             $('#dataTable').DataTable({
                 destroy: true,
                 data: data,
+                scrollX: true,
                 columns: [
+                    { title: "Date" },
                     { title: "Current Day" },
-                    { title: "Total HEX" },
-                    { title: "Staked HEX" },
-                    { title: "Tshare Rate HEX" },
-                    { title: "Daily Payout" },
-                    { title: "Total Tshares" },
-                    { title: "Average Stake Length" },
-                    { title: "Total Penalties" },
-                    { title: "Price UniswapV2" },
-                    { title: "Price UniswapV3" },
-                    { title: "Liquidity UniswapV2 USDC" },
-                    { title: "Liquidity UniswapV2 ETH" },
-                    { title: "Liquidity UniswapV3 USDC" },
-                    { title: "Liquidity UniswapV3 ETH" }
+
+                    { title: "T-Share Rate (HEX)" },
+                    { title: "Increase in  T-Share Rate (HEX)" },
+                    { title: "T-Share Rate (USD)" },
+
+                    { title: "Total T-Shares" },
+                    { title: "Daily Change in Total T-Shares" },
+
+                    { title: "Payout Per T-Share (HEX)" },
+                    { title: "Actual APY Rate (Interest + EES Penalties)" },
+
+                    { title: "Staked % of Coins" },
+                    { title: "Daily Change in % of Staked Coins" },
+                    { title: "Avg Stake Length (Years)" },
+
+                    { title: "Daily HEX Penalties (HEX)" },
+                    { title: "Daily Price (USD)" },
+                    { title: "Daily % Change (USD)" },
+
+                    { title: "Total HEX Liquidity Pool (V2 + V3)" },
+                    { title: "Total USDC Liquidity Pool (V2 + V3)" },
+                    { title: "Total ETH Liquidity Pool (V2 + V3)" },
+
+                    { title: "Circulating Supply" },
+                    { title: "Daily Change in Circulating Supply" },
+                    { title: "Staked Supply" },
+                    { title: "Daily Change in Staked Supply" },
+
+                    { title: "Daily Payout" }
                 ]
             });
         });
+
     </script>
 </head>
 <body>

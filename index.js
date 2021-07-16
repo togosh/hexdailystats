@@ -295,7 +295,7 @@ async function getDailyData() {
     tshareRateHEX, tshareRateIncrease, tshareRateUSD,
     totalTshares, totalTsharesChange,
     payoutPerTshareHEX, actualAPYRate,
-    stakedHEX, stakedSupplyChange, averageStakeLength,
+    stakedHEXPercent, stakedHEXPercentChange, averageStakeLength,
     penaltiesHEX, priceUV2UV3, priceChangeUV2UV3,
     liquidityUV2UV3_HEX, liquidityUV2UV3_USDC, liquidityUV2UV3_ETH,
     totalHEX, circulatingSupplyChange,

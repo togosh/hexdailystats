@@ -218,6 +218,7 @@ async function getDailyData() {
   var currentDailyStat = await DailyStat.find({currentDay: { $eq: currentDay }});
   if (!isEmpty(currentDailyStat)) {
     log('WARNING - Current Daily Stat already set - Day#: ' + currentDay);
+    getDataRunning = false;
     return;
   }
 

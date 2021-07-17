@@ -6,6 +6,7 @@ const express = require('express');
 const path = require('path');
 const fs = require('fs');
 const https = require('https');
+const schedule = require('node-schedule');
 
 const { JSDOM } = require( "jsdom" );
 const { window } = new JSDOM( "" );
@@ -109,6 +110,15 @@ io.on('connection', (socket) => {
   if (!getRowDataRunning){ getRowData(); }
 });
 
+const rule = new schedule.RecurrenceRule();
+rule.hour = 0;
+rule.minute = 2;
+rule.tz = 'Etc/UTC';
+
+const job = schedule.scheduleJob(rule, function(){
+  log('**** DAILY DATA TIMER!');
+  if (!getDataRunning){ getDailyData(); }
+});
 
 //////////////////////
 // DATABASE

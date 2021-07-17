@@ -163,6 +163,8 @@ var DailyStatSchema = new Schema({
   liquidityUV2UV3_USDC: { type: Number, required: true },
   liquidityUV2UV3_ETH:  { type: Number, required: true },
   liquidityUV2UV3_HEX:  { type: Number, required: true },
+
+  numberOfHolders:      { type: Number, required: true },
 });
 
 const DailyStat = mongoose.model('DailyStat', DailyStatSchema);
@@ -186,7 +188,8 @@ async function getRowData() {
         ds.liquidityUV2UV3_HEX, ds.liquidityUV2UV3_USDC, ds.liquidityUV2UV3_ETH,
         ds.totalHEX, ds.circulatingSupplyChange,
         ds.stakedHEX, ds.stakedSupplyChange,
-        ds.dailyPayoutHEX
+        ds.dailyPayoutHEX,
+        ds.numberOfHolders
       ];
       rowDataNew.push(row);
     }
@@ -209,6 +212,8 @@ async function getDailyData() {
   getDataRunning = true;
   console.log("getDailyData()");
   try {
+
+  var numberOfHolders = await get_numberOfHolders();
 
   var currentDay = await getCurrentDay() - 1;
 
@@ -313,7 +318,8 @@ async function getDailyData() {
       liquidityUV2UV3_ETH:      liquidityUV2UV3_ETH,
       liquidityUV2UV3_HEX:      liquidityUV2UV3_HEX,
 
-      // TODO - number of holders
+      numberOfHolders:          numberOfHolders
+
       // TODO - daily minted inflation
     });
 
@@ -413,6 +419,31 @@ async function getGlobalInfo(){
       totalHEX: parseInt(circulatingSupply),
       stakedHEX: parseInt(lockedHEX)
     };
+  });
+}
+
+async function get_numberOfHolders(){
+  return await fetch('https://api.thegraph.com/subgraphs/name/codeakk/hex', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query: `
+      query {
+        tokenHolders(
+          first: 1, 
+          orderDirection: desc, 
+          orderBy: numeralIndex
+        ) {
+          numeralIndex
+        }
+      }` 
+    }),
+  })
+  .then(res => res.json())
+  .then(res => {
+
+    var numberOfHolders = parseInt(res.data.tokenHolders[0].numeralIndex);
+
+    return numberOfHolders;
   });
 }
 

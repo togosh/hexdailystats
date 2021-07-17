@@ -164,7 +164,8 @@ var DailyStatSchema = new Schema({
   liquidityUV2UV3_ETH:  { type: Number, required: true },
   liquidityUV2UV3_HEX:  { type: Number, required: true },
 
-  numberOfHolders:      { type: Number, required: true },
+  numberOfHolders:        { type: Number, required: true },
+  numberOfHoldersChange:  { type: Number, required: true },
 });
 
 const DailyStat = mongoose.model('DailyStat', DailyStatSchema);
@@ -189,7 +190,7 @@ async function getRowData() {
         ds.totalHEX, ds.circulatingSupplyChange,
         ds.stakedHEX, ds.stakedSupplyChange,
         ds.dailyPayoutHEX,
-        ds.numberOfHolders
+        ds.numberOfHolders, ds.numberOfHoldersChange
       ];
       rowDataNew.push(row);
     }
@@ -229,6 +230,9 @@ async function getDailyData() {
   var previousDailyStat = await DailyStat.findOne({currentDay: { $eq: previousDay }});
 
   // Get Core Data
+  var numberOfHolders = await get_numberOfHolders();
+  var numberOfHoldersChange = (numberOfHolders - previousDailyStat.numberOfHolders);
+
   var { totalHEX, stakedHEX } = await getGlobalInfo();
   
   var tshareRateHEX = await get_shareRateChange();
@@ -318,7 +322,8 @@ async function getDailyData() {
       liquidityUV2UV3_ETH:      liquidityUV2UV3_ETH,
       liquidityUV2UV3_HEX:      liquidityUV2UV3_HEX,
 
-      numberOfHolders:          numberOfHolders
+      numberOfHolders:          numberOfHolders,
+      numberOfHoldersChange:    numberOfHoldersChange
 
       // TODO - daily minted inflation
     });

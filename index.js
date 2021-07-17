@@ -124,7 +124,7 @@ db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 var DailyStatSchema = new Schema({
   date:               { type: Date,   required: true },
   currentDay:         { type: Number, required: true },
-  totalHEX:           { type: Number, required: true },
+  circulatingHEX:     { type: Number, required: true },
   stakedHEX:          { type: Number, required: true },
 
   tshareRateHEX:      { type: Number, required: true },
@@ -166,6 +166,10 @@ var DailyStatSchema = new Schema({
 
   numberOfHolders:        { type: Number, required: true },
   numberOfHoldersChange:  { type: Number, required: true },
+
+  dailyMintedInflationTotal:  { type: Number, required: true },
+
+  totalHEX: { type: Number, required: true },
 });
 
 const DailyStat = mongoose.model('DailyStat', DailyStatSchema);
@@ -187,7 +191,8 @@ async function getRowData() {
         ds.stakedHEXPercent, ds.stakedHEXPercentChange, ds.averageStakeLength,
         ds.penaltiesHEX, ds.priceUV2UV3, ds.priceChangeUV2UV3,
         ds.liquidityUV2UV3_HEX, ds.liquidityUV2UV3_USDC, ds.liquidityUV2UV3_ETH,
-        ds.totalHEX, ds.circulatingSupplyChange,
+        ds.totalHEX, ds.dailyMintedInflationTotal,
+        ds.circulatingHEX, ds.circulatingSupplyChange,
         ds.stakedHEX, ds.stakedSupplyChange,
         ds.dailyPayoutHEX,
         ds.numberOfHolders, ds.numberOfHoldersChange
@@ -233,7 +238,7 @@ async function getDailyData() {
   var numberOfHolders = await get_numberOfHolders();
   var numberOfHoldersChange = (numberOfHolders - previousDailyStat.numberOfHolders);
 
-  var { totalHEX, stakedHEX } = await getGlobalInfo();
+  var { circulatingHEX, stakedHEX } = await getGlobalInfo();
   
   var tshareRateHEX = await get_shareRateChange();
   var { dailyPayoutHEX, totalTshares } = await get_dailyDataUpdate();
@@ -255,9 +260,9 @@ async function getDailyData() {
   var actualAPYRate           = parseFloat(((dailyPayoutHEX / stakedHEX) * 365.25 * 100).toFixed(4));
 
   var stakedSupplyChange      = (stakedHEX - previousDailyStat.stakedHEX);
-  var circulatingSupplyChange = (totalHEX - previousDailyStat.totalHEX);
+  var circulatingSupplyChange = (circulatingHEX - previousDailyStat.circulatingHEX);
 
-  var stakedHEXPercent        = parseFloat(((stakedHEX / (stakedHEX + totalHEX)) * 100).toFixed(4));
+  var stakedHEXPercent        = parseFloat(((stakedHEX / (stakedHEX + circulatingHEX)) * 100).toFixed(4));
   var stakedHEXPercentChange  = parseFloat((stakedHEXPercent - previousDailyStat.stakedHEXPercent).toFixed(4));
 
   var liquidityUV2UV3_HEX     = parseFloat((liquidityUV2_HEXUSDC + liquidityUV2_HEXETH + liquidityUV3_HEX).toFixed(4));
@@ -275,6 +280,10 @@ async function getDailyData() {
 
   var date                    = new Date();
 
+  var dailyMintedInflationTotal = (circulatingHEX + stakedHEX) - (previousDailyStat.circulatingHEX + previousDailyStat.stakedHEX);
+
+  var totalHEX = (circulatingHEX + stakedHEX);
+
   // Create Full Object, Set Calculated Values
   try {
     const dailyStat = new DailyStat({ 
@@ -282,7 +291,7 @@ async function getDailyData() {
       // CORE DATA
       date:               date,
       currentDay:         currentDay,
-      totalHEX:           totalHEX,
+      circulatingHEX:     circulatingHEX,
       stakedHEX:          stakedHEX,
 
       tshareRateHEX:      tshareRateHEX,
@@ -323,9 +332,10 @@ async function getDailyData() {
       liquidityUV2UV3_HEX:      liquidityUV2UV3_HEX,
 
       numberOfHolders:          numberOfHolders,
-      numberOfHoldersChange:    numberOfHoldersChange
+      numberOfHoldersChange:    numberOfHoldersChange,
 
-      // TODO - daily minted inflation
+      dailyMintedInflationTotal: dailyMintedInflationTotal,
+      totalHEX: totalHEX
     });
 
     dailyStat.save(function (err) {
@@ -421,7 +431,7 @@ async function getGlobalInfo(){
     lockedHEX = lockedHEX.substring(0, lockedHEX.length - 8);
 
     return {
-      totalHEX: parseInt(circulatingSupply),
+      circulatingHEX: parseInt(circulatingSupply),
       stakedHEX: parseInt(lockedHEX)
     };
   });

@@ -23,7 +23,11 @@
                 dom: 'Bfrtip',
                 buttons: ['copy', 'csv', 'excel', 'print'],
                 columns: [
-                    { title: "Date" },
+                    { title: "Date", render: function (data) {
+                    var date = new Date(data);
+                    var month = date.getMonth() + 1;
+                    return date.getFullYear() + "/" + (month.toString().length > 1 ? month : "0" + month) + "/" + date.getDate();
+                }, },
                     { title: "Current Day" },
 
                     { title: "T-Share Rate (HEX)" },

@@ -26,15 +26,16 @@
                 dom: 'Bfrtip',
                 buttons: ['copy', 'csv', 'excel', 'print'],
                 fixedColumns: {
-                    leftColumns: 2
+                    leftColumns: 1
                 },
                 columns: [
+                    { title: "Day" },
                     { title: "Date", render: function (data) {
-                    var date = new Date(data);
-                    var month = date.getUTCMonth() + 1;
-                    return (month.toString().length > 1 ? month : "0" + month) + "/" + date.getUTCDate() + "/" + date.getUTCFullYear();
-                }, },
-                    { title: "Current Day" },
+                            var date = new Date(data);
+                            var month = date.getUTCMonth() + 1;
+                            return (month.toString().length > 1 ? month : "0" + month) + "/" + date.getUTCDate() + "/" + date.getUTCFullYear();
+                        },
+                    },
 
                     { title: "T-Share Rate (HEX)" },
                     { title: "Increase in  T-Share Rate (HEX)" },

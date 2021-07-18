@@ -194,7 +194,7 @@ async function getRowData() {
     var rowDataNew = [];
     for (var ds of dailyStats){
       var row = [
-        ds.date, ds.currentDay,
+        ds.currentDay, ds.date, 
         ds.tshareRateHEX, ds.tshareRateIncrease, ds.tshareRateUSD,
         ds.totalTshares, ds.totalTsharesChange,
         ds.payoutPerTshareHEX, ds.actualAPYRate,

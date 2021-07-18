@@ -1,4 +1,4 @@
-var DEBUG = true;
+var DEBUG = false;
 var CONFIG = require('./config.json');
 const http = require('http');
 require('isomorphic-fetch');

@@ -26,7 +26,7 @@
                     { title: "Date", render: function (data) {
                     var date = new Date(data);
                     var month = date.getUTCMonth() + 1;
-                    return date.getUTCFullYear() + "/" + (month.toString().length > 1 ? month : "0" + month) + "/" + date.getUTCDate();
+                    return (month.toString().length > 1 ? month : "0" + month) + "/" + date.getUTCDate() + "/" + date.getUTCFullYear();
                 }, },
                     { title: "Current Day" },
 

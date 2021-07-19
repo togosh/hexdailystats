@@ -22,6 +22,8 @@
                 destroy: true,
                 data: data,
                 scrollX: true,
+                scrollY: "370px",
+                scrollCollapse: true,
                 order: [[ 1, "desc" ]],
                 dom: 'Bfrtip',
                 buttons: ['copy', 'csv', 'excel', 'print'],
@@ -49,7 +51,7 @@
                     { title: "Actual APY Rate (Interest + EES Penalties)" },
 
                     { title: "Staked % of Coins" },
-                    { title: "Daily Change in % of Staked Coins" },
+                    { title: "Daily Change in Staked % of Coins" },
                     { title: "Avg Stake Length (Years)" },
 
                     { title: "Daily HEX Penalties (HEX)" },
@@ -78,11 +80,7 @@
 
     </script>
     <style>
-        a { text-decoration: none; color:black; }
-        a:visited { text-decoration: none; }
-        a:hover { text-decoration: none; }
-        a:focus { text-decoration: none; }
-        a:hover, a:active { text-decoration: none; }
+        a { color:black; }
     </style>
 </head>
 <body style="background-color:lightgrey;">
@@ -95,6 +93,6 @@
         <a href="https://twitter.com/HEXDailyStats">Twitter</a> |
         <a href="https://t.me/HEXDailyStats">Telegram</a>
         </div></center>
-        <table id="dataTable" class="display" width="100%" data-page-length='10'></table>
+        <table id="dataTable" class="display" width="100%" data-page-length='30'></table>
     </div>
 </div>

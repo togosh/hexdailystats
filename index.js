@@ -266,18 +266,18 @@ async function getDailyData() {
 
   // Calculated Values
   var totalTsharesChange      = (totalTshares - previousDailyStat.totalTshares);
-  var payoutPerTshareHEX      = parseFloat((dailyPayoutHEX / totalTshares).toFixed(8));
-  var actualAPYRate           = parseFloat(((dailyPayoutHEX / stakedHEX) * 365.25 * 100).toFixed(4));
+  var payoutPerTshareHEX      = parseFloat((dailyPayoutHEX / totalTshares).toFixed(3));
+  var actualAPYRate           = parseFloat(((dailyPayoutHEX / stakedHEX) * 365.25 * 100).toFixed(2));
 
   var stakedSupplyChange      = (stakedHEX - previousDailyStat.stakedHEX);
   var circulatingSupplyChange = (circulatingHEX - previousDailyStat.circulatingHEX);
 
-  var stakedHEXPercent        = parseFloat(((stakedHEX / (stakedHEX + circulatingHEX)) * 100).toFixed(4));
-  var stakedHEXPercentChange  = parseFloat((stakedHEXPercent - previousDailyStat.stakedHEXPercent).toFixed(4));
+  var stakedHEXPercent        = parseFloat(((stakedHEX / (stakedHEX + circulatingHEX)) * 100).toFixed(2));
+  var stakedHEXPercentChange  = parseFloat((stakedHEXPercent - previousDailyStat.stakedHEXPercent).toFixed(2));
 
-  var liquidityUV2UV3_HEX     = parseFloat((liquidityUV2_HEXUSDC + liquidityUV2_HEXETH + liquidityUV3_HEX).toFixed(4));
-  var liquidityUV2UV3_USDC    = parseFloat((liquidityUV2_USDC + liquidityUV3_USDC).toFixed(4));
-  var liquidityUV2UV3_ETH     = parseFloat((liquidityUV2_ETH + liquidityUV3_ETH).toFixed(4));
+  var liquidityUV2UV3_HEX     = parseInt(liquidityUV2_HEXUSDC + liquidityUV2_HEXETH + liquidityUV3_HEX); //parseFloat((liquidityUV2_HEXUSDC + liquidityUV2_HEXETH + liquidityUV3_HEX).toFixed(4));
+  var liquidityUV2UV3_USDC    = parseInt(liquidityUV2_USDC + liquidityUV3_USDC); //parseFloat((liquidityUV2_USDC + liquidityUV3_USDC).toFixed(4));
+  var liquidityUV2UV3_ETH     = parseInt(liquidityUV2_ETH + liquidityUV3_ETH); //parseFloat((liquidityUV2_ETH + liquidityUV3_ETH).toFixed(4));
 
   var priceChangeUV2          = parseFloat((priceUV2 - previousDailyStat.priceUV2).toFixed(4));
   var priceChangeUV3          = parseFloat((priceUV3 - previousDailyStat.priceUV3).toFixed(4));
@@ -557,7 +557,7 @@ async function get_averageStakeLength(){
   var averageStakeLength = stakedDaysSum/stakedCount;
   var averageStakeLengthYears = averageStakeLength / 365.0;
 
-  return parseFloat(averageStakeLengthYears.toFixed(4));
+  return parseFloat(averageStakeLengthYears.toFixed(2));
 }
 
 async function get_stakeStarts($lastStakeId){
@@ -810,8 +810,8 @@ async function getUniswapV2HEXETH(){
     var pairDayData = res.data.pairDayDatas[0];
 
     return {
-      liquidityUV2_HEXETH: parseFloat(parseFloat(pairDayData.reserve0).toFixed(4)),
-      liquidityUV2_ETH: parseFloat(parseFloat(pairDayData.reserve1).toFixed(4))
+      liquidityUV2_HEXETH: parseInt(pairDayData.reserve0), //parseFloat(parseFloat(pairDayData.reserve0).toFixed(4)),
+      liquidityUV2_ETH: parseInt(pairDayData.reserve1), //parseFloat(parseFloat(pairDayData.reserve1).toFixed(4))
     }
   });
 }
@@ -843,8 +843,8 @@ async function getUniswapV2HEXUSDC(){
     var pairDayData = res.data.pairDayDatas[0];
 
     return {
-      liquidityUV2_HEXUSDC: parseFloat(parseFloat(pairDayData.reserve0).toFixed(4)),
-      liquidityUV2_USDC: parseFloat(parseFloat(pairDayData.reserve1).toFixed(4))
+      liquidityUV2_HEXUSDC: parseInt(pairDayData.reserve0), //parseFloat(parseFloat(pairDayData.reserve0).toFixed(4)),
+      liquidityUV2_USDC: parseInt(pairDayData.reserve1), //parseFloat(parseFloat(pairDayData.reserve1).toFixed(4))
     }
   });
 }
@@ -985,9 +985,9 @@ async function getUniswapV3() {
     }
 
     return {
-      liquidityUV3_HEX: parseFloat(parseFloat(liquidityUV3_HEX).toFixed(4)),
-      liquidityUV3_USDC: parseFloat(parseFloat(liquidityUV3_USDC).toFixed(4)),
-      liquidityUV3_ETH: parseFloat(parseFloat(liquidityUV3_ETH).toFixed(4))
+      liquidityUV3_HEX: parseInt(liquidityUV3_HEX), //parseFloat(parseFloat(liquidityUV3_HEX).toFixed(4)),
+      liquidityUV3_USDC: parseInt(liquidityUV3_USDC), //parseFloat(parseFloat(liquidityUV3_USDC).toFixed(4)),
+      liquidityUV3_ETH: parseInt(liquidityUV3_ETH), //parseFloat(parseFloat(liquidityUV3_ETH).toFixed(4))
     }
   });
 }

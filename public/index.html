@@ -52,44 +52,44 @@
                     leftColumns: 1
                 },
                 columns: [
-                    { title: "Day" },
-                    { title: "Date", render: function (data, type, row) {
+                    { title: "Day", className: "dt-body-center" },
+                    { title: "Date", className: "dt-body-center" , render: function (data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 var date = new Date(data);
                                 date.setDate(date.getDate() - 1);
                                 var month = date.getUTCMonth() + 1;
-                                return (month.toString().length > 1 ? month : "0" + month) + "/" + date.getUTCDate() + "/" + date.getUTCFullYear();
+                                return (month.toString().length > 1 ? month : "0" + month) + "/" + date.getUTCDate() + "/" + date.getUTCFullYear().toString().substr(-2);
                             }
                             return data;
                         }
                     },
 
-                    { title: "T-Share Rate (HEX)", render: function(data, type, row) {
+                    { title: "T-Share Rate (HEX)", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;
                         }
                     },
-                    { title: "Increase in  T-Share Rate (HEX)", render: function(data, type, row) {
+                    { title: "Increase in  T-Share Rate (HEX)", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;
                         }
                     },
-                    { title: "T-Share Rate (USD)", render: function(data, type, row) {
+                    { title: "T-Share Rate (USD)", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return currencyFormatter.format(data); }
                             return data;
                         }
                     },
 
-                    { title: "Total T-Shares (Shares)", render: function(data, type, row) {
+                    { title: "Total T-Shares", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;
                         }
                     },
-                    { title: "Daily Change in Total T-Shares (Shares)", render: function(data, type, row) {
+                    { title: "Daily Change in Total T-Shares", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") {
                                 if (data < 0) { 
                                     return "(" + Number(data).toLocaleString() + ")";
@@ -100,8 +100,8 @@
                         }
                     },
 
-                    { title: "Payout Per T-Share (HEX)" },
-                    { title: "Actual APY Rate (Interest + EES Penalties)", render: function(data, type, row) {
+                    { title: "Payout Per T-Share (HEX)", className: "dt-body-center" },
+                    { title: "Actual APY Rate (Interest + EES Penalties)", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data/100).toLocaleString(undefined,{style: 'percent', minimumFractionDigits:2}); } 
                             return data;
@@ -109,78 +109,78 @@
                     },
                     
 
-                    { title: "Staked % of Coins", render: function(data, type, row) {
+                    { title: "Staked % of Coins", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data/100).toLocaleString(undefined,{style: 'percent', minimumFractionDigits:2}); } 
                             return data;
                         }
                     },
-                    { title: "Daily Change in Staked % of Coins", render: function(data, type, row) {
+                    { title: "Daily Change in Staked % of Coins", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data/100).toLocaleString(undefined,{style: 'percent', minimumFractionDigits:2}); } 
                             return data;
                         }
                     },
-                    { title: "Avg Stake Length (Years)" },
+                    { title: "Avg Stake Length (Years)", className: "dt-body-center" },
 
-                    { title: "Daily HEX Penalties (HEX)", render: function(data, type, row) {
+                    { title: "Daily HEX Penalties (HEX)", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;
                         }
                     },
-                    { title: "Daily Price (USD)", render: function(data, type, row) {
+                    { title: "Daily Price (USD)", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return currencyFormatterPrice.format(data); }
                             return data;
                         }
                     },
-                    { title: "Daily % Price Change (USD)", render: function(data, type, row) {
+                    { title: "Daily % Price Change (USD)", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data/100).toLocaleString(undefined,{style: 'percent', minimumFractionDigits:2}); } 
                             return data;
                         }
                     },
 
-                    { title: "Total HEX Liquidity Pool (V2 + V3)", render: function(data, type, row) {
+                    { title: "Total HEX Liquidity Pool (V2 + V3)", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;
                         }
                     },
-                    { title: "Total USDC Liquidity Pool (V2 + V3)", render: function(data, type, row) {
+                    { title: "Total USDC Liquidity Pool (V2 + V3)", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;
                         }
                     },
-                    { title: "Total ETH Liquidity Pool (V2 + V3)", render: function(data, type, row) {
+                    { title: "Total ETH Liquidity Pool (V2 + V3)", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;
                         }
                     },
 
-                    { title: "Total Circulating + Staked", render: function(data, type, row) {
+                    { title: "Total Circulating + Staked", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;
                         }
                     },
-                    { title: "Daily Minted Inflation Total", render: function(data, type, row) {
+                    { title: "Daily Minted Inflation Total", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;
                         }
                     },
                     
-                    { title: "Circulating Supply", render: function(data, type, row) {
+                    { title: "Circulating Supply", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;
                         }
                     },
-                    { title: "Daily Change in Circulating Supply", render: function(data, type, row) {
+                    { title: "Daily Change in Circulating Supply", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") {
                                 if (data < 0) { 
                                     return "(" + Number(data).toLocaleString() + ")";
@@ -190,13 +190,13 @@
                             return data;
                         }
                     },
-                    { title: "Staked Supply", render: function(data, type, row) {
+                    { title: "Staked Supply", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;
                         }
                     },
-                    { title: "Daily Change in Staked Supply", render: function(data, type, row) {
+                    { title: "Daily Change in Staked Supply", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") {
                                 if (data < 0) { 
                                     return "(" + Number(data).toLocaleString() + ")";
@@ -207,19 +207,19 @@
                         }
                     },
 
-                    { title: "Daily Payout", render: function(data, type, row) {
+                    { title: "Daily Payout", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;
                         }
                     },
-                    { title: "Number of Holders", render: function(data, type, row) {
+                    { title: "Number of Holders", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;
                         }
                     },
-                    { title: "Daily Change in Number of Holders", render: function(data, type, row) {
+                    { title: "Daily Change in Number of Holders", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") {
                                 if (data < 0) { 
                                     return "(" + Number(data).toLocaleString() + ")";

@@ -32,6 +32,7 @@
                     { title: "Day" },
                     { title: "Date", render: function (data) {
                             var date = new Date(data);
+                            date.setDate(date.getDate() - 1);
                             var month = date.getUTCMonth() + 1;
                             return (month.toString().length > 1 ? month : "0" + month) + "/" + date.getUTCDate() + "/" + date.getUTCFullYear();
                         },

@@ -231,7 +231,7 @@ async function getDailyData() {
 
   var numberOfHolders = await get_numberOfHolders();
 
-  var currentDay = await getCurrentDay() - 1;
+  var currentDay = await getCurrentDay();
 
   // Check if Current Row of Data already exists
   var currentDailyStat = await DailyStat.findOne({currentDay: { $eq: currentDay }});
@@ -283,7 +283,7 @@ async function getDailyData() {
   var priceChangeUV3          = parseFloat((priceUV3 - previousDailyStat.priceUV3).toFixed(4));
 
   var priceUV2UV3             = parseFloat(((priceUV2 * (liquidityUV2_USDC / liquidityUV2UV3_USDC)) + (priceUV3 * (liquidityUV3_USDC / liquidityUV2UV3_USDC))).toFixed(8));
-  var priceChangeUV2UV3       = parseFloat((priceUV2UV3 / (previousDailyStat.priceUV2UV3 - 1)).toFixed(8));
+  var priceChangeUV2UV3       = parseFloat(((priceUV2UV3 / previousDailyStat.priceUV2UV3) - 1).toFixed(8));
 
   var tshareRateIncrease      = parseFloat((tshareRateHEX - previousDailyStat.tshareRateHEX).toFixed(4));
   var tshareRateUSD           = parseFloat((tshareRateHEX * priceUV2UV3).toFixed(4));

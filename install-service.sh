@@ -8,8 +8,8 @@ then
     exit 1
 fi
 
-if [ "$(id -u)" != "0" ]; then
-   echo "This script must be run as root (sudo ./install-service.sh)."
+if [ "$(id -u)" == "0" ]; then
+   echo "This script must not be run as root."
    exit 1
 fi
 
@@ -18,7 +18,7 @@ SCRIPT=`realpath $0`
 SCRIPTPATH=`dirname $SCRIPT`
 
 # Write service definition
-tee /etc/systemd/system/hexdailystats.service > /dev/null << FILE
+sudo tee /etc/systemd/system/hexdailystats.service > /dev/null << FILE
 [Unit]
 Description=HEXDailyStats
 After=network-online.target
@@ -37,10 +37,10 @@ WantedBy=multi-user.target
 FILE
 
 # Reload the changes
-systemctl daemon-reload
+sudo systemctl daemon-reload
 
 # Start automatically on boot
-systemctl enable hexdailystats
+sudo systemctl enable hexdailystats
 
 # Start now
-systemctl start hexdailystats
+sudo systemctl start hexdailystats

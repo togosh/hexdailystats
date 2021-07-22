@@ -481,7 +481,7 @@ async function get_shareRateChange(){
         shareRateChanges(
           first: 1, 
           orderDirection: desc, 
-          orderBy: stakeId
+          orderBy: timestamp
         ) {
           shareRate
           tShareRateHearts

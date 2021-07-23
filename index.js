@@ -630,7 +630,7 @@ async function get_dailyPenalties(yesterday = true){
     var data = await get_stakeEnds($lastStakeId, unixTimestamp, unixTimestampEnd);
     if (data.count <= 0) { break; }
     stakeCount += data.count;
-    penaltiesSum += data.penalty;
+    penaltiesSum += parseInt(data.penalty);
     $lastStakeId = data.lastStakeId;
 
     count += 1;
@@ -643,7 +643,7 @@ async function get_dailyPenalties(yesterday = true){
     var data = await get_stakeGoodAccountings($lastStakeId, unixTimestamp, unixTimestampEnd);
     if (data.count <= 0) { break; }
     stakeCount += data.count;
-    penaltiesSum += data.penalty;
+    penaltiesSum += parseInt(data.penalty);
     $lastStakeId = data.lastStakeId;
     
     count += 1;

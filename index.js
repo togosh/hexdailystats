@@ -112,7 +112,7 @@ io.on('connection', (socket) => {
 
 const rule = new schedule.RecurrenceRule();
 rule.hour = 0;
-rule.minute = 2;
+rule.minute = 5;
 rule.tz = 'Etc/UTC';
 
 const job = schedule.scheduleJob(rule, function(){

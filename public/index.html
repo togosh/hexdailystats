@@ -42,10 +42,6 @@
                     {
                         extend: "excelHtml5",
                         exportOptions: { orthogonal: "exportxls" }
-                    },
-                    {
-                        extend: "print",
-                        exportOptions: { orthogonal: "exportprint" }
                     }
                 ],
                 fixedColumns: {
@@ -92,7 +88,7 @@
                     { title: "Daily Change in Total T-Shares", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") {
                                 if (data < 0) { 
-                                    return "(" + Number(data).toLocaleString() + ")";
+                                    return "(" + Math.abs(Number(data)).toLocaleString() + ")";
                                 } 
                                 return Number(data).toLocaleString(); 
                             }
@@ -142,64 +138,64 @@
                         }
                     },
 
-                    { title: "Total HEX Liquidity Pool (V2 + V3)", className: "dt-body-center" , render: function(data, type, row) {
+                    { title: "Total Liquidity Pool V2 + V3 (HEX)", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;
                         }
                     },
-                    { title: "Total USDC Liquidity Pool (V2 + V3)", className: "dt-body-center" , render: function(data, type, row) {
+                    { title: "Total Liquidity Pool V2 + V3 (USDC)", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;
                         }
                     },
-                    { title: "Total ETH Liquidity Pool (V2 + V3)", className: "dt-body-center" , render: function(data, type, row) {
+                    { title: "Total Liquidity Pool V2 + V3 (ETH)", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;
                         }
                     },
 
-                    { title: "Total Circulating + Staked", className: "dt-body-center" , render: function(data, type, row) {
+                    { title: "Total Circulating + Staked (HEX)", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;
                         }
                     },
-                    { title: "Daily Minted Inflation Total", className: "dt-body-center" , render: function(data, type, row) {
+                    { title: "Daily Minted Inflation Total (HEX)", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;
                         }
                     },
                     
-                    { title: "Circulating Supply", className: "dt-body-center" , render: function(data, type, row) {
+                    { title: "Circulating Supply (HEX)", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;
                         }
                     },
-                    { title: "Daily Change in Circulating Supply", className: "dt-body-center" , render: function(data, type, row) {
+                    { title: "Daily Change in Circulating Supply (HEX)", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") {
                                 if (data < 0) { 
-                                    return "(" + Number(data).toLocaleString() + ")";
+                                    return "(" + Math.abs(Number(data)).toLocaleString() + ")";
                                 } 
                                 return Number(data).toLocaleString(); 
                             }
                             return data;
                         }
                     },
-                    { title: "Staked Supply", className: "dt-body-center" , render: function(data, type, row) {
+                    { title: "Staked Supply (HEX)", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;
                         }
                     },
-                    { title: "Daily Change in Staked Supply", className: "dt-body-center" , render: function(data, type, row) {
+                    { title: "Daily Change in Staked Supply (HEX)", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") {
                                 if (data < 0) { 
-                                    return "(" + Number(data).toLocaleString() + ")";
+                                    return "(" + Math.abs(Number(data)).toLocaleString() + ")";
                                 } 
                                 return Number(data).toLocaleString(); 
                             }
@@ -207,7 +203,7 @@
                         }
                     },
 
-                    { title: "Daily Payout", className: "dt-body-center" , render: function(data, type, row) {
+                    { title: "Daily Payout (HEX)", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;
@@ -222,7 +218,7 @@
                     { title: "Daily Change in Number of Holders", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") {
                                 if (data < 0) { 
-                                    return "(" + Number(data).toLocaleString() + ")";
+                                    return "(" + Math.abs(Number(data)).toLocaleString() + ")";
                                 } 
                                 return Number(data).toLocaleString(); 
                             }

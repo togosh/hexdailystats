@@ -285,7 +285,7 @@ async function getDailyData() {
   var priceUV2UV3             = parseFloat(((priceUV2 * (liquidityUV2_USDC / liquidityUV2UV3_USDC)) + (priceUV3 * (liquidityUV3_USDC / liquidityUV2UV3_USDC))).toFixed(8));
   var priceChangeUV2UV3       = parseFloat((((priceUV2UV3 / previousDailyStat.priceUV2UV3) - 1) * 100).toFixed(8));
 
-  var tshareRateIncrease      = parseFloat((tshareRateHEX - previousDailyStat.tshareRateHEX).toFixed(4));
+  var tshareRateIncrease      = parseInt(tshareRateHEX - previousDailyStat.tshareRateHEX);
   var tshareRateUSD           = parseFloat((tshareRateHEX * priceUV2UV3).toFixed(4));
 
   var date                    = new Date();
@@ -495,7 +495,7 @@ async function get_shareRateChange(){
 
     var tShareRateHEX = res.data.shareRateChanges[0].tShareRateHex;
 
-    return parseFloat(parseFloat(tShareRateHEX).toFixed(4));
+    return parseInt(tShareRateHEX);
   });
 }
 

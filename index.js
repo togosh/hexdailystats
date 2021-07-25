@@ -106,7 +106,7 @@ if(DEBUG){ io = require('socket.io')(httpServer);
 io.on('connection', (socket) => {
 	log('SOCKET -- ************* CONNECTED: ' + socket.id + ' *************');
 	if (rowData){ socket.emit("rowData", rowData); };
-  if (!getDataRunning){ getDailyData(); }
+  //if (!getDataRunning){ getDailyData(); }
   if (!getRowDataRunning){ getRowData(); }
 });
 

@@ -12,7 +12,7 @@ Data Sources:
 https://api.thegraph.com/subgraphs/name/codeakk/hex  
 https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2  
 https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3  
-https://etherscan.io/apis  
+https://etherscan.io/token/0x2b591e99afe9f32eaa6214f7b7629768c40eeb39#readContract    
 
 =
 
@@ -38,7 +38,7 @@ https://etherscan.io/apis
 
 C. Clone Code & Install Packages     
 ```
-git clone https://github.com/togoshige/hexdailystats.git
+git clone https://github.com/togosh/hexdailystats.git
 cd hexdailystats
 npm install
 ```
@@ -112,6 +112,7 @@ https://infura.io/
 
 ===  
 
+https://go.hex.com/  
 https://staker.app/   
 https://hex.vision/  
 https://apphex.win/charts/  

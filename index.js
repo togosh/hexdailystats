@@ -251,7 +251,7 @@ async function getDailyData() {
   var { circulatingHEX, stakedHEX } = await getGlobalInfo();
   
   var tshareRateHEX = await get_shareRateChange();
-  var { dailyPayoutHEX, totalTshares } = await get_dailyDataUpdate();
+  var { dailyPayoutHEX, totalTshares } = await get_dailyDataUpdatePolling(currentDay);
 
   var averageStakeLength = await get_averageStakeLength();
   var penaltiesHEX = await get_dailyPenalties();
@@ -499,7 +499,31 @@ async function get_shareRateChange(){
   });
 }
 
-async function get_dailyDataUpdate(){
+async function get_dailyDataUpdatePolling(currentDay) {
+  log("get_dailyDataUpdatePolling");
+
+  var count = 0;
+  while (true) {
+    var { dailyPayoutHEX, totalTshares, success } = await get_dailyDataUpdate(currentDay);
+    if (success) { 
+      return {
+        dailyPayoutHEX,
+        totalTshares
+      }; 
+    }
+    await sleep(30000);
+    count += 1;
+    if (count > 50) {
+      return {
+        dailyPayoutHEX: -1,
+        totalTshares: -1
+      };
+    }
+  }
+}
+
+async function get_dailyDataUpdate(currentDay){
+  log("get_dailyDataUpdate");
   return await fetch('https://api.thegraph.com/subgraphs/name/codeakk/hex', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -508,7 +532,10 @@ async function get_dailyDataUpdate(){
         dailyDataUpdates(
           first: 1, 
           orderDirection: desc, 
-          orderBy: timestamp 
+          orderBy: timestamp,
+          where: { 
+            endDay: ` + currentDay + `,
+          } 
         ) {
           id
           payout
@@ -521,6 +548,13 @@ async function get_dailyDataUpdate(){
   })
   .then(res => res.json())
   .then(res => {
+    if (Object.keys(res.data.dailyDataUpdates).length <= 0){
+      log("get_dailyDataUpdate - Data Missing -  Day #: " + currentDay);
+
+      return {
+        success: false
+      };
+    }
 
     var payout = res.data.dailyDataUpdates[0].payout;
     payout = payout.substring(0, payout.length - 8);
@@ -530,7 +564,8 @@ async function get_dailyDataUpdate(){
 
     return {
       dailyPayoutHEX: parseInt(payout),
-      totalTshares: parseInt(totalTshares)
+      totalTshares: parseInt(totalTshares),
+      success: true
     }
   });
 }

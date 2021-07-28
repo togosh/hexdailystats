@@ -213,7 +213,7 @@ async function getRowData() {
         ds.stakedHEXPercent, ds.stakedHEXPercentChange,
         ds.totalHEX, ds.dailyMintedInflationTotal,
         ds.circulatingHEX, ds.circulatingSupplyChange,
-        ds.stakedHEX, ds.stakedSupplyChange,
+        ds.stakedHEX,
         ds.dailyPayoutHEX, ds.penaltiesHEX,
         ds.numberOfHolders, ds.numberOfHoldersChange
       ];

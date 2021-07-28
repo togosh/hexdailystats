@@ -19,6 +19,8 @@ const HEX_CONTRACT_ADDRESS = "0x2b591e99afe9f32eaa6214f7b7629768c40eeb39";
 const HEX_CONTRACT_CURRENTDAY = "0x5c9302c9";
 const HEX_CONTRACT_GLOBALINFO = "0xf04b5fa0";
 
+const HEX_PRICE_ALLTIMELOW = 0.00005645;
+
 const UNISWAP_V2_HEXUSDC = "0xf6dcdce0ac3001b2f67f750bc64ea5beb37b5824";
 const UNISWAP_V2_HEXETH = "0x55d5c232d921b9eaa6b37b5845e439acd04b4dba";
 
@@ -180,6 +182,12 @@ var DailyStatSchema = new Schema({
   dailyMintedInflationTotal:  { type: Number, required: true },
 
   totalHEX: { type: Number, required: true },
+
+  marketCap:                        { type: Number, required: true },
+  tshareMarketCap:                  { type: Number, required: true },
+  tshareMarketCapToMarketCapRatio:  { type: Number, required: true },
+
+  roiMultiplierFromATL:             { type: Number, required: true },
 });
 
 const DailyStat = mongoose.model('DailyStat', DailyStatSchema);
@@ -199,12 +207,13 @@ async function getRowData() {
         ds.totalTshares, ds.totalTsharesChange,
         ds.payoutPerTshareHEX, ds.actualAPYRate,
         ds.stakedHEXPercent, ds.stakedHEXPercentChange, ds.averageStakeLength,
-        ds.penaltiesHEX, ds.priceUV2UV3, ds.priceChangeUV2UV3,
+        ds.marketCap, ds.tshareMarketCap, ds.tshareMarketCapToMarketCapRatio,
+        ds.priceUV2UV3, ds.priceChangeUV2UV3, ds.roiMultiplierFromATL,
         ds.liquidityUV2UV3_HEX, ds.liquidityUV2UV3_USDC, ds.liquidityUV2UV3_ETH,
         ds.totalHEX, ds.dailyMintedInflationTotal,
         ds.circulatingHEX, ds.circulatingSupplyChange,
         ds.stakedHEX, ds.stakedSupplyChange,
-        ds.dailyPayoutHEX,
+        ds.dailyPayoutHEX, ds.penaltiesHEX,
         ds.numberOfHolders, ds.numberOfHoldersChange
       ];
       rowDataNew.push(row);
@@ -294,6 +303,12 @@ async function getDailyData() {
 
   var totalHEX = (circulatingHEX + stakedHEX);
 
+  var marketCap = (priceUV2UV3 * circulatingHEX);
+  var tshareMarketCap = (tshareRateUSD * totalTshares);
+  var tshareMarketCapToMarketCapRatio = parseFloat((tshareMarketCap / marketCap).toFixed(4));
+
+  var roiMultiplierFromATL = parseInt(priceUV2UV3 / HEX_PRICE_ALLTIMELOW);
+
   // Create Full Object, Set Calculated Values
   try {
     const dailyStat = new DailyStat({ 
@@ -345,7 +360,12 @@ async function getDailyData() {
       numberOfHoldersChange:    numberOfHoldersChange,
 
       dailyMintedInflationTotal: dailyMintedInflationTotal,
-      totalHEX: totalHEX
+      totalHEX: totalHEX,
+
+      marketCap:                        marketCap,
+      tshareMarketCap:                  tshareMarketCap,
+      tshareMarketCapToMarketCapRatio:  tshareMarketCapToMarketCapRatio,
+      roiMultiplierFromATL:             roiMultiplierFromATL
     });
 
     dailyStat.save(function (err) {

@@ -39,6 +39,12 @@
 
         var socket = io.connect();
 
+        socket.on('hexPrice', function (price) {
+            if (price && price !== ''){
+                document.title = 'HEXDailyStats $' + price;
+            }
+        });
+
         function nFormatter(num, digits) {
             const lookup = [
                 { value: 1, symbol: "" },
@@ -297,5 +303,9 @@
         <a href="https://t.me/HEXDailyStats">Telegram</a>
         </div></center>
         <table id="dataTable" class="display" width="100%" data-page-length='30'></table>
+    </div>
+
+    <div id="nomicsSection">
+        <div><center><a href="https://nomics.com" target="_blank">Nomics.com</a></center></div>
     </div>
 </div>

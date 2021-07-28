@@ -210,10 +210,10 @@ async function getRowData() {
         ds.totalTshares, ds.totalTsharesChange,
         ds.liquidityUV2UV3_HEX, ds.liquidityUV2UV3_USDC, ds.liquidityUV2UV3_ETH,
         ds.marketCap, ds.tshareMarketCap, ds.tshareMarketCapToMarketCapRatio,
-        ds.stakedHEXPercent, ds.stakedHEXPercentChange,
+        ds.stakedHEXPercent,
         ds.totalHEX, ds.dailyMintedInflationTotal,
         ds.circulatingHEX, ds.circulatingSupplyChange,
-        ds.stakedHEX,
+        ds.stakedHEX, ds.stakedSupplyChange,
         ds.dailyPayoutHEX, ds.penaltiesHEX,
         ds.numberOfHolders, ds.numberOfHoldersChange
       ];

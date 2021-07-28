@@ -196,6 +196,9 @@ var DailyStatSchema = new Schema({
   tshareMarketCapToMarketCapRatio:  { type: Number, required: true },
 
   roiMultiplierFromATL:             { type: Number, required: true },
+
+  uniqueStakerCount:        { type: Number, required: true },
+  uniqueStakerCountChange:  { type: Number, required: true },
 });
 
 const DailyStat = mongoose.model('DailyStat', DailyStatSchema);
@@ -223,7 +226,8 @@ async function getRowData() {
         ds.circulatingHEX, ds.circulatingSupplyChange,
         ds.stakedHEX, ds.stakedSupplyChange,
         ds.dailyPayoutHEX, ds.penaltiesHEX,
-        ds.numberOfHolders, ds.numberOfHoldersChange
+        ds.numberOfHolders, ds.numberOfHoldersChange,
+        ds.uniqueStakerCount, ds.uniqueStakerCountChange,
       ];
       rowDataNew.push(row);
     }
@@ -271,7 +275,9 @@ async function getDailyData() {
   var tshareRateHEX = await get_shareRateChange();
   var { dailyPayoutHEX, totalTshares } = await get_dailyDataUpdatePolling(currentDay);
 
-  var averageStakeLength = await get_averageStakeLength();
+  var { averageStakeLength, uniqueStakerCount } = await get_stakeStartData();
+  var uniqueStakerCountChange = (uniqueStakerCount - previousDailyStat.uniqueStakerCount);
+
   var penaltiesHEX = await get_dailyPenalties();
 
   var priceUV2 = await getUniswapV2HEXDailyPrice();
@@ -374,7 +380,10 @@ async function getDailyData() {
       marketCap:                        marketCap,
       tshareMarketCap:                  tshareMarketCap,
       tshareMarketCapToMarketCapRatio:  tshareMarketCapToMarketCapRatio,
-      roiMultiplierFromATL:             roiMultiplierFromATL
+      roiMultiplierFromATL:             roiMultiplierFromATL,
+
+      uniqueStakerCount:        uniqueStakerCount,
+      uniqueStakerCountChange:  uniqueStakerCountChange,
     });
 
     dailyStat.save(function (err) {
@@ -422,6 +431,10 @@ function isEmpty(obj) {
 	}
 
 	return true;
+}
+
+function onlyUnique(value, index, self) {
+  return self.indexOf(value) === index;
 }
 
 
@@ -599,7 +612,7 @@ async function get_dailyDataUpdate(currentDay){
   });
 }
 
-async function get_averageStakeLength(){
+async function get_stakeStartData(){
 
   var $lastStakeId = 0;
   var stakedDaysSum = 0;
@@ -607,12 +620,15 @@ async function get_averageStakeLength(){
 
   var count = 0;
 
+  var uniqueAddressList = [];
+
   while (true) {
     var data = await get_stakeStarts($lastStakeId);
     if (data.count <= 0) { break; }
     stakedCount += data.count;
     stakedDaysSum += data.stakedDaysSum;
     $lastStakeId = data.lastStakeId;
+    uniqueAddressList = uniqueAddressList.concat(data.uniqueAddresses);
 
     count += 1;
     await sleep(100);
@@ -621,7 +637,12 @@ async function get_averageStakeLength(){
   var averageStakeLength = stakedDaysSum/stakedCount;
   var averageStakeLengthYears = averageStakeLength / 365.0;
 
-  return parseFloat(averageStakeLengthYears.toFixed(2));
+  uniqueAddressCount = uniqueAddressList.filter(onlyUnique).length;
+
+  return {
+    averageStakeLength: parseFloat(averageStakeLengthYears.toFixed(2)),
+    uniqueStakerCount: uniqueAddressCount
+  }
 }
 
 async function get_stakeStarts($lastStakeId){
@@ -639,6 +660,7 @@ async function get_stakeStarts($lastStakeId){
         ) {
           stakeId
           stakedDays
+          stakerAddr
         }
       }` 
     }),
@@ -661,10 +683,13 @@ async function get_stakeStarts($lastStakeId){
 
     var lastStakeId = res.data.stakeStarts[(stakeCount - 1)].stakeId;
 
+    var uniqueAddresses = res.data.stakeStarts.map(a => a.stakerAddr).filter(onlyUnique);
+
     var data = {  
       count: stakeCount, 
       stakedDaysSum: stakeStartsReduced.stakedDays,
-      lastStakeId: lastStakeId
+      lastStakeId: lastStakeId,
+      uniqueAddresses: uniqueAddresses
     };
 
     return data;

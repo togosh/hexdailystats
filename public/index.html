@@ -93,6 +93,33 @@
                             return data;
                         }
                     },
+                    { title: "Price (USD)", className: "dt-body-center" , render: function(data, type, row) {
+                            if (type === "display" || type === "filter") { 
+                                return currencyFormatterPrice.format(data); }
+                            return data;
+                        }
+                    },
+                    { title: "Price Change % (USD)", className: "dt-body-center" , render: function(data, type, row) {
+                            if (type === "display" || type === "filter") { 
+                                return Number(data/100).toLocaleString(undefined,{style: 'percent', minimumFractionDigits:2}); } 
+                            return data;
+                        }
+                    },
+                    { title: "ROI Multiplier from All Time Low", className: "dt-body-center" , render: function(data, type, row) {
+                            if (type === "display" || type === "filter") {
+                                return Number(data).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + "x";
+                            }
+                            return data;
+                        }
+                    },
+                    { title: "Avg Stake Length (Years)", className: "dt-body-center" },
+                    { title: "Payout Per T-Share (HEX)", className: "dt-body-center" },
+                    { title: "APY Rate (Interest + EES Penalties)", className: "dt-body-center" , render: function(data, type, row) {
+                            if (type === "display" || type === "filter") { 
+                                return Number(data/100).toLocaleString(undefined,{style: 'percent', minimumFractionDigits:2}); } 
+                            return data;
+                        }
+                    },
 
                     { title: "T-Share Rate (HEX)", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
@@ -130,28 +157,24 @@
                         }
                     },
 
-                    { title: "Payout Per T-Share (HEX)", className: "dt-body-center" },
-                    { title: "APY Rate (Interest + EES Penalties)", className: "dt-body-center" , render: function(data, type, row) {
+                    { title: "Liquidity Pool V2 + V3 (HEX)", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
-                                return Number(data/100).toLocaleString(undefined,{style: 'percent', minimumFractionDigits:2}); } 
+                                return Number(data).toLocaleString(); }
                             return data;
                         }
                     },
-                    
-
-                    { title: "Staked % of Coins", className: "dt-body-center" , render: function(data, type, row) {
+                    { title: "Liquidity Pool V2 + V3 (USDC)", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
-                                return Number(data/100).toLocaleString(undefined,{style: 'percent', minimumFractionDigits:2}); } 
+                                return Number(data).toLocaleString(); }
                             return data;
                         }
                     },
-                    { title: "Change in Staked % of Coins", className: "dt-body-center" , render: function(data, type, row) {
+                    { title: "Liquidity Pool V2 + V3 (ETH)", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
-                                return Number(data/100).toLocaleString(undefined,{style: 'percent', minimumFractionDigits:2}); } 
+                                return Number(data).toLocaleString(); }
                             return data;
                         }
                     },
-                    { title: "Avg Stake Length (Years)", className: "dt-body-center" },
 
                     { title: "Market Cap (USD)", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
@@ -172,41 +195,15 @@
                         }
                     },
 
-                    { title: "Price (USD)", className: "dt-body-center" , render: function(data, type, row) {
-                            if (type === "display" || type === "filter") { 
-                                return currencyFormatterPrice.format(data); }
-                            return data;
-                        }
-                    },
-                    { title: "Price Change % (USD)", className: "dt-body-center" , render: function(data, type, row) {
+                    { title: "Staked % of Coins", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data/100).toLocaleString(undefined,{style: 'percent', minimumFractionDigits:2}); } 
                             return data;
                         }
                     },
-                    { title: "ROI Multiplier from All Time Low", className: "dt-body-center" , render: function(data, type, row) {
-                            if (type === "display" || type === "filter") {
-                                return Number(data).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + "x";
-                            }
-                            return data;
-                        }
-                    },
-
-                    { title: "Liquidity Pool V2 + V3 (HEX)", className: "dt-body-center" , render: function(data, type, row) {
+                    { title: "Change in Staked % of Coins", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
-                                return Number(data).toLocaleString(); }
-                            return data;
-                        }
-                    },
-                    { title: "Liquidity Pool V2 + V3 (USDC)", className: "dt-body-center" , render: function(data, type, row) {
-                            if (type === "display" || type === "filter") { 
-                                return Number(data).toLocaleString(); }
-                            return data;
-                        }
-                    },
-                    { title: "Liquidity Pool V2 + V3 (ETH)", className: "dt-body-center" , render: function(data, type, row) {
-                            if (type === "display" || type === "filter") { 
-                                return Number(data).toLocaleString(); }
+                                return Number(data/100).toLocaleString(undefined,{style: 'percent', minimumFractionDigits:2}); } 
                             return data;
                         }
                     },

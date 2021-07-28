@@ -10,5 +10,10 @@
 	},
 	"mongodb": {
 		"connectionString": "mongodb+srv://AAA:BBB@cluster0.CCC.mongodb.net/DDD?retryWrites=true&w=majority"
+	},
+	"price": {
+		"enabled": false,
+		"nomicsKey": "AAA",
+		"timer": 5
 	}
 }

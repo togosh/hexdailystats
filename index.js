@@ -31,6 +31,7 @@ var rowData = undefined;
 var getDataRunning = false;
 var getRowDataRunning = false;
 var connections = {};
+var hexPrice = '';
 
 var hostname = CONFIG.hostname;
 if (DEBUG){ hostname = '127.0.0.1'; }
@@ -110,6 +111,7 @@ io.on('connection', (socket) => {
 	if (rowData){ socket.emit("rowData", rowData); };
   //if (!getDataRunning){ getDailyData(); }
   if (!getRowDataRunning){ getRowData(); }
+  socket.emit("hexPrice", hexPrice);
 });
 
 const rule = new schedule.RecurrenceRule();
@@ -121,6 +123,12 @@ const job = schedule.scheduleJob(rule, function(){
   log('**** DAILY DATA TIMER!');
   if (!getDataRunning){ getDailyData(); }
 });
+
+if (CONFIG.price.enabled) {
+	var priceTimer = CONFIG.price.timer * 60 * 1000;
+	setInterval(function() {
+		updatePrice();
+	}, priceTimer); }
 
 //////////////////////
 // DATABASE
@@ -1046,4 +1054,27 @@ async function getUniswapV3() {
       liquidityUV3_ETH: parseInt(liquidityUV3_ETH), //parseFloat(parseFloat(liquidityUV3_ETH).toFixed(4))
     }
   });
+}
+
+
+/////////////////////////////////////////////
+// PRICE
+
+var priceUrl = "https://api.nomics.com/v1/currencies/ticker?key=" + CONFIG.price.nomicsKey + "&ids=HEX";
+
+async function updatePrice(){
+	try {
+		const resp = await fetch(priceUrl);
+		const data = await resp.json();
+
+		if (data && data.length >= 1) {
+			var hexData = data[0];
+			if (hexData && hexData.price) {
+				hexPrice = parseFloat(hexData.price).toFixed(4).toString();
+				io.emit("hexPrice", hexPrice);
+			}
+		}
+	} catch (err) {
+		log("PRICE --- ERROR - updatePrice() - " + err + "\n" + err.stack);
+	}
 }

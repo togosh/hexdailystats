@@ -34,7 +34,7 @@
 
     <script>
         var currencyFormatter = new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD'});
-        var currencyFormatterPrice = new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD', minimumFractionDigits: 6});
+        var currencyFormatterPrice = new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD', minimumFractionDigits: 4});
         var currencyFormatterNoDecimal = new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0});
 
         var socket = io.connect();
@@ -141,7 +141,7 @@
                     },
                     { title: "T-Share Rate (USD)", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
-                                return currencyFormatter.format(data); }
+                                return currencyFormatterNoDecimal.format(data); }
                             return data;
                         }
                     },

@@ -203,13 +203,14 @@ async function getRowData() {
     for (var ds of dailyStats){
       var row = [
         ds.currentDay, ds.date, 
+        ds.priceUV2UV3, ds.priceChangeUV2UV3, ds.roiMultiplierFromATL,
+        ds.averageStakeLength,
+        ds.payoutPerTshareHEX, ds.actualAPYRate,
         ds.tshareRateHEX, ds.tshareRateIncrease, ds.tshareRateUSD,
         ds.totalTshares, ds.totalTsharesChange,
-        ds.payoutPerTshareHEX, ds.actualAPYRate,
-        ds.stakedHEXPercent, ds.stakedHEXPercentChange, ds.averageStakeLength,
-        ds.marketCap, ds.tshareMarketCap, ds.tshareMarketCapToMarketCapRatio,
-        ds.priceUV2UV3, ds.priceChangeUV2UV3, ds.roiMultiplierFromATL,
         ds.liquidityUV2UV3_HEX, ds.liquidityUV2UV3_USDC, ds.liquidityUV2UV3_ETH,
+        ds.marketCap, ds.tshareMarketCap, ds.tshareMarketCapToMarketCapRatio,
+        ds.stakedHEXPercent, ds.stakedHEXPercentChange,
         ds.totalHEX, ds.dailyMintedInflationTotal,
         ds.circulatingHEX, ds.circulatingSupplyChange,
         ds.stakedHEX, ds.stakedSupplyChange,

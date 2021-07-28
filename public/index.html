@@ -113,13 +113,13 @@
                         }
                     },
 
-                    { title: "Total T-Shares", className: "dt-body-center" , render: function(data, type, row) {
+                    { title: "T-Shares (SHARES)", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;
                         }
                     },
-                    { title: "Change in Total T-Shares", className: "dt-body-center" , render: function(data, type, row) {
+                    { title: "Change in T-Shares (SHARES)", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") {
                                 if (data < 0) { 
                                     return "(" + Math.abs(Number(data)).toLocaleString() + ")";
@@ -131,7 +131,7 @@
                     },
 
                     { title: "Payout Per T-Share (HEX)", className: "dt-body-center" },
-                    { title: "Actual APY Rate (Interest + EES Penalties)", className: "dt-body-center" , render: function(data, type, row) {
+                    { title: "APY Rate (Interest + EES Penalties)", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data/100).toLocaleString(undefined,{style: 'percent', minimumFractionDigits:2}); } 
                             return data;
@@ -165,7 +165,7 @@
                             return data;
                         }
                     },
-                    { title: "T-Share Market Cap to Market Cap Ratio", className: "dt-body-center" , render: function(data, type, row) {
+                    { title: "T-Share Market Cap ÷ Market Cap", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;
@@ -178,7 +178,7 @@
                             return data;
                         }
                     },
-                    { title: "% Price Change (USD)", className: "dt-body-center" , render: function(data, type, row) {
+                    { title: "Price Change % (USD)", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data/100).toLocaleString(undefined,{style: 'percent', minimumFractionDigits:2}); } 
                             return data;
@@ -192,32 +192,32 @@
                         }
                     },
 
-                    { title: "Total Liquidity Pool V2 + V3 (HEX)", className: "dt-body-center" , render: function(data, type, row) {
+                    { title: "Liquidity Pool V2 + V3 (HEX)", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;
                         }
                     },
-                    { title: "Total Liquidity Pool V2 + V3 (USDC)", className: "dt-body-center" , render: function(data, type, row) {
+                    { title: "Liquidity Pool V2 + V3 (USDC)", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;
                         }
                     },
-                    { title: "Total Liquidity Pool V2 + V3 (ETH)", className: "dt-body-center" , render: function(data, type, row) {
+                    { title: "Liquidity Pool V2 + V3 (ETH)", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;
                         }
                     },
 
-                    { title: "Total Circulating + Staked (HEX)", className: "dt-body-center" , render: function(data, type, row) {
+                    { title: "Circulating + Staked (HEX)", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;
                         }
                     },
-                    { title: "Minted Inflation Total (HEX)", className: "dt-body-center" , render: function(data, type, row) {
+                    { title: "Minted Inflation (HEX)", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;

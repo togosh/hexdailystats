@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>HEXDailyStats</title> 
-    <meta name="description" content="HEX Cryptocurrency statistics daily. HEX Shares, HEX Price, HEX Interest, HEX Payouts, HEX Liquidity, HEX Stats & more!">
+    <meta name="description" content="HEX Cryptocurrency Statistics Daily. HEX Shares, HEX Price, HEX Interest, HEX Payouts, HEX Liquidity, HEX Stats & More!">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.25/b-1.7.1/b-html5-1.7.1/b-print-1.7.1/date-1.1.0/fh-3.1.9/kt-2.6.2/datatables.min.css"/>
@@ -21,7 +21,7 @@
     <meta property="og:url" content="https://HEXDailyStats.com/">
     <meta property="og:type" content="website">
     <meta property="og:title" content="HEXDailyStats">
-    <meta property="og:description" content="HEX Cryptocurrency statistics daily. HEX Shares, HEX Price, HEX Interest, HEX Payouts, HEX Liquidity, HEX Stats & more!">
+    <meta property="og:description" content="HEX Cryptocurrency Statistics Daily. HEX Shares, HEX Price, HEX Interest, HEX Payouts, HEX Liquidity, HEX Stats & More!">
     <meta property="og:image:url" content="https://hexdailystats.com/hexdailystatsimage.jpg">
 
     <!-- Twitter Meta Tags -->
@@ -29,12 +29,13 @@
     <meta property="twitter:domain" content="HEXDailyStats.com">
     <meta property="twitter:url" content="https://HEXDailyStats.com/">
     <meta name="twitter:title" content="HEXDailyStats">
-    <meta name="twitter:description" content="HEX Cryptocurrency statistics daily. HEX Shares, HEX Price, HEX Interest, HEX Payouts, HEX Liquidity, HEX Stats & more!">
+    <meta name="twitter:description" content="HEX Cryptocurrency Statistics Daily. HEX Shares, HEX Price, HEX Interest, HEX Payouts, HEX Liquidity, HEX Stats & More!">
     <meta name="twitter:image" content="https://hexdailystats.com/hexdailystatsimage.jpg">
 
     <script>
         var currencyFormatter = new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD'});
         var currencyFormatterPrice = new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD', minimumFractionDigits: 6});
+        var currencyFormatterNoDecimal = new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0});
 
         var socket = io.connect();
 
@@ -137,12 +138,25 @@
                     },
                     { title: "Avg Stake Length (Years)", className: "dt-body-center" },
 
-                    { title: "Daily HEX Penalties (HEX)", className: "dt-body-center" , render: function(data, type, row) {
+                    { title: "Market Cap (USD)", className: "dt-body-center" , render: function(data, type, row) {
+                            if (type === "display" || type === "filter") { 
+                                return currencyFormatterNoDecimal.format(data); }
+                            return data;
+                        }
+                    },
+                    { title: "T-Share Market Cap (USD)", className: "dt-body-center" , render: function(data, type, row) {
+                            if (type === "display" || type === "filter") { 
+                                return currencyFormatterNoDecimal.format(data); }
+                            return data;
+                        }
+                    },
+                    { title: "T-Share Market Cap to Market Cap Ratio", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;
                         }
                     },
+
                     { title: "Daily Price (USD)", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return currencyFormatterPrice.format(data); }
@@ -152,6 +166,13 @@
                     { title: "Daily % Price Change (USD)", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data/100).toLocaleString(undefined,{style: 'percent', minimumFractionDigits:2}); } 
+                            return data;
+                        }
+                    },
+                    { title: "ROI Multiplier from All Time Low", className: "dt-body-center" , render: function(data, type, row) {
+                            if (type === "display" || type === "filter") {
+                                return Number(data).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + "x";
+                            }
                             return data;
                         }
                     },
@@ -222,6 +243,12 @@
                     },
 
                     { title: "Daily Payout (HEX)", className: "dt-body-center" , render: function(data, type, row) {
+                            if (type === "display" || type === "filter") { 
+                                return Number(data).toLocaleString(); }
+                            return data;
+                        }
+                    },
+                    { title: "Daily Penalties (HEX)", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;

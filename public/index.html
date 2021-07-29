@@ -298,6 +298,12 @@
             });
         });
 
+        $(document).ready(function() {
+            $('#buttonLegend').click(function() { 
+                $('#divLegend').toggle();
+            });
+        });
+        
     </script>
     <style>
         a { color:black; }
@@ -305,7 +311,7 @@
 </head>
 <body style="background-color:lightgrey;">
 <div>
-    <div id="mainSection" style="">
+    <div id="mainSection" style="padding-bottom: 10px;">
         <center><a href="https://t.me/HEXDailyStats"><img src="hexdailystatslogo.png" style="max-width: 100%"></img></a></center>
         <center><div style="font-size:20px; padding-bottom: 10px">
         <a href="about.html">About</a> | 
@@ -315,6 +321,16 @@
         </div></center>
         <table id="dataTable" class="display" width="100%" data-page-length='30'></table>
     </div>
+
+    <center><button id="buttonLegend" style="padding: 10px 80px 10px 80px">Legend</button>
+    
+        <ul id="divLegend" style="display: none; text-align: left; max-width: 300px; margin-bottom: 0px;">
+            <li>All Time Low: ($0.00005645)</li></br>
+            <li>APY Rate: ((Daily Payout / Staked) * 365.25)</li></br>
+            <li>Total Value Locked: (Price * Staked)</li></br>
+            <li>Minted Inflation: (Difference in Total HEX)</li></br>
+        </ul>
+    </center>
     
     <div id="nomicsSection" style="padding-top: 10px;">
         <div><center><a href="https://codeakk.medium.com/hex-development-data-a1b1822446fa" target="_blank">Subgraph</a> | 

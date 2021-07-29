@@ -282,18 +282,18 @@
                             return data;
                         }
                     },
-                    //{ title: "Number of Stakers", className: "dt-body-center" , render: function(data, type, row) {
-                    //        if (type === "display" || type === "filter") { 
-                    //            return Number(data).toLocaleString(); }
-                    //        return data;
-                    //    }
-                    //},
-                    //{ title: "Change in Number of Stakers", className: "dt-body-center" , render: function(data, type, row) {
-                    //        if (type === "display" || type === "filter") { 
-                    //            return Number(data).toLocaleString(); }
-                    //        return data;
-                    //    }
-                    //},
+                    { title: "Number of Stakers", className: "dt-body-center" , render: function(data, type, row) {
+                            if (type === "display" || type === "filter") { 
+                                return Number(data).toLocaleString(); }
+                            return data;
+                        }
+                    },
+                    { title: "Change in Number of Stakers", className: "dt-body-center" , render: function(data, type, row) {
+                            if (type === "display" || type === "filter") { 
+                                return Number(data).toLocaleString(); }
+                            return data;
+                        }
+                    },
                 ]
             });
         });

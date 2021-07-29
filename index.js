@@ -198,7 +198,7 @@ var DailyStatSchema = new Schema({
   roiMultiplierFromATL:             { type: Number, required: true },
 
   uniqueStakerCount:        { type: Number, required: true },
-  uniqueStakerCountChange:  { type: Number, required: true },
+  //uniqueStakerCountChange:  { type: Number, required: true },
 });
 
 const DailyStat = mongoose.model('DailyStat', DailyStatSchema);
@@ -276,7 +276,7 @@ async function getDailyData() {
   var { dailyPayoutHEX, totalTshares } = await get_dailyDataUpdatePolling(currentDay);
 
   var { averageStakeLength, uniqueStakerCount } = await get_stakeStartData();
-  var uniqueStakerCountChange = (uniqueStakerCount - previousDailyStat.uniqueStakerCount);
+  //var uniqueStakerCountChange = (uniqueStakerCount - previousDailyStat.uniqueStakerCount);
 
   var penaltiesHEX = await get_dailyPenalties();
 
@@ -383,7 +383,7 @@ async function getDailyData() {
       roiMultiplierFromATL:             roiMultiplierFromATL,
 
       uniqueStakerCount:        uniqueStakerCount,
-      uniqueStakerCountChange:  uniqueStakerCountChange,
+      //uniqueStakerCountChange:  uniqueStakerCountChange,
     });
 
     dailyStat.save(function (err) {

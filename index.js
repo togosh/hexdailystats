@@ -231,7 +231,7 @@ async function getRowData() {
         ds.payoutPerTshareHEX, ds.tshareRateUSD, ds.tshareRateHEX, ds.tshareRateIncrease,
         ds.averageStakeLength, ds.actualAPYRate,
         ds.liquidityUV2UV3_HEX, ds.liquidityUV2UV3_USDC, ds.liquidityUV2UV3_ETH,
-        ds.totalValueLocked, ds.marketCap, ds.tshareMarketCap, ds.tshareMarketCapToMarketCapRatio,
+        ds.totalValueLocked, ds.marketCap, ds.tshareMarketCap,
         ds.totalTshares, ds.totalTsharesChange,
         ds.totalHEX, ds.dailyMintedInflationTotal,
         ds.circulatingHEX, ds.circulatingSupplyChange,

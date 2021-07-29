@@ -184,12 +184,6 @@
                             return data;
                         }
                     },
-                    { title: "T-Share Market Cap Ratio", className: "dt-body-center" , render: function(data, type, row) {
-                            if (type === "display" || type === "filter") { 
-                                return Number(data).toLocaleString(); }
-                            return data;
-                        }
-                    },
 
                     { title: "T-Shares (SHARES)", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
@@ -321,12 +315,14 @@
         </div></center>
         <table id="dataTable" class="display" width="100%" data-page-length='30'></table>
     </div>
-
+    
     <div id="nomicsSection" style="padding-top: 10px;">
-        <div><center><a href="https://nomics.com" target="_blank">Nomics.com</a></center></div>
+        <div><center><a href="https://codeakk.medium.com/hex-development-data-a1b1822446fa" target="_blank">Subgraph</a> | 
+            <a href="https://etherscan.io/address/0x2b591e99afe9f32eaa6214f7b7629768c40eeb39#readContract" target="_blank">Etherscan</a> | 
+            <a href="https://thegraph.com/legacy-explorer/subgraph/uniswap/uniswap-v2" target="_blank">Uniswap V2</a> | 
+            <a href="https://nomics.com" target="_blank">Nomics</a></center></div>
     </div>
     <div id="footer" style="width: 100%; text-align: center; padding-top: 10px; padding-bottom: 20px;">
         <a href="https://etherscan.io/address/0xdee0A5da68ea787C5C441EB7482F61157fE8DEC5" target="_blank"><span>0xdee0A5da68ea787C5C441EB7482F61157fE8DEC5</span></a>
     </div>
-
 </div>

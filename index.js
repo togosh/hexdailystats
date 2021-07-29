@@ -238,7 +238,7 @@ async function getRowData() {
         ds.stakedHEX, ds.stakedSupplyChange, ds.stakedHEXPercent,
         ds.dailyPayoutHEX, ds.penaltiesHEX,
         ds.numberOfHolders, ds.numberOfHoldersChange,
-        //ds.uniqueStakerCount, ds.uniqueStakerCountChange,
+        ds.uniqueStakerCount, ds.uniqueStakerCountChange,
       ];
       rowDataNew.push(row);
     }

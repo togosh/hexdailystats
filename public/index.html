@@ -118,15 +118,14 @@
                             return data;
                         }
                     },
-                    { title: "Avg Stake Length (Years)", className: "dt-body-center" },
+
                     { title: "Payout Per T-Share (HEX)", className: "dt-body-center" },
-                    { title: "APY Rate (Interest + EES Penalties)", className: "dt-body-center" , render: function(data, type, row) {
+                    { title: "T-Share Price (USD)", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
-                                return Number(data/100).toLocaleString(undefined,{style: 'percent', minimumFractionDigits:2}); } 
+                                return currencyFormatterNoDecimal.format(data); }
                             return data;
                         }
                     },
-
                     { title: "T-Share Rate (HEX)", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
@@ -139,26 +138,11 @@
                             return data;
                         }
                     },
-                    { title: "T-Share Rate (USD)", className: "dt-body-center" , render: function(data, type, row) {
-                            if (type === "display" || type === "filter") { 
-                                return currencyFormatterNoDecimal.format(data); }
-                            return data;
-                        }
-                    },
 
-                    { title: "T-Shares (SHARES)", className: "dt-body-center" , render: function(data, type, row) {
+                    { title: "Avg Stake Length (Years)", className: "dt-body-center" },
+                    { title: "APY Rate (Interest + EES Penalties)", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
-                                return Number(data).toLocaleString(); }
-                            return data;
-                        }
-                    },
-                    { title: "Change in T-Shares (SHARES)", className: "dt-body-center" , render: function(data, type, row) {
-                            if (type === "display" || type === "filter") {
-                                if (data < 0) { 
-                                    return "(" + Math.abs(Number(data)).toLocaleString() + ")";
-                                } 
-                                return Number(data).toLocaleString(); 
-                            }
+                                return Number(data/100).toLocaleString(undefined,{style: 'percent', minimumFractionDigits:2}); } 
                             return data;
                         }
                     },
@@ -200,6 +184,27 @@
                             return data;
                         }
                     },
+
+                    { title: "T-Shares (SHARES)", className: "dt-body-center" , render: function(data, type, row) {
+                            if (type === "display" || type === "filter") { 
+                                return Number(data).toLocaleString(); }
+                            return data;
+                        }
+                    },
+                    { title: "Change in T-Shares (SHARES)", className: "dt-body-center" , render: function(data, type, row) {
+                            if (type === "display" || type === "filter") {
+                                if (data < 0) { 
+                                    return "(" + Math.abs(Number(data)).toLocaleString() + ")";
+                                } 
+                                return Number(data).toLocaleString(); 
+                            }
+                            return data;
+                        }
+                    },
+
+                    
+
+                    
 
                     { title: "Staked % of Coins", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 

@@ -287,7 +287,7 @@ async function getDailyData() {
   var { dailyPayoutHEX, totalTshares } = await get_dailyDataUpdatePolling(currentDay);
 
   var { averageStakeLength, uniqueStakerCount } = await get_stakeStartData();
-  //var uniqueStakerCountChange = (uniqueStakerCount - previousDailyStat.uniqueStakerCount);
+  var uniqueStakerCountChange = (uniqueStakerCount - getNum(previousDailyStat.uniqueStakerCount));
 
   var penaltiesHEX = await get_dailyPenalties();
 
@@ -394,7 +394,7 @@ async function getDailyData() {
       roiMultiplierFromATL:             roiMultiplierFromATL,
 
       uniqueStakerCount:        uniqueStakerCount,
-      //uniqueStakerCountChange:  uniqueStakerCountChange,
+      uniqueStakerCountChange:  uniqueStakerCountChange,
     });
 
     dailyStat.save(function (err) {
@@ -446,6 +446,13 @@ function isEmpty(obj) {
 
 function onlyUnique(value, index, self) {
   return self.indexOf(value) === index;
+}
+
+function getNum(val) {
+  if (isNaN(val)) {
+    return 0;
+  }
+  return val;
 }
 
 

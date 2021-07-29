@@ -209,7 +209,7 @@ var DailyStatSchema = new Schema({
   roiMultiplierFromATL:             { type: Number, required: true },
 
   uniqueStakerCount:        { type: Number, required: true },
-  //uniqueStakerCountChange:  { type: Number, required: true },
+  uniqueStakerCountChange:  { type: Number, required: true },
 
   totalValueLocked:        { type: Number, required: true },
 });

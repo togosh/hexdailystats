@@ -202,17 +202,6 @@
                         }
                     },
 
-                    
-
-                    
-
-                    { title: "Staked % of Coins", className: "dt-body-center" , render: function(data, type, row) {
-                            if (type === "display" || type === "filter") { 
-                                return Number(data/100).toLocaleString(undefined,{style: 'percent', minimumFractionDigits:2}); } 
-                            return data;
-                        }
-                    },
-
                     { title: "Circulating + Staked (HEX)", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }

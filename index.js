@@ -262,8 +262,6 @@ async function getDailyData() {
   console.log("getDailyData()");
   try {
 
-  var numberOfHolders = await get_numberOfHolders();
-
   var currentDay = await getCurrentDay();
 
   // Check if Current Row of Data already exists
@@ -404,6 +402,9 @@ async function getDailyData() {
     dailyStat.save(function (err) {
       if (err) return log(err);
     });
+
+    if (!getRowDataRunning){ getRowData(); }
+    
   } catch (err) {
     log('getDailyData() ----- SAVE --- ' + err);
   }

@@ -166,6 +166,12 @@
                         }
                     },
 
+                    { title: "Total Value Locked (USD)", className: "dt-body-center" , render: function(data, type, row) {
+                            if (type === "display" || type === "filter") { 
+                                return "$" + nFormatter(data, 2); }
+                            return data;
+                        }
+                    },
                     { title: "Market Cap (USD)", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return "$" + nFormatter(data, 2); }

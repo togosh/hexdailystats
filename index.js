@@ -124,6 +124,17 @@ const job = schedule.scheduleJob(rule, function(){
   if (!getDataRunning){ getDailyData(); }
 });
 
+const rule2 = new schedule.RecurrenceRule();
+rule2.hour = 0;
+rule2.minute = 40;
+rule2.tz = 'Etc/UTC';
+
+const job2 = schedule.scheduleJob(rule2, function(){
+  log('**** DAILY DATA TIMER 2!');
+  if (!getDataRunning){ getDailyData(); }
+});
+
+
 if (CONFIG.price.enabled) {
 	var priceTimer = CONFIG.price.timer * 60 * 1000;
 	setInterval(function() {

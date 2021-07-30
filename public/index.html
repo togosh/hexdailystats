@@ -309,11 +309,21 @@
                 if( $('#styleDark').attr('disabled') == "disabled" ) {
                     $('#styleDark').removeAttr('disabled');
                     $('#buttonDark').text('Light Mode');
+                    localStorage.setItem('theme', 'dark');
                 } else {
                     $('#styleDark').attr('disabled', 'disabled');
                     $('#buttonDark').text('Dark Mode');
+                    localStorage.setItem('theme', 'light');
                 }
             });
+
+            if (localStorage.getItem('theme') == 'dark') {
+                $('#styleDark').removeAttr('disabled');
+                $('#buttonDark').text('Light Mode');
+            } else {
+                $('#styleDark').attr('disabled', 'disabled');
+                $('#buttonDark').text('Dark Mode');
+            }
         });
 
         function display_c(){

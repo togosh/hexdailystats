@@ -3,8 +3,14 @@
 <head>
     <title>HEXDailyStats - About</title> 
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link id="styleDark" rel="stylesheet" type="text/css" href="darkmode.css" />
     <script>
+        if (localStorage.getItem('theme') == 'dark') {
+            $('#styleDark').removeAttr('disabled');
+        } else {
+            $('#styleDark').attr('disabled', 'disabled');
+        }
     </script>
     <style>
         a { color:black; }
@@ -16,24 +22,24 @@
         <center><a href="index.html"><img src="hexdailystatslogo.png" style="max-width: 100%"></img></a></center>
         <center><div style="font-size:20px">
         <a href="/">Home</a> |
-        <a href="https://hex.com/">What is HEX?</a> |
+        <a href="https://hex.com/">HEX.com</a> |
         <a href="https://twitter.com/HEXDailyStats">Twitter</a> |
         <a href="https://t.me/HEXDailyStats">Telegram</a>
         </div></center>
         </br> 
         </br> 
-        <center><div><div style="max-width: 620px"><b>About:</b> HEX Daily Stats was created to keep historical records of the HEX ecosystem in daily snapshots throughout time. 
+        <center><div><div class="text" style="max-width: 620px"><b>About:</b> HEX Daily Stats was created to keep historical records of the HEX ecosystem in daily snapshots throughout time. 
             These records can be used for research, educational and analytical purposes.</div>
             </br> 
             </br> 
-            <div style="max-width: 620px">
+            <div class="text" style="max-width: 620px">
             <b>The Team:</b> Ryan and Togo are big time HEX enthusiasts.  
             They met at the 1st HEX Vegas Meetup and decided to team up!</div></div></center>
         </br> 
         <div style="display: flex; justify-content: center; flex-wrap: wrap;">
             <div style="padding: 20px 40px">
                 <center><a href="https://twitter.com/RyanHEXLife"><img width="300" src="ryan.webp"></img></a></center>
-                <center><div>Ryan - HEX Analyst</br></br>
+                <center><div class="text">Ryan - HEX Analyst</br></br>
                     <a href="https://twitter.com/RyanHEXLife">Twitter</a> | 
                     <a href="https://www.youtube.com/channel/UCOG0DRACT4EGseHvJ11Q3oQ">Youtube</a>
                 </div></center>
@@ -41,7 +47,7 @@
 
             <div style="padding: 20px 40px">
                 <center><a href="https://twitter.com/togoshigekata"><img width="300" src="togosh.webp"></img></a></center>
-                <center><div>Togo - HEX Developer</br></br>  
+                <center><div class="text">Togo - HEX Developer</br></br>  
                     <a href="https://twitter.com/togoshigekata">Twitter</a> |
                     <a href="https://github.com/togosh">Github</a>
                 </div></center>

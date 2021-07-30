@@ -65,12 +65,13 @@
         }
 
         socket.on('rowData', function (data) {
-            rowData = data;
-            createDataTable(data);
+            if (data && data !== rowData) {
+                rowData = data;
+                createDataTable(data);
+            }
         });
         
         function createDataTable(data) {
-            
             $('#dataTable').DataTable({
                 destroy: true,
                 data: data,

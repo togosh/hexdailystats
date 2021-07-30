@@ -130,28 +130,28 @@
                         }
                     },
 
-                    { title: "Payout Per T-Share (HEX)", className: "dt-body-center" },
-                    { title: "T-Share Price (USD)", className: "dt-body-center" , render: function(data, type, row) {
+                    { title: "Payout Per T-Share (HEX)", className: "dt-body-center  purple" },
+                    { title: "T-Share Price (USD)", className: "dt-body-center pink" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return currencyFormatterNoDecimal.format(data); }
                             return data;
                         }
                     },
-                    { title: "T-Share Rate (HEX)", className: "dt-body-center" , render: function(data, type, row) {
+                    { title: "T-Share Rate (HEX)", className: "dt-body-center pink" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;
                         }
                     },
-                    { title: "Increase in  T-Share Rate (HEX)", className: "dt-body-center" , render: function(data, type, row) {
+                    { title: "Increase in  T-Share Rate (HEX)", className: "dt-body-center pink" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;
                         }
                     },
 
-                    { title: "Avg Stake Length (Years)", className: "dt-body-center" },
-                    { title: "APY Rate (Interest + EES Penalties)", className: "dt-body-center" , render: function(data, type, row) {
+                    { title: "Avg Stake Length (Years)", className: "dt-body-center pink" },
+                    { title: "APY Rate (Interest + EES Penalties)", className: "dt-body-center  purple" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data/100).toLocaleString(undefined,{style: 'percent', minimumFractionDigits:2}); } 
                             return data;
@@ -177,7 +177,7 @@
                         }
                     },
 
-                    { title: "Total Value Locked (USD)", className: "dt-body-center" , render: function(data, type, row) {
+                    { title: "Total Value Locked (USD)", className: "dt-body-center teal" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return "$" + nFormatter(data, 2); }
                             return data;
@@ -370,6 +370,20 @@
     </script>
     <style>
         a { color:black; }
+        
+        .purple {
+            background-color: #843FFF !important;
+            font-weight: bold;
+        }
+
+        thead .pink {
+            background-color: #D500DA !important;
+        }
+        
+        .teal {
+            background-color: #00B069 !important;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body style="background-color:lightgrey;" onload=display_ct();>

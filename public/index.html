@@ -39,6 +39,8 @@
         var currencyFormatterPrice = new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD', minimumFractionDigits: 4});
         var currencyFormatterNoDecimal = new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0});
 
+        var rowData = "";
+
         var socket = io.connect();
 
         socket.on('hexPrice', function (price) {
@@ -63,6 +65,12 @@
         }
 
         socket.on('rowData', function (data) {
+            rowData = data;
+            createDataTable(data);
+        });
+        
+        function createDataTable(data) {
+            
             $('#dataTable').DataTable({
                 destroy: true,
                 data: data,
@@ -298,7 +306,7 @@
                     },
                 ]
             });
-        });
+        }
 
         $(document).ready(function() {
             $('#buttonLegend').click(function() { 
@@ -310,10 +318,22 @@
                     $('#styleDark').removeAttr('disabled');
                     $('#buttonDark').text('Light Mode');
                     localStorage.setItem('theme', 'dark');
+
+                    $('#dataTable').DataTable().clear();
+                    $('#dataTable').DataTable().destroy();
+                    createDataTable(rowData);
+
+                    //window.location.reload();
                 } else {
                     $('#styleDark').attr('disabled', 'disabled');
                     $('#buttonDark').text('Dark Mode');
                     localStorage.setItem('theme', 'light');
+
+                    $('#dataTable').DataTable().clear();
+                    $('#dataTable').DataTable().destroy();
+                    createDataTable(rowData);
+
+                    //window.location.reload();
                 }
             });
 

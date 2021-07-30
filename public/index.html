@@ -314,14 +314,19 @@
             document.getElementById('ct').innerHTML = x.getUTCHours().toLocaleString(undefined, {minimumIntegerDigits: 2}) + ":" + x.getUTCMinutes().toLocaleString(undefined, {minimumIntegerDigits: 2}) + ":" + x.getUTCSeconds().toLocaleString(undefined, {minimumIntegerDigits: 2}) + " UTC";
             display_c();
         }
-        
+
+        socket.on('currentDay', function (currentDay) {
+            if (currentDay){
+                document.getElementById('currentDay').innerHTML = "Day " + currentDay.toString();
+            }
+        });
     </script>
     <style>
         a { color:black; }
     </style>
 </head>
 <body style="background-color:lightgrey;" onload=display_ct();>
-<div style="width: 100%; height: 24px;"><span id='ct' style="float:right;"></span></div>
+<div style="width: 100%; height: 24px;"><div style="float:left;"><span id='currentDay'></span></div><div style="float:right;"><span id='ct'></span></div></div>
 <div>
     <div id="mainSection" style="padding-bottom: 10px;">
         <center><a href="https://t.me/HEXDailyStats"><img src="hexdailystatslogo.png" style="max-width: 100%"></img></a></center>

@@ -32,6 +32,7 @@ var getDataRunning = false;
 var getRowDataRunning = false;
 var connections = {};
 var hexPrice = '';
+var currentDayGlobal = 0;
 
 var hostname = CONFIG.hostname;
 if (DEBUG){ hostname = '127.0.0.1'; }
@@ -80,8 +81,18 @@ app.use(function(req, res, next) {
 		log('APP ----- Connection ' + error);
 	}
 
+  getAndSet_currentGlobalDay();
+
 	next();
 });
+
+async function getAndSet_currentGlobalDay(){
+  var currentDay = await getCurrentDay() + 1;
+
+  if (currentDay != currentDayGlobal && currentDay > currentDayGlobal) {
+    currentDayGlobal = currentDay;
+  }
+}
 
 const httpServer = http.createServer(app);
 var httpsServer = undefined;
@@ -117,6 +128,7 @@ io.on('connection', (socket) => {
   //if (!getDataRunning){ getDailyData(); }
   if (!getRowDataRunning){ getRowData(); }
   socket.emit("hexPrice", hexPrice);
+  socket.emit("currentDay", currentDayGlobal);
 });
 
 const rule = new schedule.RecurrenceRule();
@@ -268,6 +280,12 @@ async function getDailyData() {
   try {
 
   var currentDay = await getCurrentDay();
+  var newDay = currentDay + 1;
+
+  if (newDay != currentDayGlobal && newDay > currentDayGlobal) {
+    currentDayGlobal = newDay;
+    io.emit("currentDay", currentDayGlobal);
+  }
 
   // Check if Current Row of Data already exists
   var currentDailyStat = await DailyStat.findOne({currentDay: { $eq: currentDay }});

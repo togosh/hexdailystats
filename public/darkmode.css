@@ -16,7 +16,7 @@ table.dataTable {
   background-color: #000;
 }
 
-a, span, button, label, li, .dataTables_info {
+a, span, button, label, li, .dataTables_info, input {
   color: #ddd !important;
 }
 

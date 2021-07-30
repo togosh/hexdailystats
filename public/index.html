@@ -17,6 +17,8 @@
     <script src="https://cdn.datatables.net/fixedcolumns/3.3.3/js/dataTables.fixedColumns.min.js"></script>
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/fixedcolumns/3.3.3/css/fixedColumns.dataTables.min.css"/> 
 
+    <link id="styleDark" rel="stylesheet" type="text/css" href="darkmode.css" />
+
     <!-- Facebook Meta Tags -->
     <meta property="og:url" content="https://HEXDailyStats.com/">
     <meta property="og:type" content="website">
@@ -302,6 +304,16 @@
             $('#buttonLegend').click(function() { 
                 $('#divLegend').toggle();
             });
+
+            $('#buttonDark').click(function() { 
+                if( $('#styleDark').attr('disabled') == "disabled" ) {
+                    $('#styleDark').removeAttr('disabled');
+                    $('#buttonDark').text('Light Mode');
+                } else {
+                    $('#styleDark').attr('disabled', 'disabled');
+                    $('#buttonDark').text('Dark Mode');
+                }
+            });
         });
 
         function display_c(){
@@ -326,7 +338,7 @@
     </style>
 </head>
 <body style="background-color:lightgrey;" onload=display_ct();>
-<div style="width: 100%; height: 24px;"><div style="float:left;"><span id='currentDay'></span></div><div style="float:right;"><span id='ct'></span></div></div>
+<div style="width: 100%; height: 24px;"><div style="float:left;"><span id='currentDay'></span></div><div style="float:right;"><button id="buttonDark" onlick="toggleDark()" style="padding: 2px 15px; margin-right: 10px;">Light Mode</button><span id='ct'></span></div></div>
 <div>
     <div id="mainSection" style="padding-bottom: 10px;">
         <center><a href="https://t.me/HEXDailyStats"><img src="hexdailystatslogo.png" style="max-width: 100%"></img></a></center>
@@ -341,7 +353,7 @@
 
     <center><button id="buttonLegend" style="padding: 10px 80px 10px 80px">Legend</button>
     
-        <ul id="divLegend" style="display: none; text-align: left; max-width: 300px; margin-bottom: 0px;">
+        <ul id="divLegend" style="display: none; text-align: left; max-width: 360px; margin-bottom: 0px;">
             <li>All Time Low: ($0.00005645)</li></br>
             <li>APY Rate: ((Daily Payout / Staked) * 365.25)</li></br>
             <li>Total Value Locked: (Price * Staked)</li></br>

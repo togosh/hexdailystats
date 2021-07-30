@@ -1,0 +1,67 @@
+:root {
+  --theadColor: #000;
+  --theadTextColor: #fff;
+  --darkColor:#000;
+  --lightColor:#fff;
+  --darkRowColor: #1b1d1b;
+}
+
+body {
+  font-family: "Open Sans", sans-serif;
+  background-color: black !important; /*#292929*/
+}
+
+table.dataTable {
+  background-color: #000;
+}
+
+a, span, button, label, li, .dataTables_info {
+  color: #ddd !important;
+}
+
+.dataTable_previous, .dataTable_next {
+  color: white !important;
+}
+
+button {
+  background-color: #000 !important;
+}
+
+th,tr,td {
+  border-color: #000 !important;
+}
+
+thead {
+  background-color: var(--theadColor);
+}
+
+table.DTFC_Cloned thead,
+table.DTFC_Cloned tfoot {
+  background-color: var(--theadColor);
+  
+}
+
+thead > tr,
+thead > tr > th {
+  background-color: transparent;
+  color: var(--theadTextColor) !important;
+}
+
+table.dataTable thead th,
+table.dataTable thead td {
+  border-bottom: 0px solid #111 !important;
+}
+
+table.dataTable.display tbody tr.even > .sorting_1,
+table.dataTable.order-column.stripe tbody tr.even> .sorting_1, 
+table.dataTable.display tbody tr.even,
+table.dataTable.display tbody tr.odd > .sorting_1,
+table.dataTable.order-column.stripe tbody tr.odd > .sorting_1,
+table.dataTable.display tbody tr.odd {
+  background-color: var(--darkRowColor);
+  color:var(--lightColor);
+}
+
+table.dataTable thead th {
+  background-image: none !important;
+}

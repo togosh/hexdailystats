@@ -219,7 +219,7 @@
                             return data;
                         }
                     },
-                    { title: "Minted Inflation (HEX)", className: "dt-body-center" , render: function(data, type, row) {
+                    { title: "Minted Inflation (HEX)", className: "dt-body-center purple" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;
@@ -277,13 +277,13 @@
                             return data;
                         }
                     },
-                    { title: "Number of Holders", className: "dt-body-center" , render: function(data, type, row) {
+                    { title: "Number of Holders", className: "dt-body-center blue" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;
                         }
                     },
-                    { title: "Change in Number of Holders", className: "dt-body-center" , render: function(data, type, row) {
+                    { title: "Change in Number of Holders", className: "dt-body-center blue" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") {
                                 if (data < 0) { 
                                     return "(" + Math.abs(Number(data)).toLocaleString() + ")";
@@ -293,13 +293,13 @@
                             return data;
                         }
                     },
-                    { title: "Number of Stakers", className: "dt-body-center" , render: function(data, type, row) {
+                    { title: "Number of Stakers", className: "dt-body-center blue" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;
                         }
                     },
-                    { title: "Change in Number of Stakers", className: "dt-body-center" , render: function(data, type, row) {
+                    { title: "Change in Number of Stakers", className: "dt-body-center blue" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;
@@ -383,6 +383,10 @@
         .teal {
             background-color: #00B069 !important;
             font-weight: bold;
+        }
+
+        thead .blue {
+            background-color: #4666FF !important;
         }
     </style>
 </head>

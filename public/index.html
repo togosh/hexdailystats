@@ -124,7 +124,7 @@
                             return data;
                         }
                     },
-                    { title: "ROI Multiplier from All Time Low", className: "dt-body-center" , render: function(data, type, row) {
+                    { title: "ROI Multiplier from All Time Low", className: "dt-body-center teal" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") {
                                 return Number(data).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + "x";
                             }
@@ -132,7 +132,7 @@
                         }
                     },
 
-                    { title: "Payout Per T-Share (HEX)", className: "dt-body-center  purple" },
+                    { title: "Payout Per T-Share (HEX)", className: "dt-body-center  pink" },
                     { title: "T-Share Price (USD)", className: "dt-body-center pink" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return currencyFormatterNoDecimal.format(data); }
@@ -191,7 +191,7 @@
                             return data;
                         }
                     },
-                    { title: "T-Share Market Cap (USD)", className: "dt-body-center" , render: function(data, type, row) {
+                    { title: "T-Share Market Cap (USD)", className: "dt-body-center pink" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return "$" + nFormatter(data, 2); }
                             return data;
@@ -204,7 +204,7 @@
                             return data;
                         }
                     },
-                    { title: "Change in T-Shares (SHARES)", className: "dt-body-center" , render: function(data, type, row) {
+                    { title: "Change in T-Shares (SHARES)", className: "dt-body-center blue" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") {
                                 if (data < 0) { 
                                     return '<div class="red-negative">' + "(" + Math.abs(Number(data)).toLocaleString() + ")" + '</div>';
@@ -221,7 +221,7 @@
                             return data;
                         }
                     },
-                    { title: "Minted Inflation (HEX)", className: "dt-body-center purple" , render: function(data, type, row) {
+                    { title: "Minted Inflation (HEX)", className: "dt-body-center teal" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;
@@ -234,7 +234,7 @@
                             return data;
                         }
                     },
-                    { title: "Change in Circulating Supply (HEX)", className: "dt-body-center" , render: function(data, type, row) {
+                    { title: "Change in Circulating Supply (HEX)", className: "dt-body-center blue" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") {
                                 if (data < 0) { 
                                     return '<div class="red-negative">' + "(" + Math.abs(Number(data)).toLocaleString() + ")" + '</div>';
@@ -250,7 +250,7 @@
                             return data;
                         }
                     },
-                    { title: "Change in Staked Supply (HEX)", className: "dt-body-center" , render: function(data, type, row) {
+                    { title: "Change in Staked Supply (HEX)", className: "dt-body-center blue" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") {
                                 if (data < 0) { 
                                     return '<div class="red-negative">' + "(" + Math.abs(Number(data)).toLocaleString() + ")" + '</div>';
@@ -279,7 +279,7 @@
                             return data;
                         }
                     },
-                    { title: "Number of Holders", className: "dt-body-center blue" , render: function(data, type, row) {
+                    { title: "Number of Holders", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;
@@ -295,7 +295,7 @@
                             return data;
                         }
                     },
-                    { title: "Number of Stakers", className: "dt-body-center blue" , render: function(data, type, row) {
+                    { title: "Number of Stakers", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;
@@ -376,25 +376,25 @@
         a { color:black; }
 
         .red-negative {
-            color: #e73030f0;
+            color: #fb01aa;
         }
         
         .purple {
-            background-color: #843fff4d !important;
+            background-color: #4d00ded9 !important;
             /*font-weight: bold;*/
         }
 
         .pink {
-            background-color: #f907ff52 !important;
+            background-color: #ff01ff96 !important;
         }
         
         .teal {
-            background-color: #00B0694d !important;
+            background-color: #11ffa0c9 !important;
             /*font-weight: bold;*/
         }
 
         .blue {
-            background-color: #4666FF4d !important;
+            background-color: #080060 !important;
         }
     </style>
 </head>

@@ -131,6 +131,7 @@ io.on('connection', (socket) => {
   socket.emit("currentDay", currentDayGlobal);
 });
 
+if(!DEBUG){
 const rule = new schedule.RecurrenceRule();
 rule.hour = 0;
 rule.minute = 5;
@@ -150,6 +151,7 @@ const job2 = schedule.scheduleJob(rule2, function(){
   log('**** DAILY DATA TIMER 2!');
   if (!getDataRunning){ getDailyData(); }
 });
+}
 
 
 if (CONFIG.price.enabled) {

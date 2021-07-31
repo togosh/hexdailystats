@@ -343,12 +343,14 @@
                 }
             });
 
-            if (localStorage.getItem('theme') == 'dark') {
-                $('#styleDark').removeAttr('disabled');
-                $('#buttonDark').text('Light Mode');
-            } else {
+            if (localStorage.getItem('theme') == 'light') {
                 $('#styleDark').attr('disabled', 'disabled');
                 $('#buttonDark').text('Dark Mode');
+            }
+            else {
+                $('#styleDark').removeAttr('disabled');
+                $('#buttonDark').text('Light Mode');
+                localStorage.setItem('theme', 'dark');
             }
         });
 

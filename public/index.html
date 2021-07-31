@@ -119,7 +119,7 @@
                     },
                     { title: "Price Change % (USD)", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
-                                return Number(data/100).toLocaleString(undefined,{style: 'percent', minimumFractionDigits:2}); } 
+                                return Number(data/100).toLocaleString(undefined,{style: 'percent', minimumFractionDigits:1}); } 
                             return data;
                         }
                     },

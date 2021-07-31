@@ -119,6 +119,7 @@
                     },
                     { title: "Price Change % (USD)", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
+                                if (data < 0) { return '<div class="red-negative">' + Number(data/100).toLocaleString(undefined,{style: 'percent', minimumFractionDigits:1}) + '</div>'; }
                                 return Number(data/100).toLocaleString(undefined,{style: 'percent', minimumFractionDigits:1}); } 
                             return data;
                         }
@@ -206,7 +207,7 @@
                     { title: "Change in T-Shares (SHARES)", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") {
                                 if (data < 0) { 
-                                    return "(" + Math.abs(Number(data)).toLocaleString() + ")";
+                                    return '<div class="red-negative">' + "(" + Math.abs(Number(data)).toLocaleString() + ")" + '</div>';
                                 } 
                                 return Number(data).toLocaleString(); 
                             }
@@ -236,7 +237,7 @@
                     { title: "Change in Circulating Supply (HEX)", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") {
                                 if (data < 0) { 
-                                    return "(" + Math.abs(Number(data)).toLocaleString() + ")";
+                                    return '<div class="red-negative">' + "(" + Math.abs(Number(data)).toLocaleString() + ")" + '</div>';
                                 } 
                                 return Number(data).toLocaleString(); 
                             }
@@ -252,7 +253,7 @@
                     { title: "Change in Staked Supply (HEX)", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") {
                                 if (data < 0) { 
-                                    return "(" + Math.abs(Number(data)).toLocaleString() + ")";
+                                    return '<div class="red-negative">' + "(" + Math.abs(Number(data)).toLocaleString() + ")" + '</div>';
                                 } 
                                 return Number(data).toLocaleString(); 
                             }
@@ -373,6 +374,10 @@
     </script>
     <style>
         a { color:black; }
+
+        .red-negative {
+            color: #e73030f0;
+        }
         
         .purple {
             background-color: #843fff4d !important;

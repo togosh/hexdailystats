@@ -422,6 +422,13 @@ async function getDailyData() {
       totalValueLocked:         totalValueLocked,
     });
 
+    // Check if Current Row of Data already exists Again
+    var currentDailyStat2 = await DailyStat.findOne({currentDay: { $eq: currentDay }});
+    if (!isEmpty(currentDailyStat2)) {
+      log('WARNING - Current Daily Stat already set Again - Day#: ' + currentDay);
+      return;
+    }
+
     dailyStat.save(function (err) {
       if (err) return log(err);
     });

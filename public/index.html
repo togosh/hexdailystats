@@ -36,6 +36,7 @@
 
     <script>
         var currencyFormatter = new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD'});
+        var currencyFormatterPriceThree = new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD', minimumFractionDigits: 3});
         var currencyFormatterPrice = new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD', minimumFractionDigits: 4});
         var currencyFormatterNoDecimal = new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0});
 
@@ -112,7 +113,7 @@
                     },
                     { title: "Price (USD)", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
-                                return currencyFormatterPrice.format(data); }
+                                return currencyFormatterPriceThree.format(data); }
                             return data;
                         }
                     },
@@ -150,7 +151,7 @@
                         }
                     },
 
-                    { title: "Avg Stake Length (Years)", className: "dt-body-center pink" },
+                    { title: "Avg Stake Length (Years)", className: "dt-body-center purple" },
                     { title: "APY Rate (Interest + EES Penalties)", className: "dt-body-center  purple" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data/100).toLocaleString(undefined,{style: 'percent', minimumFractionDigits:2}); } 
@@ -372,21 +373,21 @@
         a { color:black; }
         
         .purple {
-            background-color: #843FFF !important;
-            font-weight: bold;
+            background-color: #843fff4d !important;
+            /*font-weight: bold;*/
         }
 
-        thead .pink {
-            background-color: #D500DA !important;
+        .pink {
+            background-color: #f907ff52 !important;
         }
         
         .teal {
-            background-color: #00B069 !important;
-            font-weight: bold;
+            background-color: #00B0694d !important;
+            /*font-weight: bold;*/
         }
 
-        thead .blue {
-            background-color: #4666FF !important;
+        .blue {
+            background-color: #4666FF4d !important;
         }
     </style>
 </head>

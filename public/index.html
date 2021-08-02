@@ -62,7 +62,11 @@
             var item = lookup.slice().reverse().find(function(item) {
                 return num >= item.value;
             });
-            return item ? (num / item.value).toFixed(digits).replace(rx, "$1") + item.symbol : "0";
+
+            return { 
+                amount: (num / item.value).toFixed(digits).replace(rx, "$1"),
+                symbol: item.symbol
+            }
         }
 
         socket.on('rowData', function (data) {
@@ -145,7 +149,7 @@
                             return data;
                         }
                     },
-                    { title: "Increase in  T-Share Rate (HEX)", className: "dt-body-center pink" , render: function(data, type, row) {
+                    { title: "Increase in  T-Share Rate (HEX)", className: "dt-body-center blue" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;
@@ -181,19 +185,22 @@
 
                     { title: "Total Value Locked (USD)", className: "dt-body-center teal" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
-                                return "$" + nFormatter(data, 2); }
+                                var { amount, symbol } = nFormatter(data, 2);
+                                return "$" + Number(amount).toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2}) + symbol; }
                             return data;
                         }
                     },
                     { title: "Market Cap (USD)", className: "dt-body-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
-                                return "$" + nFormatter(data, 2); }
+                                var { amount, symbol } = nFormatter(data, 2);
+                                return "$" + Number(amount).toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2}) + symbol; }
                             return data;
                         }
                     },
                     { title: "T-Share Market Cap (USD)", className: "dt-body-center pink" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
-                                return "$" + nFormatter(data, 2); }
+                                var { amount, symbol } = nFormatter(data, 2);
+                                return "$" + Number(amount).toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2}) + symbol; }
                             return data;
                         }
                     },
@@ -408,7 +415,7 @@
         }
 
         thead .blue {
-            background-color: #0800609c !important;
+            background-color: #0800609c !important; /* #0037ff8a */
         }
     </style>
 </head>

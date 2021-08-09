@@ -77,14 +77,11 @@
             a1.length === a2.length && a1.every((o, idx) => objectsEqual(o, a2[idx]));
 
         socket.on('rowData', function (data) {
-            console.log("arraysEqual() ------------");
-            console.log(arraysEqual(rowData, data));
-            if (data && data !== rowData) {
+            if (data && !arraysEqual(rowData, data)) {
                 console.log(new Date().toISOString() + " - " + "rowData updated");
                 console.log("rowData -----");
                 console.log(rowData);
                 console.log("data ------");
-                console.log("-----------");
                 console.log(data);
                 rowData = data;
                 createDataTable(data);

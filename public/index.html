@@ -18,6 +18,7 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/fixedcolumns/3.3.3/css/fixedColumns.dataTables.min.css"/> 
 
     <link id="styleDark" rel="stylesheet" type="text/css" href="darkmode.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">
 
     <!-- Facebook Meta Tags -->
     <meta property="og:url" content="https://HEXDailyStats.com/">
@@ -89,7 +90,9 @@
         });
         
         function createDataTable(data) {
-            $('#dataTable').DataTable({
+            $('#dataTable').on('draw.dt', function () {
+                $("#loadercontainer").css("display","none");
+            }).DataTable({
                 destroy: true,
                 data: data,
                 scrollX: true,
@@ -438,10 +441,17 @@
         thead .blue {
             background-color: #0800609c !important; /* #0037ff8a */
         }
+
+        #loadercontainer{
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
     </style>
 </head>
 <body style="background-color:lightgrey;" onload=display_ct();>
-<div style="width: 100%; height: 24px; padding-bottom: 10px;"><div style="float:left; padding: 0px 2px;"><span id='currentDay'></span></div><div style="float:right;"><button id="buttonDark" onlick="toggleDark()" style="padding: 2px 36px; margin-right: 10px;">Light Mode</button><span id='ct'></span></div></div>
+<div style="width: 100%; height: 32px; padding-bottom: 10px;"><div style="float:left; padding: 0px 2px;"><span id='currentDay'></span></div><div style="float:right;"><button id="buttonDark" onlick="toggleDark()" style="padding: 2px 36px; margin-right: 10px;">Light Mode</button><span id='ct'></span></div></div>
 <div>
     <div id="mainSection" style="padding-bottom: 10px;">
         <center><a href="https://t.me/HEXDailyStats"><img src="hexdailystatslogo.png" style="max-width: 100%"></img></a></center>
@@ -451,7 +461,14 @@
         <a href="https://twitter.com/HEXDailyStats">Twitter</a> |
         <a href="https://t.me/HEXDailyStats">Telegram</a>
         </div></center>
-        <table id="dataTable" class="display" width="100%" data-page-length='10'></table>
+        <div id="tablecontainer"><table id="dataTable" class="display" width="100%" data-page-length='10'></table></div>
+        <div id="loadercontainer">
+        <div class="d-flex justify-content-center text-secondary" id="loader">
+                <div class="spinner-border" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
+            </div>
+        </div>
     </div>
 
     <center><button id="buttonLegend" style="padding: 10px 80px 10px 80px">Legend</button>

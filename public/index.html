@@ -78,7 +78,7 @@
 
         socket.on('rowData', function (data) {
             console.log("arraysEqual() ------------");
-            console.log(arraysEqual(rowData, row));
+            console.log(arraysEqual(rowData, data));
             if (data && data !== rowData) {
                 console.log(new Date().toISOString() + " - " + "rowData updated");
                 console.log("rowData -----");

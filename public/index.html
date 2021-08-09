@@ -73,6 +73,7 @@
             if (data && data !== rowData) {
                 rowData = data;
                 createDataTable(data);
+                console.log(new Date().toISOString() + " - " + "rowData updated");
             }
         });
         
@@ -81,7 +82,7 @@
                 destroy: true,
                 data: data,
                 scrollX: true,
-                scrollY: "380px",
+                //scrollY: "380px",
                 scrollCollapse: true,
                 order: [[ 0, "desc" ]],
                 dom: 'Bfrtip',
@@ -98,7 +99,12 @@
                     {
                         extend: "excelHtml5",
                         exportOptions: { orthogonal: "exportxls" }
-                    }
+                    },
+                    'pageLength'
+                ],
+                lengthMenu: [
+                    [ 10, 25, 50, -1 ],
+                    [ '10 rows', '25 rows', '50 rows', 'Show all' ]
                 ],
                 fixedColumns: {
                     leftColumns: 1
@@ -156,7 +162,11 @@
                         }
                     },
 
-                    { title: "Avg Stake Length (Years)", className: "dt-body-center purple" },
+                    { title: "Avg Stake Length (Years)", className: "dt-body-center purple", render: function(data, type, row) {
+                            if (type === "display" || type === "filter") { 
+                                return Number(data).toLocaleString(undefined,{minimumFractionDigits:2}); } 
+                            return data;
+                        } },
                     { title: "APY Rate (Interest + EES Penalties)", className: "dt-body-center  purple" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data/100).toLocaleString(undefined,{style: 'percent', minimumFractionDigits:2}); } 

@@ -124,8 +124,8 @@
                     leftColumns: 1
                 },
                 columns: [
-                    { title: "Day", className: "dt-body-center" },
-                    { title: "Date", className: "dt-body-center" , render: function (data, type, row) {
+                    { title: "Day", className: "text-center" },
+                    { title: "Date", className: "text-center" , render: function (data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 var date = new Date(data);
                                 date.setDate(date.getDate() - 1);
@@ -135,20 +135,20 @@
                             return data;
                         }
                     },
-                    { title: "Price (USD)", className: "dt-body-center" , render: function(data, type, row) {
+                    { title: "Price (USD)", className: "text-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return currencyFormatterPriceThree.format(data); }
                             return data;
                         }
                     },
-                    { title: "Price Change % (USD)", className: "dt-body-center" , render: function(data, type, row) {
+                    { title: "Price Change % (USD)", className: "text-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 if (data < 0) { return '<div class="red-negative">' + Number(data/100).toLocaleString(undefined,{style: 'percent', minimumFractionDigits:1}) + '</div>'; }
                                 return Number(data/100).toLocaleString(undefined,{style: 'percent', minimumFractionDigits:1}); } 
                             return data;
                         }
                     },
-                    { title: "ROI Multiplier from All Time Low", className: "dt-body-center teal" , render: function(data, type, row) {
+                    { title: "ROI Multiplier from All Time Low", className: "text-center teal" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") {
                                 return Number(data).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + "x";
                             }
@@ -156,72 +156,72 @@
                         }
                     },
 
-                    { title: "Payout Per T-Share (HEX)", className: "dt-body-center  pink" },
-                    { title: "T-Share Price (USD)", className: "dt-body-center pink" , render: function(data, type, row) {
+                    { title: "Payout Per T-Share (HEX)", className: "text-center  pink" },
+                    { title: "T-Share Price (USD)", className: "text-center pink" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return currencyFormatterNoDecimal.format(data); }
                             return data;
                         }
                     },
-                    { title: "T-Share Rate (HEX)", className: "dt-body-center pink" , render: function(data, type, row) {
+                    { title: "T-Share Rate (HEX)", className: "text-center pink" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;
                         }
                     },
-                    { title: "Increase in  T-Share Rate (HEX)", className: "dt-body-center blue" , render: function(data, type, row) {
+                    { title: "Increase in  T-Share Rate (HEX)", className: "text-center blue" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;
                         }
                     },
 
-                    { title: "Avg Stake Length (Years)", className: "dt-body-center purple", render: function(data, type, row) {
+                    { title: "Avg Stake Length (Years)", className: "text-center purple", render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(undefined,{minimumFractionDigits:2}); } 
                             return data;
                         } },
-                    { title: "APY Rate (Interest + EES Penalties)", className: "dt-body-center  purple" , render: function(data, type, row) {
+                    { title: "APY Rate (Interest + EES Penalties)", className: "text-center purple" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data/100).toLocaleString(undefined,{style: 'percent', minimumFractionDigits:2}); } 
                             return data;
                         }
                     },
 
-                    { title: "Liquidity Pool V2 + V3 (HEX)", className: "dt-body-center" , render: function(data, type, row) {
+                    { title: "Liquidity Pool V2 + V3 (HEX)", className: "text-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;
                         }
                     },
-                    { title: "Liquidity Pool V2 + V3 (USDC)", className: "dt-body-center" , render: function(data, type, row) {
+                    { title: "Liquidity Pool V2 + V3 (USDC)", className: "text-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;
                         }
                     },
-                    { title: "Liquidity Pool V2 + V3 (ETH)", className: "dt-body-center" , render: function(data, type, row) {
+                    { title: "Liquidity Pool V2 + V3 (ETH)", className: "text-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;
                         }
                     },
 
-                    { title: "Total Value Locked (USD)", className: "dt-body-center teal" , render: function(data, type, row) {
+                    { title: "Total Value Locked (USD)", className: "text-center teal" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 var { amount, symbol } = nFormatter(data, 2);
                                 return "$" + Number(amount).toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2}) + symbol; }
                             return data;
                         }
                     },
-                    { title: "Market Cap (USD)", className: "dt-body-center" , render: function(data, type, row) {
+                    { title: "Market Cap (USD)", className: "text-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 var { amount, symbol } = nFormatter(data, 2);
                                 return "$" + Number(amount).toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2}) + symbol; }
                             return data;
                         }
                     },
-                    { title: "T-Share Market Cap (USD)", className: "dt-body-center pink" , render: function(data, type, row) {
+                    { title: "T-Share Market Cap (USD)", className: "text-center pink" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 var { amount, symbol } = nFormatter(data, 2);
                                 return "$" + Number(amount).toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2}) + symbol; }
@@ -229,13 +229,13 @@
                         }
                     },
 
-                    { title: "T-Shares (SHARES)", className: "dt-body-center" , render: function(data, type, row) {
+                    { title: "T-Shares (SHARES)", className: "text-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;
                         }
                     },
-                    { title: "Change in T-Shares (SHARES)", className: "dt-body-center blue" , render: function(data, type, row) {
+                    { title: "Change in T-Shares (SHARES)", className: "text-center blue" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") {
                                 if (data < 0) { 
                                     return '<div class="red-negative">' + "(" + Math.abs(Number(data)).toLocaleString() + ")" + '</div>';
@@ -246,26 +246,26 @@
                         }
                     },
 
-                    { title: "Circulating + Staked (HEX)", className: "dt-body-center" , render: function(data, type, row) {
+                    { title: "Circulating + Staked (HEX)", className: "text-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;
                         }
                     },
-                    { title: "Minted Inflation (HEX)", className: "dt-body-center teal" , render: function(data, type, row) {
+                    { title: "Minted Inflation (HEX)", className: "text-center teal" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;
                         }
                     },
                     
-                    { title: "Circulating Supply (HEX)", className: "dt-body-center" , render: function(data, type, row) {
+                    { title: "Circulating Supply (HEX)", className: "text-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;
                         }
                     },
-                    { title: "Change in Circulating Supply (HEX)", className: "dt-body-center blue" , render: function(data, type, row) {
+                    { title: "Change in Circulating Supply (HEX)", className: "text-center blue" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") {
                                 if (data < 0) { 
                                     return '<div class="red-negative">' + "(" + Math.abs(Number(data)).toLocaleString() + ")" + '</div>';
@@ -275,13 +275,13 @@
                             return data;
                         }
                     },
-                    { title: "Staked Supply (HEX)", className: "dt-body-center" , render: function(data, type, row) {
+                    { title: "Staked Supply (HEX)", className: "text-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;
                         }
                     },
-                    { title: "Change in Staked Supply (HEX)", className: "dt-body-center blue" , render: function(data, type, row) {
+                    { title: "Change in Staked Supply (HEX)", className: "text-center blue" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") {
                                 if (data < 0) { 
                                     return '<div class="red-negative">' + "(" + Math.abs(Number(data)).toLocaleString() + ")" + '</div>';
@@ -291,32 +291,32 @@
                             return data;
                         }
                     },
-                    { title: "Staked % of Coins", className: "dt-body-center" , render: function(data, type, row) {
+                    { title: "Staked % of Coins", className: "text-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data/100).toLocaleString(undefined,{style: 'percent', minimumFractionDigits:2}); } 
                             return data;
                         }
                     },
 
-                    { title: "Payout (HEX)", className: "dt-body-center" , render: function(data, type, row) {
+                    { title: "Payout (HEX)", className: "text-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;
                         }
                     },
-                    { title: "Penalties (HEX)", className: "dt-body-center" , render: function(data, type, row) {
+                    { title: "Penalties (HEX)", className: "text-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;
                         }
                     },
-                    { title: "Number of Holders", className: "dt-body-center" , render: function(data, type, row) {
+                    { title: "Number of Holders", className: "text-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;
                         }
                     },
-                    { title: "Change in Number of Holders", className: "dt-body-center blue" , render: function(data, type, row) {
+                    { title: "Change in Number of Holders", className: "text-center blue" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") {
                                 if (data < 0) { 
                                     return "(" + Math.abs(Number(data)).toLocaleString() + ")";
@@ -326,13 +326,13 @@
                             return data;
                         }
                     },
-                    { title: "Number of Stakers", className: "dt-body-center" , render: function(data, type, row) {
+                    { title: "Number of Stakers", className: "text-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;
                         }
                     },
-                    { title: "Change in Number of Stakers", className: "dt-body-center blue" , render: function(data, type, row) {
+                    { title: "Change in Number of Stakers", className: "text-center blue" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;

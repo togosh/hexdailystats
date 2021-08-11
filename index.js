@@ -664,7 +664,11 @@ async function get_dailyDataUpdate(currentDay){
     payout = payout.substring(0, payout.length - 8);
 
     var totalTshares = res.data.dailyDataUpdates[0].shares;
-    totalTshares = totalTshares.substring(0, totalTshares.length - 12);
+    if (totalTshares == 0) {
+      totalTshares = "0";
+    } else {
+      totalTshares = totalTshares.substring(0, totalTshares.length - 12);
+    }
 
     return {
       dailyPayoutHEX: parseInt(payout),

@@ -262,7 +262,7 @@ async function getRowData() {
       rowDataNew.push(row);
     }
 
-    if (rowData === undefined || !arraysEqual(rowData, rowDataNew)) {
+    if (rowData === undefined || !(JSON.stringify(rowData) === JSON.stringify(rowDataNew))){ //!arraysEqual(rowData, rowDataNew)) {
       rowData = rowDataNew;
       log('SOCKET -- ****EMIT: rowData');
       io.emit("rowData", rowData);

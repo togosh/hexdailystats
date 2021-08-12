@@ -324,7 +324,7 @@ async function getDailyData() {
 
   // Calculated Values
   var totalTsharesChange      = (totalTshares - previousDailyStat.totalTshares);
-  var payoutPerTshareHEX      = parseFloat((dailyPayoutHEX / totalTshares).toFixed(3));
+  var payoutPerTshareHEX      = (dailyPayoutHEX / totalTshares);
   var actualAPYRate           = parseFloat(((dailyPayoutHEX / stakedHEX) * 365.25 * 100).toFixed(2));
 
   var stakedSupplyChange      = (stakedHEX - previousDailyStat.stakedHEX);
@@ -599,7 +599,7 @@ async function get_shareRateChange(){
 
     var tShareRateHEX = res.data.shareRateChanges[0].tShareRateHex;
 
-    return parseInt(tShareRateHEX);
+    return tShareRateHEX;
   });
 }
 
@@ -661,18 +661,18 @@ async function get_dailyDataUpdate(currentDay){
     }
 
     var payout = res.data.dailyDataUpdates[0].payout;
-    payout = payout.substring(0, payout.length - 8);
+    payout = payout.substring(0, payout.length - 8) + "." + payout.substring(payout.length - 8);
 
     var totalTshares = res.data.dailyDataUpdates[0].shares;
     if (totalTshares == 0) {
       totalTshares = "0";
     } else {
-      totalTshares = totalTshares.substring(0, totalTshares.length - 12);
+      totalTshares = totalTshares.substring(0, totalTshares.length - 12) + "." + totalTshares.substring(totalTshares.length - 12);
     }
 
     return {
-      dailyPayoutHEX: parseInt(payout),
-      totalTshares: parseInt(totalTshares),
+      dailyPayoutHEX: parseFloat(payout),
+      totalTshares: parseFloat(totalTshares),
       success: true
     }
   });

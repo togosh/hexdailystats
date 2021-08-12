@@ -1169,3 +1169,317 @@ async function updatePrice(){
 		log("PRICE --- ERROR - updatePrice() - " + err + "\n" + err.stack);
 	}
 }
+
+
+
+
+
+////////////////////////////////////////////////
+// HISTORICAL
+
+async function createAllRows(){
+  var currentDay = await getCurrentDay();
+  var previousDate = new Date();
+  var dateOffset = (24*60*60*1000) * 1;
+
+  for (var day = 597; day >= 594; day--) {
+    var rowFind = await DailyStat.findOne({currentDay: { $eq: day}});
+
+    if (isEmpty(rowFind)) {
+      previousDate.setTime(previousDate.getTime() - dateOffset);
+
+      var newRow = new DailyStat({ 
+        date:               previousDate,
+        currentDay:         day,
+        circulatingHEX:     0,
+        stakedHEX:          0,
+
+        tshareRateHEX:      0,
+        dailyPayoutHEX:     0,
+        totalTshares:       0,
+        averageStakeLength: 0,
+        penaltiesHEX:       0,
+
+        priceUV2:           0,
+        priceUV3:           0,
+
+        liquidityUV2_USDC:  0,
+        liquidityUV2_ETH:   0,
+        liquidityUV3_USDC:  0,
+        liquidityUV3_ETH:   0,
+
+        // CALCULATED DATA
+        tshareRateIncrease: 0,
+        tshareRateUSD:      0,
+
+        totalTsharesChange: 0,
+        payoutPerTshareHEX: 0,
+        actualAPYRate:      0,
+
+        stakedSupplyChange:       0,
+        circulatingSupplyChange:  0,
+
+        stakedHEXPercent:         0,
+        stakedHEXPercentChange:   0,
+
+        priceUV2UV3:          0,
+        priceChangeUV2:       0,
+        priceChangeUV3:       0,
+        priceChangeUV2UV3:    0,
+
+        liquidityUV2UV3_USDC: 0,
+        liquidityUV2UV3_ETH:  0,
+        liquidityUV2UV3_HEX:  0,
+
+        numberOfHolders:        0,
+        numberOfHoldersChange:  0,
+
+        dailyMintedInflationTotal:  0,
+
+        totalHEX: 0,
+
+        marketCap:                        0,
+        tshareMarketCap:                  0,
+        tshareMarketCapToMarketCapRatio:  0,
+
+        roiMultiplierFromATL:             0,
+
+        uniqueStakerCount:        0,
+        uniqueStakerCountChange:  0,
+
+        totalValueLocked:        0,
+      });
+
+      //await sleep(500);
+
+      log("CREATEROWS - SAVE: " + newRow.date + " - " + day);
+      newRow.save(function (err) {
+        if (err) return log("CREATEROWS - SAVE ERROR: " + err);
+      });
+
+    } else {
+      console.log("row Found! ------ " + day)
+      console.log("rowFind.date - " + rowFind.date);
+      previousDate = new Date(rowFind.date);
+    }
+
+    //await sleep(500);
+  }
+}
+
+async function create_dailyUpdates(){
+  log("create_dailyUpdates");
+  var day = 618;
+  var { dailyPayoutHEX, totalTshares, success } = await get_dailyDataUpdate(day);
+  log(dailyPayoutHEX);
+  log(totalTshares);
+  log((dailyPayoutHEX / totalTshares));
+  return;
+
+  try {
+  for (var day = 191; day <= 617; day++) {
+    var rowFind = await DailyStat.findOne({currentDay: { $eq: day}});
+    if (!isEmpty(rowFind)) {
+      var { dailyPayoutHEX, totalTshares, success } = await get_dailyDataUpdate(day);
+      //log(dailyPayoutHEX + " - " + totalTshares + " - " + success);
+      if (success) { 
+
+        rowFind.dailyPayoutHEX = dailyPayoutHEX;
+        rowFind.totalTshares = totalTshares
+
+        if ( totalTshares == 0 ) {
+          rowFind.payoutPerTshareHEX = 0.0;
+        } else {
+          rowFind.payoutPerTshareHEX = (dailyPayoutHEX / totalTshares);
+        }
+
+        log("CREATEDAILY - SAVE: " + rowFind.dailyPayoutHEX + " - " + rowFind.totalTshares + " - " + rowFind.payoutPerTshareHEX + " ------ " + day);
+        rowFind.save(function (err) {
+          if (err) return log("CREATEDAILY - SAVE ERROR: " + err);
+        });
+      } else {
+        log("CREATEDAILY - MISSING DATA DAY: " + day); 
+      }
+    } else {
+      log("CREATEDAILY - MISSING DAY: " + day); 
+    }
+    
+    await sleep(50);
+  }
+} catch (error) {
+  log("ERROR");
+  log(error);
+}
+}
+
+async function create_totalTshareChanges(){
+  for (var day = 3; day < 593; day++) {
+    var rowFind = await DailyStat.findOne({currentDay: { $eq: day}});
+    var rowFind2 = await DailyStat.findOne({currentDay: { $eq: day + 1}});
+    if (!isEmpty(rowFind) && !isEmpty(rowFind2)){
+      var totalTsharesChange = (rowFind2.totalTshares - rowFind.totalTshares);
+      rowFind2.totalTsharesChange = totalTsharesChange;
+
+      log("CREATETSHARECHANGE - SAVE: " + totalTsharesChange + " - " + (day + 1));
+      rowFind2.save(function (err) {
+        if (err) return log("CREATETSHARECHANGE - SAVE ERROR: " + err);
+      });
+    }
+  }  
+}
+
+
+
+///////////////////////////////////////////
+
+// Day 2 = 2019-12-04T00:00:00.000Z <= data < 2019-12-05T00:00:00.000Z = 1575417600
+const day2Epoch = 1575417600 + 86400;
+
+async function get_shareRateChangeByDay(day){
+
+  var dayMultiplier = day - 2;
+  var startTime = day2Epoch + (dayMultiplier * 86400);
+  var endTime = startTime + 86400;
+  log("get_shareRateChangeByDay() --- startTime " + startTime + " endTime " + endTime + " day --- " + day);
+
+  return await fetch('https://api.thegraph.com/subgraphs/name/codeakk/hex', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query: `
+      query {
+        shareRateChanges(
+          first: 1, 
+          orderDirection: desc, 
+          orderBy: timestamp,
+          where: { 
+            timestamp_gte: ` + startTime + `,
+            timestamp_lt: ` + endTime + `,
+          } 
+        ) {
+          shareRate
+          tShareRateHearts
+          tShareRateHex
+        }
+      }` 
+    }),
+  })
+  .then(res => res.json())
+  .then(res => {
+    log(res);
+    log(Object.keys(res.data.shareRateChanges).length);
+    if (Object.keys(res.data.shareRateChanges).length <= 0) {
+      return {
+        tShareRateHEX: 0
+      }
+    }
+
+    var tShareRateHEX = res.data.shareRateChanges[0].tShareRateHex;
+    log(tShareRateHEX);
+
+    return {
+      tShareRateHEX: tShareRateHEX
+    }
+  });
+}
+
+async function create_tshareRateHEXs(){
+  log("create_tshareRateHEXs");
+  var { tShareRateHEX } = await get_shareRateChangeByDay(618);
+  log("CREATE_tshareRateHEX - TEST: " + tShareRateHEX + " ------ " + day);
+  return;
+  try {
+    var previousValue = 0;
+    for (var day = 594; day <= 617; day++) {
+      var rowFind = await DailyStat.findOne({currentDay: { $eq: day}});
+      if (!isEmpty(rowFind)) {
+        var { tShareRateHEX } = await get_shareRateChangeByDay(day);
+
+        if (!tShareRateHEX) {
+          tShareRateHEX = previousValue;
+        }
+        previousValue = tShareRateHEX;
+
+        rowFind.tshareRateHEX = tShareRateHEX;
+
+        log("CREATE_tshareRateHEX - SAVE: " + tShareRateHEX + " ------ " + day);
+        rowFind.save(function (err) {
+          if (err) return log("CREATE_tshareRateHEX - SAVE ERROR: " + err);
+        });
+
+      } else {
+        log("CREATE_tshareRateHEX - MISSING DAY: " + day); 
+      }
+      
+      //await sleep(10000);
+    }
+  } catch (error) {
+    log("ERROR");
+    log(error);
+  }
+}
+
+async function create_tshareRateHEXIncreases(){
+  log("create_tshareRateHEXIncreases");
+  try {
+    for (var day = 594; day <= 616; day++) {
+
+      var rowFind = await DailyStat.findOne({currentDay: { $eq: day}});
+      var rowFind2 = await DailyStat.findOne({currentDay: { $eq: day + 1}});
+
+      if (!isEmpty(rowFind) && !isEmpty(rowFind2)){
+        var tshareRateIncrease = Math.round(Math.round(rowFind2.tshareRateHEX) - Math.round(rowFind.tshareRateHEX));
+        rowFind2.tshareRateIncrease = tshareRateIncrease;
+
+        log("CREATE_tshareRateIncrease - SAVE: " + tshareRateIncrease + " ------ " + day);
+        rowFind2.save(function (err) {
+          if (err) return log("CREATE_tshareRateIncrease - SAVE ERROR: " + err);
+        });
+
+      } else {
+        log("CREATE_tshareRateIncrease- MISSING DAY: " + day); 
+      }
+      
+      //await sleep(10000);
+    }
+  } catch (error) {
+    log("ERROR");
+    log(error);
+  }
+}
+
+
+
+async function update_shiftRowsDown(){
+  log("update_shiftRowsDown");
+  try {
+    var dateOffset = (24*60*60*1000) * 1;
+
+    for (var day = 595; day <= 595; day++) {
+
+      var rowFind = await DailyStat.findOne({currentDay: { $eq: day}});
+
+      if (!isEmpty(rowFind)){
+
+        rowFind.currentDay = (day - 1);
+
+        var rowDate = new Date(rowFind.date)
+        rowDate.setTime(rowDate.getTime() - dateOffset);
+
+        rowFind.date = rowDate;
+
+        log("update_shiftRowsDown - SAVE:  ------ " + day);
+        rowFind.save(function (err) {
+          if (err) return log("update_shiftRowsDown - SAVE ERROR: " + err);
+        });
+
+      } else {
+        log("update_shiftRowsDown - MISSING DAY: " + day); 
+      }
+      
+      //await sleep(10000);
+    }
+  } catch (error) {
+    log("ERROR");
+    log(error);
+  }
+}

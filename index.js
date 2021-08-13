@@ -82,6 +82,7 @@ app.use(function(req, res, next) {
 	}
 
   getAndSet_currentGlobalDay();
+  if (!getRowDataRunning){ getRowData(); }
 
 	next();
 });

@@ -38,6 +38,8 @@
     <script>
         var currencyFormatter = new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD'});
         var currencyFormatterPriceThree = new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD', minimumFractionDigits: 3});
+        var currencyFormatterPriceFour = new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD', minimumFractionDigits: 4});
+        var currencyFormatterPriceFive = new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD', minimumFractionDigits: 5});
         var currencyFormatterPrice = new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD', minimumFractionDigits: 4});
         var currencyFormatterNoDecimal = new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0});
 
@@ -145,7 +147,15 @@
                     },
                     { title: "Price (USD)", className: "text-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
-                                return currencyFormatterPriceThree.format(data); }
+                                //if ((Number(data) * 1000) < 1) {
+                                //    return currencyFormatterPriceFive.format(data);
+                                //} else 
+                                //if ((Number(data) * 100) < 1) {
+                                //    return currencyFormatterPriceFive.format(data);
+                                //} else if ((Number(data) * 10) < 1) {
+                                //    return currencyFormatterPriceFour.format(data);
+                                //}
+                                return currencyFormatterPriceFive.format(data); }
                             return data;
                         }
                     },

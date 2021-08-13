@@ -126,7 +126,7 @@ io.on('connection', (socket) => {
 	log('SOCKET -- ************* CONNECTED: ' + socket.id + ' *************');
 	if (rowData){ socket.emit("rowData", rowData); };
   //if (!getDataRunning){ getDailyData(); }
-  if (!getRowDataRunning){ getRowData(); }
+  //if (!getRowDataRunning){ getRowData(); }
   socket.emit("hexPrice", hexPrice);
   socket.emit("currentDay", currentDayGlobal);
 

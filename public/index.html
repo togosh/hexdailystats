@@ -213,19 +213,19 @@
 
                     { title: "Liquidity Pool V2 + V3 (HEX)", className: "text-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
-                                return Number(data).toLocaleString(); }
+                                return Number(data).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}); }
                             return data;
                         }
                     },
                     { title: "Liquidity Pool V2 + V3 (USDC)", className: "text-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
-                                return Number(data).toLocaleString(); }
+                                return Number(data).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}); }
                             return data;
                         }
                     },
                     { title: "Liquidity Pool V2 + V3 (ETH)", className: "text-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
-                                return Number(data).toLocaleString(); }
+                                return Number(data).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}); }
                             return data;
                         }
                     },

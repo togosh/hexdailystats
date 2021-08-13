@@ -129,6 +129,30 @@ io.on('connection', (socket) => {
   if (!getRowDataRunning){ getRowData(); }
   socket.emit("hexPrice", hexPrice);
   socket.emit("currentDay", currentDayGlobal);
+
+  //createAllRows();
+  //create_dailyUpdates();
+  //create_totalTshareChanges();
+  //get_shareRateChangeByDay(3);
+  //create_tshareRateHEXs();
+  //create_tshareRateHEXIncreases();
+  //update_shiftRowsDown();
+
+  //create_tshareRateHEXs();
+  //create_dailyUpdates();
+  //create_tshareRateHEXs();
+  //create_tshareRateHEXIncreases();
+  //create_dailyUpdates();
+
+  //create_uniswapV2HEXPrice();
+  //create_uniswapV3HEXPrice();
+
+  //createUV2UV3Liquidity();
+  //create_uniswapV2V3CombinedHEXPrice();
+  //create_uniswapV2V3CombinedHEXPrice();
+  //create_priceChangeUV2UV3s();
+  //create_priceChangeUV2UV3s();
+  //create_roiMultiplierFromATLs();
 });
 
 if(!DEBUG){
@@ -986,6 +1010,49 @@ async function getUniswapV2HEXETH(){
   });
 }
 
+async function getUniswapV2HEXETHHistorical(dateEpoch){
+  return await fetch('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query: `
+      query {
+        pairDayDatas (
+          orderBy: id, orderDirection: desc, first: 1,
+          where: {
+            pairAddress: "` + UNISWAP_V2_HEXETH + `",
+            date: ` + dateEpoch + `
+        }){
+         token0 {
+           symbol
+         }
+          token1 {
+            symbol
+          }
+          pairAddress
+          reserve0
+          reserve1
+        }
+      }` 
+    }),
+  })
+  .then(res => res.json())
+  .then(res => {
+    try {
+      var pairDayData = res.data.pairDayDatas[0];
+
+      return {
+        liquidityUV2_HEXETH: parseInt(pairDayData.reserve0), //parseFloat(parseFloat(pairDayData.reserve0).toFixed(4)),
+        liquidityUV2_ETH: parseInt(pairDayData.reserve1), //parseFloat(parseFloat(pairDayData.reserve1).toFixed(4))
+      }
+    } catch (error) {
+      return {
+        liquidityUV2_HEXETH: 0.0,
+        liquidityUV2_ETH: 0.0
+      }
+    }
+  });
+}
+
 async function getUniswapV2HEXUSDC(){
   return await fetch('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2', {
     method: 'POST',
@@ -1010,12 +1077,56 @@ async function getUniswapV2HEXUSDC(){
   })
   .then(res => res.json())
   .then(res => {
+      var pairDayData = res.data.pairDayDatas[0];
+
+      return {
+        liquidityUV2_HEXUSDC: parseInt(pairDayData.reserve0), //parseFloat(parseFloat(pairDayData.reserve0).toFixed(4)),
+        liquidityUV2_USDC: parseInt(pairDayData.reserve1), //parseFloat(parseFloat(pairDayData.reserve1).toFixed(4))
+      }        
+  });
+}
+
+async function getUniswapV2HEXUSDCHistorical(dateEpoch){
+  return await fetch('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query: `
+      query {
+        pairDayDatas (
+          orderBy: date, orderDirection: desc, first: 1,
+          where: {
+            pairAddress: "` + UNISWAP_V2_HEXUSDC + `",
+            date: ` + dateEpoch + `
+        }){
+         token0 {
+           symbol
+         }
+          token1 {
+            symbol
+          }
+          pairAddress
+          reserve0
+          reserve1
+          date
+        }
+      }` 
+    }),
+  })
+  .then(res => res.json())
+  .then(res => {
+    try {
     var pairDayData = res.data.pairDayDatas[0];
 
     return {
       liquidityUV2_HEXUSDC: parseInt(pairDayData.reserve0), //parseFloat(parseFloat(pairDayData.reserve0).toFixed(4)),
       liquidityUV2_USDC: parseInt(pairDayData.reserve1), //parseFloat(parseFloat(pairDayData.reserve1).toFixed(4))
     }
+  } catch (error) {
+    return {
+      liquidityUV2_HEXUSDC: 0.0,
+      liquidityUV2_USDC: 0.0
+    }
+  }
   });
 }
 
@@ -1102,6 +1213,77 @@ async function getUniswapV3Pools() {
   });
 }
 
+async function getUniswapV3Historical(blockNumber) {
+  //var pools = await getUniswapV3Pools();
+  //await sleep(200);
+  var pools = [ 
+    UNISWAP_V3_HEXUSDC,
+    UNISWAP_V3_HEXETH
+  ]
+
+  if (pools == undefined) {return;}
+
+  return await fetch('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query: `
+      query {
+        pools (
+          orderBy: volumeUSD, orderDirection: desc,
+          block: {number: ` + blockNumber + `},
+          where: {
+            id_in: ` + JSON.stringify(pools) + `
+          }
+        ){
+          id
+          token0 { name }
+          token1 { name }
+          liquidity
+          totalValueLockedToken0
+          totalValueLockedToken1
+          volumeUSD
+        }
+      }` 
+    }),
+  })
+  .then(res => res.json())
+  .then(res => {
+    try {
+    var liquidityUV3_USDC = 0;
+    var liquidityUV3_ETH = 0;
+    var liquidityUV3_HEX = 0;
+    for(var i = 0; i < res.data.pools.length; i++) {
+      var token0Name = res.data.pools[i].token0.name;
+      var token1Name = res.data.pools[i].token1.name;
+      var token0TVL = res.data.pools[i].totalValueLockedToken0;
+      var token1TVL = res.data.pools[i].totalValueLockedToken1;
+
+      if (token0Name == "HEX" && token1Name == "USD Coin") {
+        liquidityUV3_HEX += token0TVL;
+        liquidityUV3_USDC = token1TVL;
+      } 
+      
+      if (token0Name == "HEX" && token1Name == "Wrapped Ether") {
+        liquidityUV3_HEX += token0TVL;
+        liquidityUV3_ETH = token1TVL;
+      }
+    }
+
+    return {
+      liquidityUV3_HEX: parseInt(liquidityUV3_HEX), //parseFloat(parseFloat(liquidityUV3_HEX).toFixed(4)),
+      liquidityUV3_USDC: parseInt(liquidityUV3_USDC), //parseFloat(parseFloat(liquidityUV3_USDC).toFixed(4)),
+      liquidityUV3_ETH: parseInt(liquidityUV3_ETH), //parseFloat(parseFloat(liquidityUV3_ETH).toFixed(4))
+    }
+  } catch (error){
+    return {
+      liquidityUV3_HEX: 0,
+      liquidityUV3_USDC: 0,
+      liquidityUV3_ETH: 0
+    }
+  }
+  });
+}
+
 async function getUniswapV3() {
   //var pools = await getUniswapV3Pools();
   //await sleep(200);
@@ -1163,6 +1345,8 @@ async function getUniswapV3() {
 }
 
 
+
+
 /////////////////////////////////////////////
 // PRICE
 
@@ -1186,6 +1370,40 @@ async function updatePrice(){
 }
 
 
+
+
+////////////////////////////////////////////////
+// ETHEREUM
+
+async function getEthereumBlock(day){
+  var startTime = day2Epoch + ((day - 2) * 86400) - 86400;
+
+  return await fetch('https://api.thegraph.com/subgraphs/name/blocklytics/ethereum-blocks', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query: `
+      query {
+        blocks(
+          first: 1, 
+          orderBy: timestamp, 
+          orderDirection: asc, 
+          where: {
+            timestamp_gt: ` + startTime + `
+          }
+        ){
+          id
+          number
+          timestamp
+        }
+      }` 
+    }),
+  })
+  .then(res => res.json())
+  .then(res => {
+    var block = res.data.blocks[0];
+    return block.number;
+  });
+}
 
 
 
@@ -1343,17 +1561,10 @@ async function create_totalTshareChanges(){
   }  
 }
 
-
-
-///////////////////////////////////////////
-
-// Day 2 = 2019-12-04T00:00:00.000Z <= data < 2019-12-05T00:00:00.000Z = 1575417600
 const day2Epoch = 1575417600 + 86400;
 
 async function get_shareRateChangeByDay(day){
-
-  var dayMultiplier = day - 2;
-  var startTime = day2Epoch + (dayMultiplier * 86400);
+  var startTime = day2Epoch + ((day - 2) * 86400);
   var endTime = startTime + 86400;
   log("get_shareRateChangeByDay() --- startTime " + startTime + " endTime " + endTime + " day --- " + day);
 
@@ -1399,7 +1610,7 @@ async function get_shareRateChangeByDay(day){
 
 async function create_tshareRateHEXs(){
   log("create_tshareRateHEXs");
-  var { tShareRateHEX } = await get_shareRateChangeByDay(618);
+  var { tShareRateHEX } = await get_shareRateChangeByDay(619 - 1);
   log("CREATE_tshareRateHEX - TEST: " + tShareRateHEX + " ------ " + day);
   return;
   try {
@@ -1462,8 +1673,6 @@ async function create_tshareRateHEXIncreases(){
   }
 }
 
-
-
 async function update_shiftRowsDown(){
   log("update_shiftRowsDown");
   try {
@@ -1492,6 +1701,439 @@ async function update_shiftRowsDown(){
       }
       
       //await sleep(10000);
+    }
+  } catch (error) {
+    log("ERROR");
+    log(error);
+  }
+}
+
+
+async function getUniswapV2HEXDailyPriceHistorical(dateEpoch){
+  return await fetch('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query: `
+      query {
+        tokenDayDatas (
+          first: 1, 
+          orderBy: date, 
+          orderDirection: desc, 
+          where: { 
+            token: "` + HEX_CONTRACT_ADDRESS + `",
+            date: ` + dateEpoch + `,
+          }) 
+            { 
+              date
+              token { symbol }
+              priceUSD 
+            }
+      }` 
+    }),
+  })
+  .then(res => res.json())
+  .then(res => {
+    try {
+    var tokenDayData = res.data.tokenDayDatas[0];
+    return parseFloat(parseFloat(tokenDayData.priceUSD).toFixed(8));
+    } catch (error) {
+      return 0.0;
+    }
+  });
+}
+
+async function create_uniswapV2HEXPrice(){
+  log("create_uniswapV2HEXPrice");
+  //var day = 2;
+  //var startTime = day2Epoch + ((day - 2) * 86400)  - 86400;
+  //log("startTime - " + startTime);
+  //var priceUV2 = await getUniswapV2HEXDailyPriceHistorical(startTime);
+  //log("create_uniswapV2HEXPrice - TEST: " + priceUV2 + " ------ " + day + " " + startTime);
+  //return;
+  try {
+    for (var day = 282; day <= 282; day++) {  // Starts on Day 167
+      var rowFind = await DailyStat.findOne({currentDay: { $eq: day}});
+      if (!isEmpty(rowFind)) {
+        var startTime = day2Epoch + ((day - 2) * 86400) - 86400;
+        var priceUV2 = await getUniswapV2HEXDailyPriceHistorical(startTime);
+
+        rowFind.priceUV2 = priceUV2;
+
+        log("create_uniswapV2HEXPrice - SAVE: " + startTime.toString() + " - " + priceUV2 + " ------ " + day);
+        rowFind.save(function (err) {
+          if (err) return log("create_uniswapV2HEXPrice - SAVE ERROR: " + err);
+        });
+
+      } else {
+        log("create_uniswapV2HEXPrice - MISSING DAY: " + day); 
+      }
+      
+      await sleep(200);
+    }
+  } catch (error) {
+    log("ERROR");
+    log(error);
+  }
+}
+
+async function getUniswapV3HEXDailyPriceHistorical(dateEpoch){
+  return await fetch('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query: `
+      query {
+        tokenDayDatas (
+          first: 1, 
+          orderBy: date, 
+          orderDirection: desc, 
+          where: { 
+            token: "` + HEX_CONTRACT_ADDRESS + `",
+            date: ` + dateEpoch + `,
+          }) 
+            { 
+              date
+              token { symbol }
+              priceUSD 
+            }
+      }` 
+    }),
+  })
+  .then(res => res.json())
+  .then(res => {
+    try {
+    var tokenDayData = res.data.tokenDayDatas[0];
+    return parseFloat(parseFloat(tokenDayData.priceUSD).toFixed(8));
+    } catch (error) {
+      return 0.0;
+    }
+  });
+}
+
+async function create_uniswapV3HEXPrice(){
+  log("create_uniswapV3HEXPrice");
+  //var day = 596;
+  //var startTime = day2Epoch + ((day - 2) * 86400) - 86400;
+  //log("startTime - " + startTime);
+  //var priceUV3 = await getUniswapV3HEXDailyPriceHistorical(startTime);
+  //log("create_uniswapV3HEXPrice - TEST: " + priceUV3 + " ------ " + day + " " + startTime);
+  //return;
+  try {
+    for (var day = 526; day <= 530; day++) {  // Starts on Day 522
+      var rowFind = await DailyStat.findOne({currentDay: { $eq: day}});
+      if (!isEmpty(rowFind)) {
+        var startTime = day2Epoch + ((day - 2) * 86400) - 86400;
+        var priceUV3 = await getUniswapV3HEXDailyPriceHistorical(startTime);
+
+        rowFind.priceUV3 = priceUV3;
+
+        log("create_uniswapV3HEXPrice - SAVE: " + startTime.toString() + " - " + priceUV3 + " ------ " + day);
+        rowFind.save(function (err) {
+          if (err) return log("create_uniswapV3HEXPrice - SAVE ERROR: " + err);
+        });
+
+      } else {
+        log("create_uniswapV3HEXPrice - MISSING DAY: " + day); 
+      }
+      
+      await sleep(1000);
+    }
+  } catch (error) {
+    log("ERROR");
+    log(error);
+  }
+}
+
+async function createUV2UV3Liquidity(){
+  log("createUV2UV3Liquidity");
+
+  //var day = 597;
+  //var blockNumber = await getEthereumBlock(day)
+  //log("blockNumber - " + blockNumber);
+  //var { liquidityUV3_HEX, liquidityUV3_USDC, liquidityUV3_ETH } = await getUniswapV3Historical(blockNumber);
+  //log("createUV2UV3Liquidity - " + liquidityUV3_HEX + " liquidityUV3_USDC - " + liquidityUV3_USDC + " liquidityUV3_ETH - " + liquidityUV3_ETH);
+
+  //var startTime = day2Epoch + ((day - 2) * 86400) - 86400;
+  //log("startTime - " + startTime);
+  //var { liquidityUV2_HEXUSDC, liquidityUV2_USDC } = await getUniswapV2HEXUSDCHistorical(startTime);
+  //var { liquidityUV2_HEXETH, liquidityUV2_ETH } = await getUniswapV2HEXETHHistorical(startTime);
+  //log("createUV2UV3Liquidity - SAVE: " + startTime.toString() + " - HEXUSDC " + liquidityUV2_HEXUSDC  + " - USDC " + liquidityUV2_USDC + " ------ " + day);
+  //log("createUV2UV3Liquidity - SAVE: " + startTime.toString() + " - HEXETH " + liquidityUV2_HEXETH  + " - ETH " + liquidityUV2_ETH + " ------ " + day);
+
+  //log("COMBINED - HEX - " + (liquidityUV3_HEX + liquidityUV2_HEXUSDC + liquidityUV2_HEXETH) + " USDC - " + (liquidityUV3_USDC + liquidityUV2_USDC) + " ETH - " + (liquidityUV3_ETH + liquidityUV2_ETH));
+  //return;
+  try {
+    for (var day = 314; day <= 314; day++) {  // Starts on Day 167 End 595
+      var rowFind = await DailyStat.findOne({currentDay: { $eq: day}});
+      if (!isEmpty(rowFind)) {
+        // UV2
+        var startTime = day2Epoch + ((day - 2) * 86400) - 86400;
+        
+        var { liquidityUV2_HEXUSDC, liquidityUV2_USDC } = await getUniswapV2HEXUSDCHistorical(startTime);
+        sleep(700);
+        var { liquidityUV2_HEXETH, liquidityUV2_ETH } = await getUniswapV2HEXETHHistorical(startTime);
+        sleep(300);
+
+        rowFind.liquidityUV2_HEXUSDC = liquidityUV2_HEXUSDC;
+        rowFind.liquidityUV2_USDC = liquidityUV2_USDC;
+        rowFind.liquidityUV2_HEXETH = liquidityUV2_HEXETH;
+        rowFind.liquidityUV2_ETH = liquidityUV2_ETH;
+
+        // UV3
+        var blockNumber = await getEthereumBlock(day)
+
+        var { liquidityUV3_HEX, liquidityUV3_USDC, liquidityUV3_ETH } = await getUniswapV3Historical(blockNumber);
+
+        rowFind.liquidityUV3_HEX = liquidityUV3_HEX;
+        rowFind.liquidityUV3_USDC = liquidityUV3_USDC;
+        rowFind.liquidityUV3_ETH = liquidityUV3_ETH;
+
+        // Calculated
+        rowFind.liquidityUV2UV3_HEX = (liquidityUV2_HEXUSDC + liquidityUV2_HEXETH + liquidityUV3_HEX);
+        rowFind.liquidityUV2UV3_USDC = (liquidityUV2_USDC + liquidityUV3_USDC);
+        rowFind.liquidityUV2UV3_ETH = (liquidityUV2_ETH + liquidityUV3_ETH);
+
+        log("COMBINED - HEX - " + (rowFind.liquidityUV2UV3_HEX) + " USDC - " + (rowFind.liquidityUV2UV3_USDC) + " ETH - " + (rowFind.liquidityUV2UV3_ETH));
+        rowFind.save(function (err) {
+          if (err) return log("createUV2UV3Liquidity - SAVE ERROR: " + err);
+        });
+
+      } else {
+        log("createUV2UV3Liquidity - MISSING DAY: " + day); 
+      }
+      
+      await sleep(300);
+    }
+  } catch (error) {
+    log("ERROR");
+    log(error);
+  }
+}
+
+async function create_uniswapV2V3CombinedHEXPrice(){
+  log("create_uniswapV2V3CombinedHEXPrice");
+  //var day = 2;
+  //var startTime = day2Epoch + ((day - 2) * 86400)  - 86400;
+  //log("startTime - " + startTime);
+  //var priceUV2 = await getUniswapV2HEXDailyPriceHistorical(startTime);
+  //log("create_uniswapV2HEXPrice - TEST: " + priceUV2 + " ------ " + day + " " + startTime);
+  //return;
+  try {
+    for (var day = 282; day <= 282; day++) {  // Starts on Day 167
+      var rowFind = await DailyStat.findOne({currentDay: { $eq: day}});
+      if (!isEmpty(rowFind)) {
+
+        if (!rowFind.priceUV3 && !rowFind.priceUV2){
+          console.log("BOTH ZERO - 0 --- " + day)
+          rowFind.priceUV2UV3 = 0;
+        } else if (!rowFind.priceUV3 && rowFind.priceUV2) {
+          console.log("ONLY UV2 - " + rowFind.priceUV2 + " --- " + day)
+          rowFind.priceUV2UV3 = rowFind.priceUV2;
+        } else if (rowFind.priceUV3 && !rowFind.priceUV2) {
+          console.log("ONLY UV3 - " + rowFind.priceUV3 + " --- " + day)
+          rowFind.priceUV2UV3 = rowFind.priceUV3;
+        } else { // BOTH NON-ZERO
+
+          //if ( liquidityUV2_USDC > 9000000) {
+          //  rowFind.priceUV2UV3 = parseFloat((
+          //    (rowFind.priceUV2 * (rowFind.liquidityUV2_USDC / rowFind.liquidityUV2UV3_USDC)) 
+          //    + 
+          //    (rowFind.priceUV3 * (rowFind.liquidityUV3_USDC / rowFind.liquidityUV2UV3_USDC))
+          //  ).toFixed(8));
+          //}
+
+          // I need price of Ethereum to weigh it in USD terms with USDC and Ethereum together
+
+          rowFind.priceUV2UV3 = ((rowFind.priceUV2 + rowFind.priceUV3) / 2.0);
+        }
+
+        log("create_uniswapV2V3CombinedHEXPrice - SAVE: " + rowFind.priceUV2UV3 + " ------ " + day);
+        rowFind.save(function (err) {
+          if (err) return log("create_uniswapV2V3CombinedHEXPrice - SAVE ERROR: " + err);
+        });
+
+      } else {
+        log("create_uniswapV2V3CombinedHEXPrice - MISSING DAY: " + day); 
+      }
+      
+      await sleep(500);
+    }
+  } catch (error) {
+    log("ERROR");
+    log(error);
+  }
+}
+
+async function create_priceChangeUV2UV3s(){
+  log("create_priceChangeUV2UV3s");
+  try {
+    for (var day = 166; day <= 167; day++) {
+
+      var rowFind = await DailyStat.findOne({currentDay: { $eq: day}});
+      sleep(100);
+      var rowFind2 = await DailyStat.findOne({currentDay: { $eq: day + 1}});
+
+      if (!isEmpty(rowFind) && !isEmpty(rowFind2)){
+        if (!rowFind.priceUV2UV3 || !rowFind2.priceUV2UV3) {
+          rowFind2.priceChangeUV2UV3 = 0.0
+        } else {
+          rowFind2.priceChangeUV2UV3 = parseFloat((((rowFind2.priceUV2UV3 / rowFind.priceUV2UV3) - 1) * 100).toFixed(8));
+        }
+
+        log("create_priceChangeUV2UV3s - SAVE: " + rowFind2.priceChangeUV2UV3 + " ------ " + day);
+        rowFind2.save(function (err) {
+          if (err) return log("create_priceChangeUV2UV3s - SAVE ERROR: " + err);
+        });
+
+      } else {
+        log("create_priceChangeUV2UV3s- MISSING DAY: " + day); 
+      }
+      
+      await sleep(100);
+    }
+  } catch (error) {
+    log("ERROR");
+    log(error);
+  }
+}
+
+async function create_tshareRateUSDs(){
+  log("create_tshareRateUSDs");
+  try {
+    for (var day = 14; day <= 167; day++) { //167
+      var rowFind = await DailyStat.findOne({currentDay: { $eq: day}});
+      if (!isEmpty(rowFind)) {
+
+        if (rowFind.tshareRateHEX && rowFind.priceUV2UV3) {
+          rowFind.tshareRateUSD = parseFloat((rowFind.tshareRateHEX * rowFind.priceUV2UV3).toFixed(4));
+        } else {
+          rowFind.tshareRateUSD = 0.0;
+        }
+
+        log("create_tshareRateUSDs - SAVE: " + rowFind.tshareRateUSD + " ------ " + day);
+        rowFind.save(function (err) {
+          if (err) return log("create_tshareRateUSDs - SAVE ERROR: " + err);
+        });
+
+      } else {
+        log("create_tshareRateUSDs - MISSING DAY: " + day); 
+      }
+      
+      await sleep(200);
+    }
+  } catch (error) {
+    log("ERROR");
+    log(error);
+  }
+}
+
+async function create_roiMultiplierFromATLs(){
+  log("create_roiMultiplierFromATLs");
+  try {
+    for (var day = 14; day <= 167; day++) { //167
+      var rowFind = await DailyStat.findOne({currentDay: { $eq: day}});
+      if (!isEmpty(rowFind)) {
+
+        if (rowFind.priceUV2UV3) {
+          rowFind.roiMultiplierFromATL = (rowFind.priceUV2UV3 / HEX_PRICE_ALLTIMELOW);
+        } else {
+          rowFind.roiMultiplierFromATL = 0.0;
+        }
+
+        log("create_roiMultiplierFromATLs - SAVE: " + rowFind.roiMultiplierFromATL + " ------ " + day);
+        rowFind.save(function (err) {
+          if (err) return log("create_roiMultiplierFromATLs - SAVE ERROR: " + err);
+        });
+
+      } else {
+        log("create_roiMultiplierFromATLs - MISSING DAY: " + day); 
+      }
+      
+      await sleep(200);
+    }
+  } catch (error) {
+    log("ERROR");
+    log(error);
+  }
+}
+
+async function getUniswapV1PriceAndLiquidityHistorical(timestamp){
+  return await fetch('https://api.thegraph.com/subgraphs/name/graphprotocol/uniswap', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query: `
+      query {
+        exchangeHistoricalDatas(
+          first: 1,
+          where: { 
+            exchangeAddress: "0x05cde89ccfa0ada8c88d5a23caaa79ef129e7883",
+            timestamp_gt: ` + timestamp + `
+          }, 
+          orderBy: timestamp, 
+          orderDirection: asc
+        ) {
+          type
+          timestamp
+          ethBalance
+          tokenBalance
+          tokenPriceUSD
+        }
+      }` 
+    }),
+  })
+  .then(res => res.json())
+  .then(res => {
+    try {
+    var data = res.data.exchangeHistoricalDatas[0];
+    return {
+      tokenPriceUSD: parseFloat(data.tokenPriceUSD),
+      tokenBalance: parseFloat(data.tokenBalance),
+      ethBalance: parseFloat(data.ethBalance)
+    }
+    } catch (error) {
+      log(error);
+      return {
+        tokenPriceUSD: 0.0,
+        tokenBalance: 0.0,
+        ethBalance: 0.0
+      }
+    }
+  });
+}
+
+async function create_uniswapV1PriceAndLiquidityHistorical(){
+  log("create_uniswapV1PriceAndLiquidityHistorical");
+  //var day = 596;
+  //var startTime = day2Epoch + ((day - 2) * 86400) - 86400;
+  //log("startTime - " + startTime);
+  //var priceUV3 = await getUniswapV3HEXDailyPriceHistorical(startTime);
+  //log("create_uniswapV3HEXPrice - TEST: " + priceUV3 + " ------ " + day + " " + startTime);
+  //return;
+  try {
+    for (var day = 167; day <= 300; day++) {  // Starts on Day 522 14 167
+      var rowFind = await DailyStat.findOne({currentDay: { $eq: day}});
+      if (!isEmpty(rowFind)) {
+        var startTime = day2Epoch + ((day - 2) * 86400) - 86400;
+        var { tokenPriceUSD, tokenBalance, ethBalance } = await getUniswapV1PriceAndLiquidityHistorical(startTime);
+
+        //rowFind.priceUV1 = tokenPriceUSD;
+        //rowFind.priceUV2UV3 = tokenPriceUSD
+        rowFind.liquidityUV1_HEX = tokenBalance;
+        rowFind.liquidityUV1_ETH = ethBalance;
+
+        rowFind.liquidityUV2UV3_HEX = rowFind.liquidityUV2UV3_HEX + tokenBalance;
+        rowFind.liquidityUV2UV3_ETH = rowFind.liquidityUV2UV3_ETH + ethBalance;
+
+        log("create_uniswapV1PriceAndLiquidityHistorical - SAVE: " + startTime.toString() + " - " + tokenPriceUSD + " - " + tokenBalance + " - " + ethBalance + " ------ " + day);
+        
+        rowFind.save(function (err) {
+          if (err) return log("create_uniswapV1PriceAndLiquidityHistorical - SAVE ERROR: " + err);
+        });
+
+      } else {
+        log("create_uniswapV1PriceAndLiquidityHistorical - MISSING DAY: " + day); 
+      }
+      
+      await sleep(300);
     }
   } catch (error) {
     log("ERROR");

@@ -183,13 +183,22 @@ var DailyStatSchema = new Schema({
   averageStakeLength: { type: Number, required: true },
   penaltiesHEX:       { type: Number, required: true },
 
+  priceUV1:           { type: Number },
   priceUV2:           { type: Number, required: true },
   priceUV3:           { type: Number, required: true },
 
+  liquidityUV1_HEX:   { type: Number },
+  liquidityUV1_ETH:   { type: Number },
+
   liquidityUV2_USDC:  { type: Number, required: true },
   liquidityUV2_ETH:   { type: Number, required: true },
-  liquidityUV3_USDC:  { type: Number, required: true },
-  liquidityUV3_ETH:   { type: Number, required: true },
+
+  liquidityUV2_HEXUSDC: { type: Number },
+  liquidityUV2_HEXETH:  { type: Number },
+
+  liquidityUV3_HEX:   { type: Number },
+  liquidityUV3_USDC:  { type: Number },
+  liquidityUV3_ETH:   { type: Number },
 
   // CALCULATED DATA
   tshareRateIncrease: { type: Number, required: true },
@@ -356,7 +365,7 @@ async function getDailyData() {
   var tshareMarketCap = (tshareRateUSD * totalTshares);
   var tshareMarketCapToMarketCapRatio = parseFloat((tshareMarketCap / marketCap).toFixed(4));
 
-  var roiMultiplierFromATL = parseInt(priceUV2UV3 / HEX_PRICE_ALLTIMELOW);
+  var roiMultiplierFromATL = (priceUV2UV3 / HEX_PRICE_ALLTIMELOW);
 
   var totalValueLocked = (priceUV2UV3 * stakedHEX);
 
@@ -381,8 +390,14 @@ async function getDailyData() {
 
       liquidityUV2_USDC:  liquidityUV2_USDC,
       liquidityUV2_ETH:   liquidityUV2_ETH,
-      liquidityUV3_USDC:  liquidityUV3_USDC,
-      liquidityUV3_ETH:   liquidityUV3_ETH,
+
+      liquidityUV2_HEXUSDC: liquidityUV2_HEXUSDC,
+      liquidityUV2_HEXETH:  liquidityUV2_HEXETH,
+
+      liquidityUV3_HEX:     liquidityUV3_HEX,
+      liquidityUV3_USDC:    liquidityUV3_USDC,
+      liquidityUV3_ETH:     liquidityUV3_ETH,
+
 
       // CALCULATED DATA
       tshareRateIncrease:       tshareRateIncrease,

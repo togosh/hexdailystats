@@ -113,6 +113,7 @@ app.get("/", function(req, res){ res.sendFile('/index.html', {root: __dirname});
 app.get('/grabdata', function (req, res) {
   if (!getDataRunning){ getDailyData(); }
   res.send(new Date().toISOString() + ' - Grab Data!');
+  if (!getRowDataRunning){ getRowData(); }
 });
 
 httpServer.listen(httpPort, hostname, () => { log(`Server running at http://${hostname}:${httpPort}/`);});

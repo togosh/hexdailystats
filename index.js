@@ -33,6 +33,7 @@ var getRowDataRunning = false;
 var connections = {};
 var hexPrice = '';
 var currentDayGlobal = 0;
+var getStakeStartHistorical = false;
 
 var hostname = CONFIG.hostname;
 if (DEBUG){ hostname = '127.0.0.1'; }
@@ -155,6 +156,14 @@ io.on('connection', (socket) => {
   //create_priceChangeUV2UV3s();
   //create_priceChangeUV2UV3s();
   //create_roiMultiplierFromATLs();
+
+  //if(!getStakeStartHistorical){create_stakeStartsHistorical();}
+
+  //create_stakedSupplyChanges();
+  //create_uniqueStakerCountChanges();
+  //create_totalValueLockeds();
+  //create_tshareMarketCaps();
+  //create_actualAPYRates();
 });
 
 if(!DEBUG){
@@ -1612,9 +1621,9 @@ async function get_shareRateChangeByDay(day){
 
 async function create_tshareRateHEXs(){
   log("create_tshareRateHEXs");
-  var { tShareRateHEX } = await get_shareRateChangeByDay(619 - 1);
-  log("CREATE_tshareRateHEX - TEST: " + tShareRateHEX + " ------ " + day);
-  return;
+  //var { tShareRateHEX } = await get_shareRateChangeByDay(619 - 1);
+  //log("CREATE_tshareRateHEX - TEST: " + tShareRateHEX + " ------ " + day);
+  //return;
   try {
     var previousValue = 0;
     for (var day = 594; day <= 617; day++) {
@@ -1648,31 +1657,21 @@ async function create_tshareRateHEXs(){
 
 async function create_tshareRateHEXIncreases(){
   log("create_tshareRateHEXIncreases");
-  try {
-    for (var day = 594; day <= 616; day++) {
+  try { for (var day = 1; day <= 619; day++) {
 
       var rowFind = await DailyStat.findOne({currentDay: { $eq: day}});
       var rowFind2 = await DailyStat.findOne({currentDay: { $eq: day + 1}});
 
       if (!isEmpty(rowFind) && !isEmpty(rowFind2)){
-        var tshareRateIncrease = Math.round(Math.round(rowFind2.tshareRateHEX) - Math.round(rowFind.tshareRateHEX));
+        var tshareRateIncrease = parseFloat((rowFind2.tshareRateHEX - rowFind.tshareRateHEX).toFixed(3));
         rowFind2.tshareRateIncrease = tshareRateIncrease;
 
         log("CREATE_tshareRateIncrease - SAVE: " + tshareRateIncrease + " ------ " + day);
-        rowFind2.save(function (err) {
-          if (err) return log("CREATE_tshareRateIncrease - SAVE ERROR: " + err);
-        });
+        rowFind2.save(function (err) { if (err) return log("CREATE_tshareRateIncrease - SAVE ERROR: " + err); });
+      } else { log("CREATE_tshareRateIncrease- MISSING DAY: " + day); }
 
-      } else {
-        log("CREATE_tshareRateIncrease- MISSING DAY: " + day); 
-      }
-      
-      //await sleep(10000);
-    }
-  } catch (error) {
-    log("ERROR");
-    log(error);
-  }
+      await sleep(100);
+    } } catch (error) { log("ERROR"); log(error); }
 }
 
 async function update_shiftRowsDown(){
@@ -2141,4 +2140,254 @@ async function create_uniswapV1PriceAndLiquidityHistorical(){
     log("ERROR");
     log(error);
   }
+}
+
+/////////////////////////////////////////////////////////////
+
+async function create_stakeStartsHistorical(){
+  getStakeStartHistorical = true;
+  log("create_stakeStartsHistorical");
+  //var day = 596;
+  //var startTime = day2Epoch + ((day - 2) * 86400) - 86400;
+  //log("startTime - " + startTime);
+  //var priceUV3 = await getUniswapV3HEXDailyPriceHistorical(startTime);
+  //log("create_uniswapV3HEXPrice - TEST: " + priceUV3 + " ------ " + day + " " + startTime);
+  //return;
+  
+    for (var day = 595; day <= 603; day++) {  // Starts on Day 522 14 167
+      try {
+        var rowFind = await DailyStat.findOne({currentDay: { $eq: day}});
+        if (!isEmpty(rowFind)) {
+          var blockNumber = await getEthereumBlock(day)
+          var { averageStakeLength, uniqueStakerCount, stakedHEX } = await get_stakeStartDataHistorical(blockNumber);
+
+          //rowFind.averageStakeLength = averageStakeLength;
+          rowFind.uniqueStakerCount = uniqueStakerCount;
+          //rowFind.stakedHEX = stakedHEX
+
+          log("create_stakeStartsHistorical - SAVE: " + blockNumber + " - " + averageStakeLength + " - " + uniqueStakerCount + " - " + stakedHEX + " ------ " + day);
+          
+          rowFind.save(function (err) {
+            if (err) return log("create_stakeStartsHistorical - SAVE ERROR: " + err);
+          });
+
+        } else {
+          log("create_stakeStartsHistorical - MISSING DAY: " + day); 
+        }
+      
+        await sleep(250);
+
+      } catch (error) {
+        log("ERROR");
+        log(error);
+        sleep(1000);
+        day--;
+      }
+    }
+
+    getStakeStartHistorical = false;
+}
+
+async function get_stakeStartDataHistorical(blockNumber){
+
+  var $lastStakeId = 0;
+  var stakedDaysSum = 0;
+  var stakedCount = 0;
+  var uniqueAddressList = [];
+  var stakedHEXSum = 0;
+
+  while (true) {
+    var data = await get_stakeStartsHistorical($lastStakeId, blockNumber);
+    if (data.count <= 0) { break; }
+    stakedCount += data.count;
+    stakedDaysSum += data.stakedDaysSum;
+    $lastStakeId = data.lastStakeId;
+    uniqueAddressList = uniqueAddressList.concat(data.uniqueAddresses);
+    stakedHEXSum += data.stakedHEX;
+
+    log($lastStakeId);
+    await sleep(250);
+  }
+
+  var averageStakeLength = 0.0;
+  var averageStakeLengthYears = 0.0;
+
+  if (stakedCount && stakedDaysSum ) {
+    averageStakeLength = stakedDaysSum/stakedCount;
+    averageStakeLengthYears = averageStakeLength / 365.0;
+  } 
+
+  uniqueAddressCount = uniqueAddressList.filter(onlyUnique).length;
+
+  return {
+    averageStakeLength: parseFloat(averageStakeLengthYears.toFixed(2)),
+    uniqueStakerCount: uniqueAddressCount,
+    stakedHEX: stakedHEXSum
+  }
+}
+
+async function get_stakeStartsHistorical($lastStakeId, blockNumber){
+  return await fetch('https://api.thegraph.com/subgraphs/name/codeakk/hex', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query: `
+      query {
+        stakeStarts(first: 1000, orderBy: stakeId, 
+          block: {number: ` + blockNumber + `},
+          where: { 
+            stakeId_gt: "` + $lastStakeId + `",
+            stakeEnd: null, 
+            stakeGoodAccounting: null 
+          }
+        ) {
+          stakeId
+          stakedDays
+          stakerAddr
+          stakedHearts
+        }
+      }` 
+    }),
+  })
+  .then(res => res.json())
+  .then(res => {
+    var stakeCount = Object.keys(res.data.stakeStarts).length;
+
+    if (stakeCount <= 0) {
+      return {  
+        count: 0
+      };
+    } 
+    else {
+    var stakeStartsReduced = res.data.stakeStarts.reduce(function(previousValue, currentValue) {
+      return {
+        stakedDays: parseInt(previousValue.stakedDays, 10) + parseInt(currentValue.stakedDays, 10),
+        stakedHearts: parseInt(previousValue.stakedHearts, 10) + parseInt(currentValue.stakedHearts, 10),
+      }
+    });
+
+    var lastStakeId = res.data.stakeStarts[(stakeCount - 1)].stakeId;
+
+    var uniqueAddresses = res.data.stakeStarts.map(a => a.stakerAddr).filter(onlyUnique);
+
+    var data = {  
+      count: stakeCount, 
+      stakedDaysSum: stakeStartsReduced.stakedDays,
+      lastStakeId: lastStakeId,
+      uniqueAddresses: uniqueAddresses,
+      stakedHEX: stakeStartsReduced.stakedHearts / 100000000,
+    };
+
+    return data;
+  }});
+}
+
+async function create_stakedSupplyChanges(){
+  log("create_stakedSupplyChanges");
+  try { for (var day = 1; day <= 595; day++) {
+
+      var rowFind = await DailyStat.findOne({currentDay: { $eq: day}}); sleep(100);
+      var rowFind2 = await DailyStat.findOne({currentDay: { $eq: day + 1}});
+
+      if (!isEmpty(rowFind) && !isEmpty(rowFind2)){
+        if (rowFind.stakedHEX && rowFind2.stakedHEX) {
+          rowFind2.stakedSupplyChange = rowFind2.stakedHEX - rowFind.stakedHEX;
+        } else if (!rowFind.stakedHEX && rowFind2.stakedHEX) {
+          rowFind2.stakedSupplyChange = rowFind2.stakedHEX;
+        } else {
+          rowFind2.stakedSupplyChange = 0.0;
+        }
+
+        log("create_stakedSupplyChanges - SAVE: " + rowFind2.stakedSupplyChange + " ------ " + day);
+        rowFind2.save(function (err) { if (err) return log("create_stakedSupplyChanges - SAVE ERROR: " + err);});
+      } else { log("create_stakedSupplyChanges- MISSING DAY: " + day); }
+      
+      await sleep(100);
+    } } catch (error) { log("ERROR"); log(error); }
+}
+
+async function create_uniqueStakerCountChanges(){
+  log("create_uniqueStakerCountChanges");
+  try { for (var day = 1; day <= 595; day++) {
+
+      var rowFind = await DailyStat.findOne({currentDay: { $eq: day}}); sleep(100);
+      var rowFind2 = await DailyStat.findOne({currentDay: { $eq: day + 1}});
+
+      if (!isEmpty(rowFind) && !isEmpty(rowFind2)){
+        if (rowFind.uniqueStakerCount && rowFind2.uniqueStakerCount) {
+          rowFind2.uniqueStakerCountChange = rowFind2.uniqueStakerCount - getNum(rowFind.uniqueStakerCount);
+        } else if (!rowFind.uniqueStakerCount && rowFind2.uniqueStakerCount) {
+          rowFind2.uniqueStakerCountChange = rowFind2.uniqueStakerCount;
+        }else {
+          rowFind2.uniqueStakerCountChange = 0.0;
+        }
+
+        log("create_uniqueStakerCountChanges - SAVE: " + rowFind2.uniqueStakerCountChange + " ------ " + day);
+        rowFind2.save(function (err) { if (err) return log("create_uniqueStakerCountChanges - SAVE ERROR: " + err);});
+      } else { log("create_uniqueStakerCountChanges- MISSING DAY: " + day); }
+      
+      await sleep(100);
+    } } catch (error) { log("ERROR"); log(error); }
+}
+
+async function create_tshareMarketCaps(){
+  log("create_tshareMarketCaps");
+  try { for (var day = 13; day <= 595; day++) {
+
+      var rowFind = await DailyStat.findOne({currentDay: { $eq: day}});
+
+      if (!isEmpty(rowFind)){
+        if (rowFind.tshareRateUSD && rowFind.totalTshares) {
+          rowFind.tshareMarketCap = (rowFind.tshareRateUSD * rowFind.totalTshares);
+        } else {
+          rowFind.tshareMarketCap = 0.0;
+        }
+
+        log("create_tshareMarketCaps - SAVE: " + rowFind.tshareMarketCap + " ------ " + day);
+        rowFind.save(function (err) { if (err) return log("create_tshareMarketCaps - SAVE ERROR: " + err);});
+      } else { log("create_tshareMarketCaps- MISSING DAY: " + day); }
+      
+      await sleep(100);
+    } } catch (error) { log("ERROR"); log(error); }
+}
+
+async function create_totalValueLockeds(){
+  log("create_totalValueLockeds");
+  try { for (var day = 40; day <= 595; day++) {
+
+      var rowFind = await DailyStat.findOne({currentDay: { $eq: day}});
+
+      if (!isEmpty(rowFind)){
+        if (rowFind.priceUV2UV3 && rowFind.stakedHEX) {
+          rowFind.totalValueLocked = (rowFind.priceUV2UV3 * rowFind.stakedHEX);
+        } else {
+          rowFind.totalValueLocked = 0.0;
+        }
+
+        log("create_totalValueLockeds - SAVE: " + rowFind.totalValueLocked + " ------ " + day);
+        rowFind.save(function (err) { if (err) return log("create_totalValueLockeds - SAVE ERROR: " + err);});
+      } else { log("create_totalValueLockeds- MISSING DAY: " + day); }
+      
+      await sleep(100);
+    } } catch (error) { log("ERROR"); log(error); }
+}
+
+async function create_actualAPYRates(){
+  log("create_actualAPYRates");
+  try { for (var day = 1; day <= 595; day++) {
+
+      var rowFind = await DailyStat.findOne({currentDay: { $eq: day}});
+
+      if (!isEmpty(rowFind)){
+        if (rowFind.dailyPayoutHEX && rowFind.stakedHEX) {
+          rowFind.actualAPYRate = parseFloat(((rowFind.dailyPayoutHEX / rowFind.stakedHEX) * 365.25 * 100).toFixed(2));
+        } else {
+          rowFind.actualAPYRate = 0.0;
+        }
+
+        log("create_actualAPYRates - SAVE: " + rowFind.actualAPYRate + " ------ " + day);
+        rowFind.save(function (err) { if (err) return log("create_actualAPYRates - SAVE ERROR: " + err);});
+      } else { log("create_actualAPYRates- MISSING DAY: " + day); }
+      
+      await sleep(100);
+    } } catch (error) { log("ERROR"); log(error); }
 }

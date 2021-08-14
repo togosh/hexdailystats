@@ -311,7 +311,7 @@
                     { title: "Change in Staked Supply (HEX)", className: "text-center blue" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") {
                                 if (data < 0) { 
-                                    return '<div class="red-negative">' + "(" + Math.abs(Number(data)).toLocaleString() + ")" + '</div>';
+                                    return '<div class="red-negative">' + "(" + Math.abs(Number(data)).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + ")" + '</div>';
                                 } 
                                 return Number(data).toLocaleString(); 
                             }

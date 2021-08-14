@@ -118,11 +118,15 @@
                     },
                     {
                         extend: "csvHtml5",
-                        exportOptions: { orthogonal: "exportcsv" }
+                        exportOptions: { orthogonal: "exportcsv" },
+                        filename: function() { var d = new Date();
+                            return "HEXDailyStats_" + d.toISOString().slice(0,10).replace(/-/g,"") + "_" + d.toISOString().slice(11,18).replace(/-/g,""); }
                     },
                     {
                         extend: "excelHtml5",
-                        exportOptions: { orthogonal: "exportxls" }
+                        exportOptions: { orthogonal: "exportxls" },
+                        filename: function() { var d = new Date();
+                            return "HEXDailyStats_" + d.toISOString().slice(0,10).replace(/-/g,"") + "_" + d.toISOString().slice(11,18).replace(/-/g,""); }
                     },
                     'pageLength'
                 ],

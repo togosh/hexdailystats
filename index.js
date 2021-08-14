@@ -164,6 +164,8 @@ io.on('connection', (socket) => {
   //create_totalValueLockeds();
   //create_tshareMarketCaps();
   //create_actualAPYRates();
+
+  //create_stakeEnds_stakeGoodAccountings_Historical();
 });
 
 if(!DEBUG){
@@ -870,7 +872,7 @@ async function get_stakeEnds($lastStakeId, unixTimestamp, unixTimestampEnd){
         stakeEnds(first: 1000, orderBy: stakeId, 
           where: { 
             stakeId_gt: "` + $lastStakeId + `",
-            timestamp_gt: ` + unixTimestamp + `,
+            timestamp_gte: ` + unixTimestamp + `,
             timestamp_lt: ` + unixTimestampEnd + `,
             penalty_gt: 0
           }
@@ -918,7 +920,7 @@ async function get_stakeGoodAccountings($lastStakeId, unixTimestamp, unixTimesta
         stakeGoodAccountings(first: 1000, orderBy: stakeId, 
           where: { 
             stakeId_gt: "` + $lastStakeId + `",
-            timestamp_gt: ` + unixTimestamp + `,
+            timestamp_gte: ` + unixTimestamp + `,
             timestamp_lt: ` + unixTimestampEnd + `,
             penalty_gt: 0
           }
@@ -2390,4 +2392,191 @@ async function create_actualAPYRates(){
       
       await sleep(100);
     } } catch (error) { log("ERROR"); log(error); }
+}
+
+/////////////////////////////////////////
+
+async function create_stakeEnds_stakeGoodAccountings_Historical(){
+  getStakeStartHistorical = true;
+  log("create_stakeEnds_stakeGoodAccountings_Historical");
+    for (var day = 596; day <= 596; day++) {
+      try {
+        var rowFind = await DailyStat.findOne({currentDay: { $eq: day}});
+        if (!isEmpty(rowFind)) {
+          
+          var penaltiesHEX = await get_dailyPenalties_Historical(day);
+
+          rowFind.penaltiesHEX = penaltiesHEX;
+
+          log("create_stakeEnds_stakeGoodAccountings_Historical - SAVE: " + " - " + penaltiesHEX + " ------ " + day);
+          //rowFind.save(function (err) { if (err) return log("create_stakeEnds_stakeGoodAccountings_Historical - SAVE ERROR: " + err);});
+        } else { log("create_stakeEnds_stakeGoodAccountings_Historical - MISSING DAY: " + day);  }
+      
+        await sleep(100);
+
+      } catch (error) {log("ERROR"); log(error);
+        sleep(1000);
+        day--;
+      }
+    }
+
+    getStakeStartHistorical = false;
+}
+
+async function get_dailyPenalties_Historical(day){
+
+  var $lastStakeId = 0; 
+  var penaltiesSum = 0;
+  var stakeCount = 0;
+  var count = 0;
+
+  var startTime = day2Epoch + ((day - 2) * 86400) - 86400;
+  var endTime = startTime + 86400;
+
+  //var start = new Date();
+  //start.setUTCHours(0, 0, 0, 0);
+  //if (yesterday) { start.setDate(start.getDate()-1); }
+  //var unixTimestamp = (start.valueOf() / 1000);
+  //console.log(start);
+
+  //var end = new Date();
+  //end.setUTCHours(23, 59, 59, 999);
+  //if (yesterday) { end.setDate(end.getDate()-1); }
+  //var unixTimestampEnd = (end.valueOf() / 1000);
+  //console.log(end);
+
+  var blockNumber = await getEthereumBlock(day + 1);
+  //log("blockNumber - " + blockNumber + " startTime - " + startTime + " endTime - " + endTime);
+
+  while (true) {
+    var data = await get_stakeEnds_Historical(blockNumber, $lastStakeId, startTime, endTime);
+    if (data.count <= 0) { break; }
+    stakeCount += data.count;
+    penaltiesSum += parseInt(data.penalty);
+    $lastStakeId = data.lastStakeId;
+
+    //log("get_stakeEnds_Historical");
+    count += 1;
+    await sleep(100);
+  }
+
+  var $lastStakeId = 0;
+
+  while (true) {
+    var data = await get_stakeGoodAccountings_Historical(blockNumber, $lastStakeId, startTime, endTime);
+    if (data.count <= 0) { break; }
+    stakeCount += data.count;
+    penaltiesSum += parseInt(data.penalty);
+    $lastStakeId = data.lastStakeId;
+    
+    //log("get_stakeGoodAccountings_Historical");
+    count += 1;
+    await sleep(100);
+  }
+
+  if (penaltiesSum > 0) {
+    var penaltyString = parseInt(penaltiesSum, 10).toString();
+    penaltiesSum = penaltyString.substring(0, penaltyString.length - 8);
+    return parseFloat(penaltiesSum);
+  }
+
+  return penaltiesSum;
+}
+
+async function get_stakeEnds_Historical(blockNumber, $lastStakeId, unixTimestamp, unixTimestampEnd){
+  return await fetch('https://api.thegraph.com/subgraphs/name/codeakk/hex', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query: `
+      query {
+        stakeEnds(first: 1000, orderBy: stakeId, 
+          block: {number: ` + blockNumber + `},
+          where: { 
+            stakeId_gt: "` + $lastStakeId + `",
+            timestamp_gte: ` + unixTimestamp + `,
+            timestamp_lt: ` + unixTimestampEnd + `,
+            penalty_gt: 0
+          }
+        ) {
+          stakeId
+          penalty
+        }
+      }` 
+    }),
+  })
+  .then(res => res.json())
+  .then(res => {
+    var stakeCount = Object.keys(res.data.stakeEnds).length;
+
+    if (stakeCount <= 0) {
+      return {  
+        count: 0
+      };
+    } 
+    else {
+    var dataReduced = res.data.stakeEnds.reduce(function(previousValue, currentValue) {
+      return {
+        penalty: parseInt(previousValue.penalty, 10) + parseInt(currentValue.penalty, 10),
+      }
+    });
+
+    var lastStakeId = res.data.stakeEnds[(stakeCount - 1)].stakeId;
+
+    var data = {  
+      count: stakeCount, 
+      penalty: dataReduced.penalty,
+      lastStakeId: lastStakeId
+    };
+
+    return data;
+  }});
+}
+
+async function get_stakeGoodAccountings_Historical(blockNumber, $lastStakeId, unixTimestamp, unixTimestampEnd){
+  return await fetch('https://api.thegraph.com/subgraphs/name/codeakk/hex', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query: `
+      query {
+        stakeGoodAccountings(first: 1000, orderBy: stakeId, 
+          block: {number: ` + blockNumber + `},
+          where: { 
+            stakeId_gt: "` + $lastStakeId + `",
+            timestamp_gte: ` + unixTimestamp + `,
+            timestamp_lt: ` + unixTimestampEnd + `,
+            penalty_gt: 0
+          }
+        ) {
+          stakeId
+          penalty
+        }
+      }` 
+    }),
+  })
+  .then(res => res.json())
+  .then(res => {
+    var stakeCount = Object.keys(res.data.stakeGoodAccountings).length;
+
+    if (stakeCount <= 0) {
+      return {  
+        count: 0
+      };
+    } 
+    else {
+    var dataReduced = res.data.stakeGoodAccountings.reduce(function(previousValue, currentValue) {
+      return {
+        penalty: parseInt(previousValue.penalty, 10) + parseInt(currentValue.penalty, 10),
+      }
+    });
+
+    var lastStakeId = res.data.stakeGoodAccountings[(stakeCount - 1)].stakeId;
+
+    var data = {  
+      count: stakeCount, 
+      penalty: dataReduced.penalty,
+      lastStakeId: lastStakeId
+    };
+
+    return data;
+  }});
 }

@@ -166,6 +166,15 @@ io.on('connection', (socket) => {
   //create_actualAPYRates();
 
   //create_stakeEnds_stakeGoodAccountings_Historical();
+  //create_numberOfHolders();
+  //create_numberOfHoldersChanges();
+  //create_circulatingSupplys();
+
+  //create_totalHEXs();
+  //create_stakedHEXPercents();
+  //create_marketCaps();
+  //create_circulatingSupplyChanges();
+  //create_dailyMintedInflationTotals();
 });
 
 if(!DEBUG){
@@ -2579,4 +2588,293 @@ async function get_stakeGoodAccountings_Historical(blockNumber, $lastStakeId, un
 
     return data;
   }});
+}
+
+//////////////////////////////////////////////
+
+async function create_numberOfHolders(){
+  log("create_numberOfHolders");
+  try { for (var day = 591; day <= 595; day++) {
+
+      var rowFind = await DailyStat.findOne({currentDay: { $eq: day}});
+
+      if (!isEmpty(rowFind)){
+        var blockNumber = await getEthereumBlock(day);
+        sleep(100);
+        var numberOfHolders = await get_numberOfHolders_Historical(blockNumber);
+        if (numberOfHolders) {
+          rowFind.numberOfHolders = numberOfHolders;
+        } else {
+          rowFind.numberOfHolders = 0;
+        }
+
+        log("create_numberOfHolders - SAVE: " + rowFind.numberOfHolders + " ------ " + day);
+        rowFind.save(function (err) { if (err) return log("create_numberOfHolders - SAVE ERROR: " + err);});
+      } else { log("create_numberOfHolders- MISSING DAY: " + day); }
+      
+      await sleep(200);
+    } } catch (error) { log("ERROR"); log(error); }
+}
+
+async function get_numberOfHolders_Historical(blockNumber){
+  return await fetch('https://api.thegraph.com/subgraphs/name/codeakk/hex', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query: `
+      query {
+        tokenHolders(
+          block: {number: ` + blockNumber + `},
+          first: 1, 
+          orderDirection: desc, 
+          orderBy: numeralIndex
+        ) {
+          numeralIndex
+        }
+      }` 
+    }),
+  })
+  .then(res => res.json())
+  .then(res => {
+    try {
+    var numberOfHolders = parseInt(res.data.tokenHolders[0].numeralIndex);
+    return numberOfHolders;
+    } catch (error) {
+      return 0;
+    }
+  });
+}
+
+async function create_numberOfHoldersChanges(){
+  log("create_numberOfHoldersChanges");
+  try { for (var day = 2; day <= 595; day++) {
+
+      var rowFind = await DailyStat.findOne({currentDay: { $eq: day}}); sleep(100);
+      var rowFind2 = await DailyStat.findOne({currentDay: { $eq: day + 1}});
+
+      if (!isEmpty(rowFind) && !isEmpty(rowFind2)){
+        if (rowFind.numberOfHolders && rowFind2.numberOfHolders) {
+          rowFind2.numberOfHoldersChange = rowFind2.numberOfHolders - getNum(rowFind.numberOfHolders);
+        } else if (!rowFind.numberOfHolders && rowFind2.numberOfHolders) {
+          rowFind2.numberOfHoldersChange = rowFind2.numberOfHolders;
+        }else {
+          rowFind2.numberOfHoldersChange = 0.0;
+        }
+
+        log("create_numberOfHoldersChanges - SAVE: " + rowFind2.numberOfHoldersChange + " ------ " + day);
+        rowFind2.save(function (err) { if (err) return log("create_numberOfHoldersChanges - SAVE ERROR: " + err);});
+      } else { log("create_numberOfHoldersChanges- MISSING DAY: " + day); }
+      
+      await sleep(100);
+    } } catch (error) { log("ERROR"); log(error); }
+}
+
+
+//////////////////////////////////////////////
+
+async function create_circulatingSupplys(){
+  log("create_circulatingSupplys");
+  for (var day = 452; day <= 595; day++) {
+    try { 
+      var rowFind = await DailyStat.findOne({currentDay: { $eq: day}});
+
+      if (!isEmpty(rowFind)){
+        var blockNumber = await getEthereumBlock(day + 1);
+        await sleep(300);
+        var { circulatingSupply } = await get_tokenHoldersData_Historical(blockNumber);
+        if (circulatingSupply) {
+          rowFind.circulatingHEX = circulatingSupply;
+        } else {
+          rowFind.circulatingHEX = 0;
+        }
+
+        log("create_circulatingSupplys - SAVE: " + rowFind.circulatingHEX + " ------ " + day);
+        rowFind.save(function (err) { if (err) return log("create_circulatingSupplys - SAVE ERROR: " + err);});
+      } else { log("create_circulatingSupplys- MISSING DAY: " + day); }
+      
+      await sleep(1000);
+    } catch (error) { log("ERROR"); log(error); await sleep(30000); day--; }
+  }
+}
+
+async function get_tokenHoldersData_Historical(blockNumber){
+  var $lastNumeralIndex = 0;
+  var circulatingSum = 0;
+  var count = 0;
+
+  while (true) {
+    var data = await get_tokenHolders_Historical(blockNumber, $lastNumeralIndex);
+    if (data.count <= 0) { break; }
+    circulatingSum += data.circulatingHEX;
+    $lastNumeralIndex = data.lastNumeralIndex;
+    log($lastNumeralIndex);
+
+    await sleep(300);
+  }
+
+  return {
+    circulatingSupply: circulatingSum,
+  }
+}
+
+async function get_tokenHolders_Historical(blockNumber, $lastNumeralIndex){
+  return await fetch('https://api.thegraph.com/subgraphs/name/codeakk/hex', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query: `
+      query {
+        tokenHolders(first: 1000, orderBy: numeralIndex, 
+          block: {number: ` + blockNumber + `},
+          where: { 
+            numeralIndex_gt: "` + $lastNumeralIndex + `",
+            tokenBalance_gt: 0
+          }
+        ) {
+          numeralIndex
+          tokenBalance
+        }
+      }` 
+    }),
+  })
+  //.then(res => console.log(res))
+  .then(res => res.json())
+  .then(res => {
+    var tokenHolders = Object.keys(res.data.tokenHolders).length;
+
+    if (tokenHolders <= 0) {
+      return {  
+        count: 0
+      };
+    } 
+    else {
+    var tokenHoldersReduced = res.data.tokenHolders.reduce(function(previousValue, currentValue) {
+      return {
+        tokenBalance: parseInt(previousValue.tokenBalance, 10) + parseInt(currentValue.tokenBalance, 10),
+      }
+    });
+
+    var lastNumeralIndex = res.data.tokenHolders[(tokenHolders - 1)].numeralIndex;
+
+    var data = {  
+      count: tokenHolders, 
+      circulatingHEX: tokenHoldersReduced.tokenBalance / 100000000,
+      lastNumeralIndex: lastNumeralIndex
+    };
+
+    return data;
+  }});
+}
+
+//////////////////////////////////////////////
+
+async function create_totalHEXs(){
+  log("create_totalHEXs");
+  try { for (var day = 1; day <= 595; day++) {
+
+      var rowFind = await DailyStat.findOne({currentDay: { $eq: day}});
+
+      if (!isEmpty(rowFind)){
+        if (rowFind.circulatingHEX && rowFind.stakedHEX) {
+          rowFind.totalHEX = rowFind.circulatingHEX + rowFind.stakedHEX;
+        } else {
+          continue;
+        }
+
+        log("create_totalHEXs - SAVE: " + rowFind.totalHEX + " ------ " + day);
+        rowFind.save(function (err) { if (err) return log("create_totalHEXs - SAVE ERROR: " + err);});
+      } else { log("create_totalHEXs- MISSING DAY: " + day); }
+      
+      await sleep(100);
+    } } catch (error) { log("ERROR"); log(error); }
+}
+
+async function create_stakedHEXPercents(){
+  log("create_stakedHEXPercents");
+  try { for (var day = 1; day <= 595; day++) {
+
+      var rowFind = await DailyStat.findOne({currentDay: { $eq: day}});
+
+      if (!isEmpty(rowFind)){
+        if (rowFind.circulatingHEX && rowFind.stakedHEX) {
+          rowFind.stakedHEXPercent = (rowFind.stakedHEX / (rowFind.stakedHEX + rowFind.circulatingHEX) * 100);
+        } else {
+          continue;
+        }
+
+        log("create_stakedHEXPercents - SAVE: " + rowFind.stakedHEXPercent + " ------ " + day);
+        rowFind.save(function (err) { if (err) return log("create_stakedHEXPercents - SAVE ERROR: " + err);});
+      } else { log("create_stakedHEXPercents- MISSING DAY: " + day); }
+      
+      await sleep(100);
+    } } catch (error) { log("ERROR"); log(error); }
+}
+
+async function create_marketCaps(){
+  log("create_marketCaps");
+  try { for (var day = 1; day <= 595; day++) {
+
+      var rowFind = await DailyStat.findOne({currentDay: { $eq: day}});
+
+      if (!isEmpty(rowFind)){
+        if (rowFind.priceUV2UV3 && rowFind.circulatingHEX) {
+          rowFind.marketCap = (rowFind.priceUV2UV3 * rowFind.circulatingHEX);
+        } else {
+          continue;
+        }
+
+        log("create_marketCaps - SAVE: " + rowFind.marketCap + " ------ " + day);
+        rowFind.save(function (err) { if (err) return log("create_marketCaps - SAVE ERROR: " + err);});
+      } else { log("create_marketCaps- MISSING DAY: " + day); }
+      
+      await sleep(100);
+    } } catch (error) { log("ERROR"); log(error); }
+}
+
+
+//var circulatingSupplyChange = (circulatingHEX - previousDailyStat.circulatingHEX);
+//var dailyMintedInflationTotal = (circulatingHEX + stakedHEX) - (previousDailyStat.circulatingHEX + previousDailyStat.stakedHEX);
+
+async function create_circulatingSupplyChanges(){
+  log("create_circulatingSupplyChanges");
+  try { for (var day = 1; day <= 595; day++) {
+
+      var rowFind = await DailyStat.findOne({currentDay: { $eq: day}}); sleep(100);
+      var rowFind2 = await DailyStat.findOne({currentDay: { $eq: day + 1}});
+
+      if (!isEmpty(rowFind) && !isEmpty(rowFind2)){
+        if (rowFind.circulatingHEX && rowFind2.circulatingHEX) {
+          rowFind2.circulatingSupplyChange = rowFind2.circulatingHEX - getNum(rowFind.circulatingHEX);
+        } else if (!rowFind.circulatingHEX && rowFind2.circulatingHEX) {
+          rowFind2.circulatingSupplyChange = rowFind2.circulatingHEX;
+        }else {
+          rowFind2.circulatingSupplyChange = 0.0;
+        }
+
+        log("create_circulatingSupplyChanges - SAVE: " + rowFind2.circulatingSupplyChange + " ------ " + day);
+        rowFind2.save(function (err) { if (err) return log("create_circulatingSupplyChanges - SAVE ERROR: " + err);});
+      } else { log("create_circulatingSupplyChanges- MISSING DAY: " + day); }
+      
+      await sleep(100);
+    } } catch (error) { log("ERROR"); log(error); }
+}
+
+async function create_dailyMintedInflationTotals(){
+  log("create_dailyMintedInflationTotals");
+  try { for (var day = 1; day <= 595; day++) {
+
+      var rowFind = await DailyStat.findOne({currentDay: { $eq: day}}); sleep(100);
+      var rowFind2 = await DailyStat.findOne({currentDay: { $eq: day + 1}});
+
+      if (!isEmpty(rowFind) && !isEmpty(rowFind2)){
+        if (rowFind.circulatingHEX && rowFind2.stakedHEX) {
+          rowFind2.dailyMintedInflationTotal = (rowFind2.circulatingHEX + rowFind2.stakedHEX) - (getNum(rowFind.circulatingHEX) + getNum(rowFind.stakedHEX));
+        }else {
+          rowFind2.dailyMintedInflationTotal = 0.0;
+        }
+
+        log("create_dailyMintedInflationTotals - SAVE: " + rowFind2.dailyMintedInflationTotal + " ------ " + day);
+        rowFind2.save(function (err) { if (err) return log("create_dailyMintedInflationTotals - SAVE ERROR: " + err);});
+      } else { log("create_dailyMintedInflationTotals- MISSING DAY: " + day); }
+      
+      await sleep(100);
+    } } catch (error) { log("ERROR"); log(error); }
 }

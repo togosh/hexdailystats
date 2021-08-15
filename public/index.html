@@ -384,9 +384,11 @@
         $(document).ready(function() {
             $('#buttonLegend').click(function() { 
                 $('#divLegend').toggle();
+                $('#divLegend').get(0).scrollIntoView();
             });
             $('#buttonLegendLinks').click(function() { 
                 $('#divLegendLinks').toggle();
+                $('#divLegendLinks').get(0).scrollIntoView();
             });
 
             $('#buttonDark').click(function() { 

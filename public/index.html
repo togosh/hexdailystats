@@ -381,6 +381,9 @@
             $('#buttonLegend').click(function() { 
                 $('#divLegend').toggle();
             });
+            $('#buttonLegendLinks').click(function() { 
+                $('#divLegendLinks').toggle();
+            });
 
             $('#buttonDark').click(function() { 
                 if( $('#styleDark').attr('disabled') == "disabled" ) {
@@ -506,13 +509,21 @@
         </div>
     </div>
 
-    <center><button id="buttonLegend" style="padding: 10px 80px 10px 80px">Legend</button>
-    
-        <ul id="divLegend" style="display: none; text-align: left; max-width: 360px; margin-bottom: 0px;">
+    <center>
+        <button id="buttonLegendLinks" style="width: 150px; height: 48px; margin-bottom: 10px;">Links</button>
+        <button id="buttonLegend" style="width: 150px; height: 48px; ">Legend</button>
+        <ul id="divLegend" style="display: none; text-align: left; max-width: 360px; margin-bottom: 0px; margin-top: 16px;">
             <li>All Time Low: ($0.00005645)</li></br>
             <li>APY Rate: ((Daily Payout / Staked) * 365.25)</li></br>
             <li>Total Value Locked: (Price * Staked)</li></br>
             <li>Minted Inflation: (Difference in Total HEX)</li></br>
+        </ul>
+        <ul id="divLegendLinks" style="display: none; text-align: left; max-width: 360px; margin-bottom: 0px; margin-top: 16px;">
+            <li><a href="https://apphex.win/charts/">Apphex.win/charts</a></li></br>
+            <li><a href="https://hex.vision/">Hex.vision</a></li></br>
+            <li><a href="https://hexgraphs.com/">HexGraphs.com</a></li></br>
+            <li><a href="https://www.lookintohex.com/">LookIntoHex.com</a></li></br>
+            <li><a href="https://www.whalesonly.com/charts">WhalesOnly.com/charts</a></li></br>
         </ul>
     </center>
     

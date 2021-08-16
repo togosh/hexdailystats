@@ -260,7 +260,7 @@ var DailyStatSchema = new Schema({
   circulatingSupplyChange:  { type: Number, required: true },
 
   stakedHEXPercent:         { type: Number, required: true },
-  stakedHEXPercentChange:   { type: Number, required: true },
+  stakedHEXPercentChange:   { type: Number},
 
   priceUV2UV3:          { type: Number, required: true },
   priceChangeUV2:       { type: Number, required: true },
@@ -354,6 +354,8 @@ async function getDailyData() {
     return;
   }
 
+  var blockNumber = await getEthereumBlock(currentDay)
+
   // Get Previous Row of Data
   var previousDay = (currentDay - 1);
   var previousDailyStat = await DailyStat.findOne({currentDay: { $eq: previousDay }});
@@ -363,6 +365,8 @@ async function getDailyData() {
   var numberOfHoldersChange = (numberOfHolders - previousDailyStat.numberOfHolders);
 
   var { circulatingHEX, stakedHEX } = await getGlobalInfo();
+
+  var { stakedHEXGA } = await get_stakeStartGADataHistorical(blockNumber);
   
   var tshareRateHEX = await get_shareRateChange();
   var { dailyPayoutHEX, totalTshares } = await get_dailyDataUpdatePolling(currentDay);
@@ -386,6 +390,7 @@ async function getDailyData() {
   var actualAPYRate           = parseFloat(((dailyPayoutHEX / stakedHEX) * 365.25 * 100).toFixed(2));
 
   var stakedSupplyChange      = (stakedHEX - previousDailyStat.stakedHEX);
+  var stakedHEXGAChange       = (stakedHEXGA - previousDailyStat.stakedHEXGA)
   var circulatingSupplyChange = (circulatingHEX - previousDailyStat.circulatingHEX);
 
   var stakedHEXPercent        = parseFloat(((stakedHEX / (stakedHEX + circulatingHEX)) * 100).toFixed(2));
@@ -427,6 +432,7 @@ async function getDailyData() {
       currentDay:         currentDay,
       circulatingHEX:     circulatingHEX,
       stakedHEX:          stakedHEX,
+      stakedHEXGA:        stakedHEXGA,
 
       tshareRateHEX:      tshareRateHEX,
       dailyPayoutHEX:     dailyPayoutHEX,
@@ -458,6 +464,7 @@ async function getDailyData() {
 
       stakedSupplyChange:       stakedSupplyChange,
       circulatingSupplyChange:  circulatingSupplyChange,
+      stakedHEXGAChange:        stakedHEXGAChange,
 
       stakedHEXPercent:         stakedHEXPercent,
       stakedHEXPercentChange:   stakedHEXPercentChange,

@@ -255,6 +255,7 @@ var DailyStatSchema = new Schema({
   payoutPerTshareHEX: { type: Number, required: true },
   actualAPYRate:      { type: Number, required: true },
 
+  stakedHEXGAChange:        { type: Number},
   stakedSupplyChange:       { type: Number, required: true },
   circulatingSupplyChange:  { type: Number, required: true },
 
@@ -314,7 +315,7 @@ async function getRowData() {
         ds.dailyPayoutHEX, ds.penaltiesHEX,
         ds.numberOfHolders, ds.numberOfHoldersChange,
         ds.uniqueStakerCount, ds.uniqueStakerCountChange,
-        ds.stakedHEXGA
+        ds.stakedHEXGA, ds.stakedHEXGAChange
       ];
       rowDataNew.push(row);
     }

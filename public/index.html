@@ -373,6 +373,12 @@
                             return data;
                         }
                     },
+                    { title: "Staked Supply GA (HEX)", className: "text-center" , render: function(data, type, row) {
+                            if (type === "display" || type === "filter") { 
+                                return Number(data).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}); }
+                            return data;
+                        }
+                    },
                 ],
                 drawCallback: function(settings) {
                     var pagination = $(this).closest('.dataTables_wrapper').find('.dataTables_paginate');

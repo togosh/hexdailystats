@@ -332,11 +332,10 @@ async function getRowData() {
         ds.totalTshares, ds.totalTsharesChange,
         ds.totalHEX, ds.dailyMintedInflationTotal,
         ds.circulatingHEX, ds.circulatingSupplyChange,
-        ds.stakedHEX, ds.stakedSupplyChange, ds.stakedHEXPercent,
+        ds.stakedHEX, ds.stakedSupplyChange, ds.stakedHEXGA, ds.stakedHEXGAChange, ds.stakedHEXPercent,
         ds.dailyPayoutHEX, ds.penaltiesHEX,
         ds.numberOfHolders, ds.numberOfHoldersChange,
         ds.uniqueStakerCount, ds.uniqueStakerCountChange,
-        ds.stakedHEXGA, ds.stakedHEXGAChange
       ];
       rowDataNew.push(row);
     }

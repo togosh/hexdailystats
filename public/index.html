@@ -334,6 +334,22 @@
                             return data;
                         }
                     },
+                    { title: "Staked Supply GA (HEX)", className: "text-center" , render: function(data, type, row) {
+                            if (type === "display" || type === "filter") { 
+                                return Number(data).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}); }
+                            return data;
+                        }
+                    },
+                    { title: "Change in Staked Supply GA (HEX)", className: "text-center blue" , render: function(data, type, row) {
+                            if (type === "display" || type === "filter") {
+                                if (data < 0) { 
+                                    return '<div class="red-negative">' + "(" + Math.abs(Number(data)).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + ")" + '</div>';
+                                } 
+                                return Number(data).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}); 
+                            }
+                            return data;
+                        }
+                    },
                     { title: "Staked % of Coins", className: "text-center" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data/100).toLocaleString(undefined,{style: 'percent', minimumFractionDigits:2}); } 
@@ -369,29 +385,13 @@
                             return data;
                         }
                     },
-                    { title: "Number of Stakers", className: "text-center" , render: function(data, type, row) {
+                    { title: "Current Number of Stakers", className: "text-center purple" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;
                         }
                     },
-                    { title: "Change in Number of Stakers", className: "text-center blue" , render: function(data, type, row) {
-                            if (type === "display" || type === "filter") {
-                                if (data < 0) { 
-                                    return '<div class="red-negative">' + "(" + Math.abs(Number(data)).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + ")" + '</div>';
-                                } 
-                                return Number(data).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}); 
-                            }
-                            return data;
-                        }
-                    },
-                    { title: "Staked Supply GA (HEX)", className: "text-center" , render: function(data, type, row) {
-                            if (type === "display" || type === "filter") { 
-                                return Number(data).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}); }
-                            return data;
-                        }
-                    },
-                    { title: "Change in Staked Supply GA (HEX)", className: "text-center blue" , render: function(data, type, row) {
+                    { title: "Change in Current Number of Stakers", className: "text-center blue" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") {
                                 if (data < 0) { 
                                     return '<div class="red-negative">' + "(" + Math.abs(Number(data)).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + ")" + '</div>';

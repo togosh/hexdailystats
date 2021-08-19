@@ -385,19 +385,25 @@
                             return data;
                         }
                     },
-                    { title: "Current Number of Stakers", className: "text-center purple" , render: function(data, type, row) {
+                    { title: "Current Stakers", className: "text-center purple" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;
                         }
                     },
-                    { title: "Change in Current Number of Stakers", className: "text-center blue" , render: function(data, type, row) {
+                    { title: "Change in Current Stakers", className: "text-center blue" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") {
                                 if (data < 0) { 
                                     return '<div class="red-negative">' + "(" + Math.abs(Number(data)).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + ")" + '</div>';
                                 } 
                                 return Number(data).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}); 
                             }
+                            return data;
+                        }
+                    },
+                    { title: "Total Stakers", className: "text-center purple" , render: function(data, type, row) {
+                            if (type === "display" || type === "filter") { 
+                                return Number(data).toLocaleString(); }
                             return data;
                         }
                     },
@@ -558,6 +564,8 @@
             <li><a href="https://hexgraphs.com/">HexGraphs.com</a></li></br>
             <li><a href="https://www.lookintohex.com/">LookIntoHex.com</a></li></br>
             <li><a href="https://www.whalesonly.com/charts">WhalesOnly.com/charts</a></li></br>
+            <li><a href="https://www.hexcalc.net/">HexCalc.net</a></li></br>
+            <li><a href="https://info.uniswap.org/#/pools/0x69d91b94f0aaf8e8a2586909fa77a5c2c89818d5">Info.Uniswap.org</a></li></br>
         </ul>
     </center>
     

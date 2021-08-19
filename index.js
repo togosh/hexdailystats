@@ -35,6 +35,7 @@ var hexPrice = '';
 var currentDayGlobal = 0;
 var getStakeStartHistorical = false;
 var getStakeStartGAHistorical = false;
+var getStakeStartsCountHistorical = false;
 
 var hostname = CONFIG.hostname;
 if (DEBUG){ hostname = '127.0.0.1'; }
@@ -196,6 +197,44 @@ io.on('connection', (socket) => {
   //create_stakedSupplyChanges();
   //create_totalValueLockeds();
   //create_actualAPYRates();
+
+  //////////////////////////////////////////////////////////////////
+  // Create New Row
+
+  //createRow(623);
+  //create_dailyUpdates();
+  //create_totalTshareChanges();
+  //get_shareRateChangeByDay(623);
+  //create_tshareRateHEXIncreases();
+  //create_uniswapV2HEXPrice();
+  //create_uniswapV3HEXPrice();
+  //createUV2UV3Liquidity();
+  //create_uniswapV2V3CombinedHEXPrice();
+  //create_priceChangeUV2UV3s();
+  //create_tshareRateUSDs();
+  //create_roiMultiplierFromATLs();
+
+  //create_stakeStartsHistorical();
+  //create_stakeStartGAsHistorical();
+  //create_stakedSupplyGAChanges();
+  //update_stakedSupplyWithGA();
+  //create_stakedSupplyChanges();
+  //create_uniqueStakerCountChanges();
+  //create_tshareMarketCaps();
+  //create_totalValueLockeds();
+  //create_actualAPYRates();
+  //create_stakeEnds_stakeGoodAccountings_Historical();
+
+  //create_numberOfHolders();
+  //create_numberOfHoldersChanges();
+  //create_circulatingSupplys();
+  //create_totalHEXs();
+  //create_stakedHEXPercents();
+  //create_marketCaps();
+  //create_circulatingSupplyChanges();
+  //create_dailyMintedInflationTotals();
+  
+  //if (!getStakeStartsCountHistorical){create_stakeStartsCountHistorical();}
 });
 
 if(!DEBUG){
@@ -307,6 +346,7 @@ var DailyStatSchema = new Schema({
 
   uniqueStakerCount:        { type: Number, required: true },
   uniqueStakerCountChange:  { type: Number, required: true },
+  totalStakerCount:         { type: Number,},
 
   totalValueLocked:        { type: Number, required: true },
 });
@@ -336,6 +376,7 @@ async function getRowData() {
         ds.dailyPayoutHEX, ds.penaltiesHEX,
         ds.numberOfHolders, ds.numberOfHoldersChange,
         ds.uniqueStakerCount, ds.uniqueStakerCountChange,
+        ds.totalStakerCount
       ];
       rowDataNew.push(row);
     }
@@ -393,6 +434,8 @@ async function getDailyData() {
 
   var { averageStakeLength, uniqueStakerCount } = await get_stakeStartData();
   var uniqueStakerCountChange = (uniqueStakerCount - getNum(previousDailyStat.uniqueStakerCount));
+
+  var totalStakerCount = await get_stakeStartsCountHistorical(currentDay);
 
   var penaltiesHEX = await get_dailyPenalties();
 
@@ -511,6 +554,7 @@ async function getDailyData() {
 
       uniqueStakerCount:        uniqueStakerCount,
       uniqueStakerCountChange:  uniqueStakerCountChange,
+      totalStakerCount:         totalStakerCount,
 
       totalValueLocked:         totalValueLocked,
     });
@@ -1462,6 +1506,91 @@ async function getEthereumBlock(day){
 ////////////////////////////////////////////////
 // HISTORICAL
 
+async function createRow(day){
+  var previousDate = new Date();
+  var dateOffset = (24*60*60*1000) * 1;
+
+  var rowFind = await DailyStat.findOne({currentDay: { $eq: day - 1}});
+
+  if (!isEmpty(rowFind)) {
+    previousDate.setTime(previousDate.getTime() + dateOffset);
+
+    var newRow = new DailyStat({ 
+      date:               previousDate,
+      currentDay:         day,
+      circulatingHEX:     0,
+      stakedHEX:          0,
+
+      tshareRateHEX:      0,
+      dailyPayoutHEX:     0,
+      totalTshares:       0,
+      averageStakeLength: 0,
+      penaltiesHEX:       0,
+
+      priceUV2:           0,
+      priceUV3:           0,
+
+      liquidityUV2_USDC:  0,
+      liquidityUV2_ETH:   0,
+      liquidityUV3_USDC:  0,
+      liquidityUV3_ETH:   0,
+
+      // CALCULATED DATA
+      tshareRateIncrease: 0,
+      tshareRateUSD:      0,
+
+      totalTsharesChange: 0,
+      payoutPerTshareHEX: 0,
+      actualAPYRate:      0,
+
+      stakedSupplyChange:       0,
+      circulatingSupplyChange:  0,
+
+      stakedHEXPercent:         0,
+      stakedHEXPercentChange:   0,
+
+      priceUV2UV3:          0,
+      priceChangeUV2:       0,
+      priceChangeUV3:       0,
+      priceChangeUV2UV3:    0,
+
+      liquidityUV2UV3_USDC: 0,
+      liquidityUV2UV3_ETH:  0,
+      liquidityUV2UV3_HEX:  0,
+
+      numberOfHolders:        0,
+      numberOfHoldersChange:  0,
+
+      dailyMintedInflationTotal:  0,
+
+      totalHEX: 0,
+
+      marketCap:                        0,
+      tshareMarketCap:                  0,
+      tshareMarketCapToMarketCapRatio:  0,
+
+      roiMultiplierFromATL:             0,
+
+      uniqueStakerCount:        0,
+      uniqueStakerCountChange:  0,
+
+      totalValueLocked:        0,
+    });
+
+      //await sleep(500);
+
+    log("CREATEROWS - SAVE: " + newRow.date + " - " + day);
+    newRow.save(function (err) {
+      if (err) return log("CREATEROWS - SAVE ERROR: " + err);
+    });
+
+  } else {
+    console.log("row Found! ------ " + day)
+    console.log("rowFind.date - " + rowFind.date);
+    previousDate = new Date(rowFind.date);
+  }
+}
+
 async function createAllRows(){
   var currentDay = await getCurrentDay();
   var previousDate = new Date();
@@ -1554,12 +1683,12 @@ async function createAllRows(){
 
 async function create_dailyUpdates(){
   log("create_dailyUpdates");
-  var day = 618;
-  var { dailyPayoutHEX, totalTshares, success } = await get_dailyDataUpdate(day);
-  log(dailyPayoutHEX);
-  log(totalTshares);
-  log((dailyPayoutHEX / totalTshares));
-  return;
+  //var day = 618;
+  //var { dailyPayoutHEX, totalTshares, success } = await get_dailyDataUpdate(day);
+  //log(dailyPayoutHEX);
+  //log(totalTshares);
+  //log((dailyPayoutHEX / totalTshares));
+  //return;
 
   try {
   for (var day = 191; day <= 617; day++) {
@@ -2199,22 +2328,17 @@ async function create_stakeStartsHistorical(){
       try {
         var rowFind = await DailyStat.findOne({currentDay: { $eq: day}});
         if (!isEmpty(rowFind)) {
-          var blockNumber = await getEthereumBlock(day)
+          var blockNumber = await getEthereumBlock(day + 1)
           var { averageStakeLength, uniqueStakerCount, stakedHEX } = await get_stakeStartDataHistorical(blockNumber);
 
-          //rowFind.averageStakeLength = averageStakeLength;
+          rowFind.averageStakeLength = averageStakeLength;
           rowFind.uniqueStakerCount = uniqueStakerCount;
-          //rowFind.stakedHEX = stakedHEX
+          rowFind.stakedHEX = stakedHEX
 
           log("create_stakeStartsHistorical - SAVE: " + blockNumber + " - " + averageStakeLength + " - " + uniqueStakerCount + " - " + stakedHEX + " ------ " + day);
-          
-          rowFind.save(function (err) {
-            if (err) return log("create_stakeStartsHistorical - SAVE ERROR: " + err);
-          });
+          rowFind.save(function (err) { if (err) return log("create_stakeStartsHistorical - SAVE ERROR: " + err); });
 
-        } else {
-          log("create_stakeStartsHistorical - MISSING DAY: " + day); 
-        }
+        } else { log("create_stakeStartsHistorical - MISSING DAY: " + day);  }
       
         await sleep(250);
 
@@ -2448,7 +2572,7 @@ async function create_stakeEnds_stakeGoodAccountings_Historical(){
           rowFind.penaltiesHEX = penaltiesHEX;
 
           log("create_stakeEnds_stakeGoodAccountings_Historical - SAVE: " + " - " + penaltiesHEX + " ------ " + day);
-          //rowFind.save(function (err) { if (err) return log("create_stakeEnds_stakeGoodAccountings_Historical - SAVE ERROR: " + err);});
+          rowFind.save(function (err) { if (err) return log("create_stakeEnds_stakeGoodAccountings_Historical - SAVE ERROR: " + err);});
         } else { log("create_stakeEnds_stakeGoodAccountings_Historical - MISSING DAY: " + day);  }
       
         await sleep(100);
@@ -2629,7 +2753,7 @@ async function create_numberOfHolders(){
       var rowFind = await DailyStat.findOne({currentDay: { $eq: day}});
 
       if (!isEmpty(rowFind)){
-        var blockNumber = await getEthereumBlock(day);
+        var blockNumber = await getEthereumBlock(day + 1);
         sleep(100);
         var numberOfHolders = await get_numberOfHolders_Historical(blockNumber);
         if (numberOfHolders) {
@@ -2708,7 +2832,7 @@ async function create_circulatingSupplys(){
       var rowFind = await DailyStat.findOne({currentDay: { $eq: day}});
 
       if (!isEmpty(rowFind)){
-        var blockNumber = await getEthereumBlock(day);
+        var blockNumber = await getEthereumBlock(day + 1);
         await sleep(300);
         var { circulatingSupply } = await get_tokenHoldersData_Historical(blockNumber);
         if (circulatingSupply) {
@@ -2946,17 +3070,15 @@ async function update_shiftCirculatingSupply(){
 async function create_stakeStartGAsHistorical(){
   getStakeStartGAHistorical = true;
   log("create_stakeStartGAsHistorical");
-  for (var day = 1; day <= 622; day++) {  try {
+  for (var day = 623; day <= 623; day++) {  try {
         var rowFind = await DailyStat.findOne({currentDay: { $eq: day}});
         if (!isEmpty(rowFind)) {
           var blockNumber = await getEthereumBlock(day)
           var { stakedHEXGA } = await get_stakeStartGADataHistorical(blockNumber);
 
-          //rowFind.averageStakeLength = averageStakeLength;
           rowFind.stakedHEXGA = stakedHEXGA;
-          //rowFind.stakedHEX = stakedHEX
 
-          log("create_stakeStartGAsHistorical - SAVE: " + blockNumber + " - " + averageStakeLength + " - " + uniqueStakerCount + " - " + stakedHEXGA + " ------ " + day);
+          log("create_stakeStartGAsHistorical - SAVE: " + blockNumber + " - " + stakedHEXGA + " ------ " + day);
           rowFind.save(function (err) { if (err) return log("create_stakeStartGAsHistorical - SAVE ERROR: " + err); });
         } else { log("create_stakeStartGAsHistorical - MISSING DAY: " + day);  }
         await sleep(250);
@@ -3104,4 +3226,103 @@ async function update_stakedSupplyWithGA(){
       
       await sleep(100);
     } } catch (error) { log("ERROR"); log(error); }
+}
+
+////////////////////////////////////////////////
+
+async function create_stakeStartsCountHistorical(){
+  getStakeStartsCountHistorical= true;
+  log("create_stakeStartsCountHistorical");
+  for (var day = 515; day <= 619; day++) {  try { // 515 - 619
+        var rowFind = await DailyStat.findOne({currentDay: { $eq: day}});
+        if (!isEmpty(rowFind)) {
+          var blockNumber = await getEthereumBlock(day)
+          var { uniqueStakerCount } = await getAll_stakeStartsCountHistorical(blockNumber);
+
+          rowFind.totalStakerCount = uniqueStakerCount;
+
+          log("create_stakeStartsCountHistorical - SAVE: " + blockNumber + " - " + uniqueStakerCount + " ------ " + day);
+          rowFind.save(function (err) { if (err) return log("create_stakeStartsCountHistorical - SAVE ERROR: " + err); });
+        } else { log("create_stakeStartsCountHistorical - MISSING DAY: " + day);  }
+        await sleep(250);
+      } catch (error) { log("ERROR"); log(error);
+        sleep(3000); day--;
+      }
+    }
+    getStakeStartsCountHistorical = false;
+}
+
+
+async function get_stakeStartsCountHistorical(day){
+  console.log("get_stakeStartsCountHistorical");
+      try {
+      		console.log("Day: " + day);
+          var blockNumber = await getEthereumBlock(day);
+          console.log("BlockNumber: " + blockNumber);
+          var { uniqueStakerCount } = await getAll_stakeStartsCountHistorical(blockNumber);
+          console.log("Staker Count: " + uniqueStakerCount);
+          return uniqueStakerCount;
+      } catch (error) {
+        console.log("ERROR " + error.name + ': ' + error.message);
+      }
+}
+
+async function getAll_stakeStartsCountHistorical(blockNumber){
+
+  var $lastStakeId = 0;
+  var uniqueAddressList = [];
+
+  while (true) {
+    var data = await get_stakeStartsCountHistorical($lastStakeId, blockNumber);
+    if (data.count <= 0) { break; }
+    $lastStakeId = data.lastStakeId;
+    uniqueAddressList = uniqueAddressList.concat(data.uniqueAddresses);
+
+    console.log($lastStakeId);
+    await sleep(250);
+  }
+  var uniqueAddressCount = uniqueAddressList.filter(onlyUnique).length;
+  return {
+    uniqueStakerCount: uniqueAddressCount,
+  }
+}
+
+async function get_stakeStartsCountHistorical($lastStakeId, blockNumber){
+  return await fetch('https://api.thegraph.com/subgraphs/name/codeakk/hex', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query: `
+      query {
+        stakeStarts(first: 1000, orderBy: stakeId, 
+          block: {number: ` + blockNumber + `},
+          where: { 
+            stakeId_gt: "` + $lastStakeId + `"
+          }
+        ) {
+          stakeId
+          stakerAddr
+        }
+      }` 
+    }),
+  })
+  .then(res => res.json())
+  .then(res => {
+    var stakeCount = Object.keys(res.data.stakeStarts).length;
+    if (stakeCount <= 0) {
+      return {  
+        count: 0
+      };
+    }
+
+    var lastStakeId = res.data.stakeStarts[(stakeCount - 1)].stakeId;
+    var uniqueAddresses = res.data.stakeStarts.map(a => a.stakerAddr).filter(onlyUnique);
+
+    var data = {  
+      count: stakeCount, 
+      lastStakeId: lastStakeId,
+      uniqueAddresses: uniqueAddresses,
+    };
+
+    return data;
+  });
 }

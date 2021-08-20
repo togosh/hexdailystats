@@ -424,23 +424,23 @@ async function getDailyData() {
 
 
   // Core Live
-  var tshareRateHEX = await get_shareRateChange();
+  var tshareRateHEX = await get_shareRateChange(); await sleep(250);
 
-  var { circulatingHEX, stakedHEX } = await getGlobalInfo();
+  var { circulatingHEX, stakedHEX } = await getGlobalInfo(); await sleep(250);
 
-  var priceUV2 = await getUniswapV2HEXDailyPrice();
-  var priceUV3 = await getUniswapV3HEXDailyPrice();
+  var priceUV2 = await getUniswapV2HEXDailyPrice(); await sleep(250);
+  var priceUV3 = await getUniswapV3HEXDailyPrice(); await sleep(250);
 
-  var { liquidityUV2_HEXUSDC, liquidityUV2_USDC } = await getUniswapV2HEXUSDC();
-  var { liquidityUV2_HEXETH, liquidityUV2_ETH } = await getUniswapV2HEXETH();
+  var { liquidityUV2_HEXUSDC, liquidityUV2_USDC } = await getUniswapV2HEXUSDC(); await sleep(250);
+  var { liquidityUV2_HEXETH, liquidityUV2_ETH } = await getUniswapV2HEXETH(); await sleep(250);
 
-  var { liquidityUV3_HEX, liquidityUV3_USDC, liquidityUV3_ETH } = await getUniswapV3();
+  var { liquidityUV3_HEX, liquidityUV3_USDC, liquidityUV3_ETH } = await getUniswapV3(); await sleep(250);
 
 
   // Core Historical
-  var penaltiesHEX = await get_dailyPenalties();
+  var penaltiesHEX = await get_dailyPenalties(); await sleep(250);
 
-  var { dailyPayoutHEX, totalTshares } = await get_dailyDataUpdatePolling(currentDay);
+  var { dailyPayoutHEX, totalTshares } = await get_dailyDataUpdatePolling(currentDay); await sleep(250);
 
 
   // Core Live Long Running
@@ -1115,16 +1115,24 @@ async function getUniswapV2HEXETH(){
   })
   .then(res => res.json())
   .then(res => {
+    try {
     var pairDayData = res.data.pairDayDatas[0];
 
     return {
       liquidityUV2_HEXETH: parseInt(pairDayData.reserve0), //parseFloat(parseFloat(pairDayData.reserve0).toFixed(4)),
       liquidityUV2_ETH: parseInt(pairDayData.reserve1), //parseFloat(parseFloat(pairDayData.reserve1).toFixed(4))
     }
+  } catch (error){
+    return {
+      liquidityUV2_HEXETH: 0,
+      liquidityUV2_ETH: 0,
+    }
+  }
   });
 }
 
 async function getUniswapV2HEXETHHistorical(dateEpoch){
+  console.log("getUniswapV2HEXETHHistorical() - START");
   return await fetch('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -1191,12 +1199,19 @@ async function getUniswapV2HEXUSDC(){
   })
   .then(res => res.json())
   .then(res => {
+    try {
       var pairDayData = res.data.pairDayDatas[0];
 
       return {
         liquidityUV2_HEXUSDC: parseInt(pairDayData.reserve0), //parseFloat(parseFloat(pairDayData.reserve0).toFixed(4)),
         liquidityUV2_USDC: parseInt(pairDayData.reserve1), //parseFloat(parseFloat(pairDayData.reserve1).toFixed(4))
-      }        
+      }   
+    } catch (error){
+      return {
+        liquidityUV2_HEXUSDC: 0,
+        liquidityUV2_USDC: 0,
+      }
+    }     
   });
 }
 

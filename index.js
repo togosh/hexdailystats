@@ -347,6 +347,7 @@ var DailyStatSchema = new Schema({
   uniqueStakerCount:        { type: Number, required: true },
   uniqueStakerCountChange:  { type: Number, required: true },
   totalStakerCount:         { type: Number,},
+  totalStakerCountChange:   { type: Number,},
 
   totalValueLocked:        { type: Number, required: true },
 });
@@ -376,7 +377,7 @@ async function getRowData() {
         ds.dailyPayoutHEX, ds.penaltiesHEX,
         ds.numberOfHolders, ds.numberOfHoldersChange,
         ds.uniqueStakerCount, ds.uniqueStakerCountChange,
-        ds.totalStakerCount
+        ds.totalStakerCount, ds.totalStakerCountChange
       ];
       rowDataNew.push(row);
     }
@@ -421,23 +422,11 @@ async function getDailyData() {
   var previousDay = (currentDay - 1);
   var previousDailyStat = await DailyStat.findOne({currentDay: { $eq: previousDay }});
 
-  // Get Core Data
-  var numberOfHolders = await get_numberOfHolders();
-  var numberOfHoldersChange = (numberOfHolders - previousDailyStat.numberOfHolders);
+
+  // Core Live
+  var tshareRateHEX = await get_shareRateChange();
 
   var { circulatingHEX, stakedHEX } = await getGlobalInfo();
-
-  var { stakedHEXGA } = await get_stakeStartGADataHistorical(blockNumber);
-  
-  var tshareRateHEX = await get_shareRateChange();
-  var { dailyPayoutHEX, totalTshares } = await get_dailyDataUpdatePolling(currentDay);
-
-  var { averageStakeLength, uniqueStakerCount } = await get_stakeStartData();
-  var uniqueStakerCountChange = (uniqueStakerCount - getNum(previousDailyStat.uniqueStakerCount));
-
-  var totalStakerCount = await get_stakeStartsCountHistorical(currentDay);
-
-  var penaltiesHEX = await get_dailyPenalties();
 
   var priceUV2 = await getUniswapV2HEXDailyPrice();
   var priceUV3 = await getUniswapV3HEXDailyPrice();
@@ -446,6 +435,26 @@ async function getDailyData() {
   var { liquidityUV2_HEXETH, liquidityUV2_ETH } = await getUniswapV2HEXETH();
 
   var { liquidityUV3_HEX, liquidityUV3_USDC, liquidityUV3_ETH } = await getUniswapV3();
+
+
+  // Core Historical
+  var penaltiesHEX = await get_dailyPenalties();
+
+  var { dailyPayoutHEX, totalTshares } = await get_dailyDataUpdatePolling(currentDay);
+
+
+  // Core Live Long Running
+  var { stakedHEXGA } = await get_stakeStartGADataHistorical(blockNumber);
+
+  var { averageStakeLength, uniqueStakerCount } = await get_stakeStartData();
+  var uniqueStakerCountChange = (uniqueStakerCount - getNum(previousDailyStat.uniqueStakerCount));
+
+  var totalStakerCount = await get_stakeStartsCountHistorical(currentDay);
+  var totalStakerCountChange = (totalStakerCount - getNum(previousDailyStat.totalStakerCount))
+
+  var numberOfHolders = await get_numberOfHolders();
+  var numberOfHoldersChange = (numberOfHolders - previousDailyStat.numberOfHolders);
+
 
   // Calculated Values
   var totalTsharesChange      = (totalTshares - previousDailyStat.totalTshares);
@@ -555,6 +564,7 @@ async function getDailyData() {
       uniqueStakerCount:        uniqueStakerCount,
       uniqueStakerCountChange:  uniqueStakerCountChange,
       totalStakerCount:         totalStakerCount,
+      totalStakerCountChange:   totalStakerCountChange,
 
       totalValueLocked:         totalValueLocked,
     });
@@ -868,6 +878,7 @@ async function get_stakeStarts($lastStakeId){
   })
   .then(res => res.json())
   .then(res => {
+    try {
     var stakeCount = Object.keys(res.data.stakeStarts).length;
 
     if (stakeCount <= 0) {
@@ -876,25 +887,32 @@ async function get_stakeStarts($lastStakeId){
       };
     } 
     else {
-    var stakeStartsReduced = res.data.stakeStarts.reduce(function(previousValue, currentValue) {
-      return {
-        stakedDays: parseInt(previousValue.stakedDays, 10) + parseInt(currentValue.stakedDays, 10),
-      }
-    });
+      var stakeStartsReduced = res.data.stakeStarts.reduce(function(previousValue, currentValue) {
+        return {
+          stakedDays: parseInt(previousValue.stakedDays, 10) + parseInt(currentValue.stakedDays, 10),
+        }
+      });
 
-    var lastStakeId = res.data.stakeStarts[(stakeCount - 1)].stakeId;
+      var lastStakeId = res.data.stakeStarts[(stakeCount - 1)].stakeId;
 
-    var uniqueAddresses = res.data.stakeStarts.map(a => a.stakerAddr).filter(onlyUnique);
+      var uniqueAddresses = res.data.stakeStarts.map(a => a.stakerAddr).filter(onlyUnique);
 
-    var data = {  
-      count: stakeCount, 
-      stakedDaysSum: stakeStartsReduced.stakedDays,
-      lastStakeId: lastStakeId,
-      uniqueAddresses: uniqueAddresses
+      var data = {  
+        count: stakeCount, 
+        stakedDaysSum: stakeStartsReduced.stakedDays,
+        lastStakeId: lastStakeId,
+        uniqueAddresses: uniqueAddresses
+      };
+
+      return data;
+    }
+  } catch (error){
+    console.log("ERROR - get_stakeStartGAsHistorical() - " + error.message);
+    return {  
+      count: 0
     };
-
-    return data;
-  }});
+  }
+  });
 }
 
 async function get_dailyPenalties(yesterday = true){
@@ -3151,6 +3169,7 @@ async function get_stakeStartGAsHistorical($lastStakeId, blockNumber){
   })
   .then(res => res.json())
   .then(res => {
+    try{
     var stakeCount = Object.keys(res.data.stakeStarts).length;
 
     if (stakeCount <= 0) {
@@ -3159,27 +3178,35 @@ async function get_stakeStartGAsHistorical($lastStakeId, blockNumber){
       };
     } 
     else {
-    var stakeStartsReduced = res.data.stakeStarts.reduce(function(previousValue, currentValue) {
-      return {
-        //stakedDays: parseInt(previousValue.stakedDays, 10) + parseInt(currentValue.stakedDays, 10),
-        stakedHearts: parseInt(previousValue.stakedHearts, 10) + parseInt(currentValue.stakedHearts, 10),
-      }
-    });
+      var stakeStartsReduced = res.data.stakeStarts.reduce(function(previousValue, currentValue) {
+        return {
+          //stakedDays: parseInt(previousValue.stakedDays, 10) + parseInt(currentValue.stakedDays, 10),
+          stakedHearts: parseInt(previousValue.stakedHearts, 10) + parseInt(currentValue.stakedHearts, 10),
+        }
+      });
 
-    var lastStakeId = res.data.stakeStarts[(stakeCount - 1)].stakeId;
+      var lastStakeId = res.data.stakeStarts[(stakeCount - 1)].stakeId;
 
-    //var uniqueAddresses = res.data.stakeStarts.map(a => a.stakerAddr).filter(onlyUnique);
+      //var uniqueAddresses = res.data.stakeStarts.map(a => a.stakerAddr).filter(onlyUnique);
 
-    var data = {  
-      //count: stakeCount, 
-      //stakedDaysSum: stakeStartsReduced.stakedDays,
-      lastStakeId: lastStakeId,
-      //uniqueAddresses: uniqueAddresses,
-      stakedHEXGA: stakeStartsReduced.stakedHearts / 100000000,
+      var data = {  
+        //count: stakeCount, 
+        //stakedDaysSum: stakeStartsReduced.stakedDays,
+        lastStakeId: lastStakeId,
+        //uniqueAddresses: uniqueAddresses,
+        stakedHEXGA: stakeStartsReduced.stakedHearts / 100000000,
+      };
+
+      return data;
+    }
+  } catch (error){
+    console.log("ERROR - get_stakeStartGAsHistorical() - " + error.message);
+    return {  
+      count: 0
     };
-
-    return data;
-  }});
+  }
+  }
+  );
 }
 
 // stakedHEXGAChange
@@ -3307,6 +3334,7 @@ async function get_stakeStartsCountHistorical($lastStakeId, blockNumber){
   })
   .then(res => res.json())
   .then(res => {
+    try {
     var stakeCount = Object.keys(res.data.stakeStarts).length;
     if (stakeCount <= 0) {
       return {  
@@ -3324,5 +3352,11 @@ async function get_stakeStartsCountHistorical($lastStakeId, blockNumber){
     };
 
     return data;
+    } catch (error){
+      console.log("ERROR  - get_stakeStartsCountHistorical() - " + error.message);
+      return {  
+        count: 0
+      };
+    }
   });
 }

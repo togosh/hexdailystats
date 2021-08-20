@@ -450,7 +450,8 @@ async function getDailyData() {
   var uniqueStakerCountChange = (uniqueStakerCount - getNum(previousDailyStat.uniqueStakerCount));
 
   var totalStakerCount = await get_stakeStartsCountHistorical(currentDay);
-  var totalStakerCountChange = (totalStakerCount - getNum(previousDailyStat.totalStakerCount))
+  console.log("totalStakerCount: " + totalStakerCount);
+  var totalStakerCountChange = (getNum(totalStakerCount) - getNum(previousDailyStat.totalStakerCount))
 
   var numberOfHolders = await get_numberOfHolders();
   var numberOfHoldersChange = (numberOfHolders - previousDailyStat.numberOfHolders);
@@ -3316,7 +3317,7 @@ async function getAll_stakeStartsCountHistorical(blockNumber){
   var uniqueAddressList = [];
 
   while (true) {
-    var data = await get_stakeStartsCountHistorical($lastStakeId, blockNumber);
+    var data = await get_stakeStartsCountHistoricalBlock($lastStakeId, blockNumber);
     if (data.count <= 0) { break; }
     $lastStakeId = data.lastStakeId;
     uniqueAddressList = uniqueAddressList.concat(data.uniqueAddresses);
@@ -3330,8 +3331,8 @@ async function getAll_stakeStartsCountHistorical(blockNumber){
   }
 }
 
-async function get_stakeStartsCountHistorical($lastStakeId, blockNumber){
-  console.log("get_stakeStartsCountHistorical()- START -" + " lastStakeID: " + $lastStakeId + " Block: " + blockNumber );
+async function get_stakeStartsCountHistoricalBlock($lastStakeId, blockNumber){
+  console.log("get_stakeStartsCountHistoricalBlock()- START -" + " lastStakeID: " + $lastStakeId + " Block: " + blockNumber );
   return await fetch('https://api.thegraph.com/subgraphs/name/codeakk/hex', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -3355,7 +3356,9 @@ async function get_stakeStartsCountHistorical($lastStakeId, blockNumber){
     var stakeCount = Object.keys(res.data.stakeStarts).length;
     if (stakeCount <= 0) {
       return {  
-        count: 0
+        count: 0,
+        lastStakeId: lastStakeId,
+        uniqueAddresses: []
       };
     }
 
@@ -3370,9 +3373,11 @@ async function get_stakeStartsCountHistorical($lastStakeId, blockNumber){
 
     return data;
     } catch (error){
-      console.log("ERROR  - get_stakeStartsCountHistorical() - " + error.message);
+      console.log("ERROR  - get_stakeStartsCountHistoricalBlock() - " + error.message);
       return {  
-        count: 0
+        count: 0,
+        lastStakeId: lastStakeId,
+        uniqueAddresses: [],
       };
     }
   });

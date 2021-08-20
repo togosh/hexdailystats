@@ -3291,6 +3291,7 @@ async function get_stakeStartsCountHistorical(day){
           return uniqueStakerCount;
       } catch (error) {
         console.log("ERROR " + error.name + ': ' + error.message);
+        return 0;
       }
 }
 
@@ -3315,6 +3316,7 @@ async function getAll_stakeStartsCountHistorical(blockNumber){
 }
 
 async function get_stakeStartsCountHistorical($lastStakeId, blockNumber){
+  console.log("get_stakeStartsCountHistorical()- START -" + " lastStakeID: " + $lastStakeId + " Block: " + blockNumber );
   return await fetch('https://api.thegraph.com/subgraphs/name/codeakk/hex', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

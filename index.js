@@ -233,6 +233,7 @@ io.on('connection', (socket) => {
   //create_marketCaps();
   //create_circulatingSupplyChanges();
   //create_dailyMintedInflationTotals();
+  //create_totalStakerCountChanges();
   
   //if (!getStakeStartsCountHistorical){create_stakeStartsCountHistorical();}
 });
@@ -3381,4 +3382,28 @@ async function get_stakeStartsCountHistoricalBlock($lastStakeId, blockNumber){
       };
     }
   });
+}
+
+async function create_totalStakerCountChanges(){
+  log("create_totalStakerCountChanges");
+  try { for (var day = 1; day <= 625; day++) {
+
+      var rowFind = await DailyStat.findOne({currentDay: { $eq: day}}); sleep(100);
+      var rowFind2 = await DailyStat.findOne({currentDay: { $eq: day + 1}});
+
+      if (!isEmpty(rowFind) && !isEmpty(rowFind2)){
+        if (rowFind.totalStakerCount && rowFind2.totalStakerCount) {
+          rowFind2.totalStakerCountChange = rowFind2.totalStakerCount - getNum(rowFind.totalStakerCount);
+        } else if (!rowFind.totalStakerCount && rowFind2.totalStakerCount) {
+          rowFind2.totalStakerCountChange = rowFind2.totalStakerCount;
+        }else {
+          rowFind2.totalStakerCountChange = 0.0;
+        }
+
+        log("create_totalStakerCountChanges - SAVE: " + rowFind2.totalStakerCountChange + " ------ " + day);
+        rowFind2.save(function (err) { if (err) return log("create_totalStakerCountChanges - SAVE ERROR: " + err);});
+      } else { log("create_totalStakerCountChanges- MISSING DAY: " + day); }
+      
+      await sleep(100);
+    } } catch (error) { log("ERROR"); log(error); }
 }

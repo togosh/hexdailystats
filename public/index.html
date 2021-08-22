@@ -471,6 +471,14 @@
             }
         });
 
+        function closeAbout(){
+            $('#divAbout').toggle();
+        }
+
+        function aboutClick(){
+            $('#divAbout').toggle();
+        }
+
         function display_c(){
             var refresh=1000; // Refresh rate in milli seconds
             mytime=setTimeout('display_ct()',refresh)
@@ -591,11 +599,40 @@
     <div id="mainSection" style="padding-bottom: 10px;">
         <center><a href="https://t.me/HEXDailyStats"><img src="hexdailystatslogo.png" style="max-width: 100%"></img></a></center>
         <center><div style="font-size:20px; padding-bottom: 10px">
-        <a href="about.html">About</a> | 
+        <a href="#" onclick="aboutClick();">About</a> | 
         <a href="https://hex.com/">HEX.com</a> |
         <a href="https://twitter.com/HEXDailyStats">Twitter</a> |
         <a href="https://t.me/HEXDailyStats">Telegram</a>
         </div></center>
+
+        <div id="divAbout" style="display: none;">
+            <div id="aboutSection">
+                <center><div><div class="text" style="max-width: 620px"><b>About:</b> Created to keep historical records of the HEX ecosystem, for research, education and analysis</div>
+                    </br> 
+                    <div class="text" style="max-width: 620px">
+                    <b>The Team:</b> Ryan and Togo met randomly in Las Vegas at the 1st HEX Meetup!</div></div></center>
+                <div style="display: flex; justify-content: center; flex-wrap: wrap;">
+                    <div style="padding: 20px 40px">
+                        <center><a href="https://twitter.com/RyanHEXLife"><img width="300" src="ryan.webp"></img></a></center>
+                        <center><div class="text">Ryan - HEX Analyst</br></br>
+                            <a href="https://twitter.com/RyanHEXLife">Twitter</a> | 
+                            <a href="https://www.youtube.com/channel/UCOG0DRACT4EGseHvJ11Q3oQ">Youtube</a>
+                        </div></center>
+                    </div>
+        
+                    <div style="padding: 20px 40px">
+                        <center><a href="https://twitter.com/togoshigekata"><img width="300" src="togosh.webp"></img></a></center>
+                        <center><div class="text">Togo - HEX Developer</br></br>  
+                            <a href="https://twitter.com/togoshigekata">Twitter</a> |
+                            <a href="https://github.com/togosh">Github</a>
+                        </div></center>
+                    </div>
+                </div> 
+                <center><button style="padding: 20px 160px; cursor: pointer" onclick="closeAbout()">Close</button></center>
+                </br> 
+            </div>
+        </div>
+
         <div id="tablecontainer"><table id="dataTable" class="display" width="100%" data-page-length='10'></table></div>
         <div id="loadercontainer">
         <div class="d-flex justify-content-center text-secondary" id="loader">

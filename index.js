@@ -366,7 +366,7 @@ async function runLiveData() {
   await sleep(300);
   if (!getDataRunning && !getLiveDataRUNNING){
     var liveDataNew = await getLiveData();
-    console.log(liveDataNew);
+    //console.log(liveDataNew);
     if (liveDataNew && (JSON.stringify(liveDataNew) !== JSON.stringify(liveData))){
       liveData = liveDataNew;
       io.emit("liveData", liveData);

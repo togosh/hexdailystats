@@ -36,6 +36,8 @@ var currentDayGlobal = 0;
 var getStakeStartHistorical = false;
 var getStakeStartGAHistorical = false;
 var getStakeStartsCountHistorical = false;
+var getLiveDataRUNNING = false;
+var liveData = undefined;
 
 var hostname = CONFIG.hostname;
 if (DEBUG){ hostname = '127.0.0.1'; }
@@ -134,6 +136,7 @@ io.on('connection', (socket) => {
   //if (!getRowDataRunning){ getRowData(); }
   socket.emit("hexPrice", hexPrice);
   socket.emit("currentDay", currentDayGlobal);
+  socket.emit("liveData", liveData);
 
   //createAllRows();
   //create_dailyUpdates();
@@ -267,6 +270,10 @@ if (CONFIG.price.enabled) {
 		updatePrice();
 	}, priceTimer); }
 
+var job3 = schedule.scheduleJob("*/1 * * * *", function() { 
+  runLiveData();
+});
+
 //////////////////////
 // DATABASE
 
@@ -354,6 +361,57 @@ var DailyStatSchema = new Schema({
 });
 
 const DailyStat = mongoose.model('DailyStat', DailyStatSchema);
+
+async function runLiveData() {
+  await sleep(300);
+  if (!getDataRunning && !getLiveDataRUNNING){
+    var liveDataNew = await getLiveData();
+    console.log(liveDataNew);
+    if (liveDataNew && (JSON.stringify(liveDataNew) !== JSON.stringify(liveData))){
+      liveData = liveDataNew;
+      io.emit("liveData", liveData);
+    }
+  }
+}
+
+async function getLiveData() {
+  getLiveDataRUNNING = true;
+  try {
+  if (!getDataRunning){
+    var priceUV2 = await getUniswapV2HEXDailyPrice(); await sleep(250);
+    var priceUV3 = await getUniswapV3HEXDailyPrice(); await sleep(250);
+    
+    var { liquidityUV2_HEXUSDC, liquidityUV2_USDC } = await getUniswapV2HEXUSDC(); await sleep(250);
+    var { liquidityUV2_HEXETH, liquidityUV2_ETH } = await getUniswapV2HEXETH(); await sleep(250);
+    
+    var { liquidityUV3_HEX, liquidityUV3_USDC, liquidityUV3_ETH } = await getUniswapV3(); await sleep(250);
+    
+    var liquidityUV2UV3_HEX = parseInt(liquidityUV2_HEXUSDC + liquidityUV2_HEXETH + liquidityUV3_HEX);
+    var liquidityUV2UV3_USDC = parseInt(liquidityUV2_USDC + liquidityUV3_USDC);
+    var liquidityUV2UV3_ETH  = parseInt(liquidityUV2_ETH + liquidityUV3_ETH);
+
+    var priceUV2UV3 = parseFloat(((priceUV2 * (liquidityUV2_USDC / liquidityUV2UV3_USDC)) + 
+    (priceUV3 * (liquidityUV3_USDC / liquidityUV2UV3_USDC))).toFixed(8));
+    
+    var tshareRateHEX = await get_shareRateChange(); await sleep(250);
+    var tshareRateUSD = parseFloat((tshareRateHEX * priceUV2).toFixed(4));
+
+    return {
+      price: priceUV2UV3,
+      tsharePrice: tshareRateUSD,
+      tshareRateHEX: tshareRateHEX,
+      liquidityHEX: liquidityUV2UV3_HEX,
+      liquidityUSDC: liquidityUV2UV3_USDC,
+      liquidityETH: liquidityUV2UV3_ETH,
+    };
+  }
+  } catch (error){
+    log("getLiveData()");
+    log(error);
+  } finally {
+    getLiveDataRUNNING = false;
+  }
+}
 
 async function getRowData() {
   getRowDataRunning = true;

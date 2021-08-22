@@ -56,6 +56,7 @@
         var currencyFormatterNoDecimal = new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0});
 
         var rowData = "";
+        var liveData = "";
 
         var socket = io.connect();
 
@@ -106,9 +107,241 @@
                 console.log("data ------");
                 console.log(data);
                 rowData = data;
+                createChart(data);
                 createDataTable(data);
             }
         });
+
+        socket.on('liveData', function (data) {
+            if (data) {
+                //console.log(new Date().toISOString() + " - " + "liveData updated");
+                //console.log(data);
+                liveData = data;
+
+                var htmlNew = "<div>" +
+                "<b>Price</b> $" + Number(data.price).toLocaleString(undefined,{minimumFractionDigits:5, maximumFractionDigits:5}) + 
+                " &nbsp; <b>T-Share</b> $" + Number(data.tsharePrice).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + 
+                " &nbsp; <b>Rate</b> " +  Number(data.tshareRateHEX).toLocaleString(undefined,{minimumFractionDigits:1, maximumFractionDigits:1}) + " " + 
+                "</div><div>" + 
+                " &nbsp; <b>HEX</b> " + getLiqiudityString(data.liquidityHEX) +
+                " &nbsp; <b>USDC</b> " + getLiqiudityString(data.liquidityUSDC) + 
+                " &nbsp; <b>ETH</b> " + getLiqiudityString(data.liquidityETH, 0)
+                + "</div>";
+
+                $("#divLiveSection").html(htmlNew);
+            }
+        });
+
+        function getLiqiudityString(data, decimals=2) {
+            var { amount, symbol } = nFormatter(data, 2);
+            return Number(amount).toLocaleString(undefined,{minimumFractionDigits:decimals, maximumFractionDigits:decimals}) + symbol;
+        }
+
+        /*ds.currentDay, ds.date, 
+        ds.priceUV2UV3, ds.priceChangeUV2UV3, ds.roiMultiplierFromATL,
+        ds.payoutPerTshareHEX, ds.tshareRateUSD, ds.tshareRateHEX, ds.tshareRateIncrease,
+        ds.averageStakeLength, ds.actualAPYRate,
+        ds.liquidityUV2UV3_HEX, ds.liquidityUV2UV3_USDC, ds.liquidityUV2UV3_ETH,
+        ds.totalValueLocked, ds.marketCap, ds.tshareMarketCap,
+        ds.totalTshares, ds.totalTsharesChange,
+        ds.totalHEX, ds.dailyMintedInflationTotal,
+        ds.circulatingHEX, ds.circulatingSupplyChange,
+        ds.stakedHEX, ds.stakedSupplyChange, ds.stakedHEXGA, ds.stakedHEXGAChange, ds.stakedHEXPercent,
+        ds.dailyPayoutHEX, ds.penaltiesHEX,
+        ds.numberOfHolders, ds.numberOfHoldersChange,
+        ds.uniqueStakerCount, ds.uniqueStakerCountChange,
+        ds.totalStakerCount, ds.totalStakerCountChange*/
+
+        const arrayColumn = (arr, n) => arr.map(x => x[n]);
+
+        function createChart(data) {
+
+            var dates = arrayColumn(data, 1).reverse().slice(2); //, 600);
+            var prices = arrayColumn(data, 2).reverse().slice(2); //, 600);
+            var tsharePrices = arrayColumn(data, 6).reverse().slice(2); //, 600);
+            var payoutPerTshares = arrayColumn(data, 5).reverse().slice(2); //, 600);
+            var tshareRates = arrayColumn(data, 7).reverse().slice(2); //, 600);
+            
+            const result_HEXPrice = dates.map((item,index) => {return {x: Date.parse(item), y: prices[index]}});
+            const result_TsharePrice = dates.map((item,index) => {return {x: Date.parse(item), y: tsharePrices[index]}});
+            const result_PayoutPerTshare = dates.map((item,index) => {return {x: Date.parse(item), y: payoutPerTshares[index]}});
+            const result_TshareRate = dates.map((item,index) => {return {x: Date.parse(item), y: tshareRates[index]}});
+            
+            var options_TsharePrice = {
+                chart: {
+                    type: 'area',
+                    height: 400,
+                    toolbar: {
+                        show: true,
+                        offsetY: 0,
+                    }
+                },
+                title: {
+                    text: 'Prices (USD)' ,
+                    style: {
+                        color:  'white'
+                    },
+                },
+                //subtitle: {
+                //    text: "$" + tsharePrices[tsharePrices.length - 1].toFixed(2),
+                //    align: 'left',
+                //    style: {
+                //        color:  'white'
+                //    },
+                //},
+                series: [{
+                    name: 'T-Share Price',
+                    data: result_TsharePrice
+                },
+                {
+                    name: 'HEX Price',
+                    data: result_HEXPrice
+                },
+                ],
+                xaxis: {
+                    type: 'datetime',
+                    labels: { style: { colors: 'white', }, },
+                },
+                yaxis: [{
+                    labels: { style: { colors: 'white', }, formatter: function (value) { return "$" + value.toFixed(2); }, },
+                    logarithmic: true,
+                    opposite: false,
+                }, 
+                {
+                    labels: { style: { colors: 'white', }, formatter: function (value) { return "$" + value.toFixed(5); }, },
+                    logarithmic: false,
+                    opposite: true,
+                }],
+                markers: {
+                    size: 0
+                },
+                tooltip: {
+                    theme: 'dark'
+                },
+                stroke: {
+                    show: true,
+                    width: 2,   
+                },
+                dataLabels: {
+                    enabled: false,
+                }
+            }
+            var chart_TsharePrice = new ApexCharts(document.querySelector("#chart_TsharePrice"), options_TsharePrice);
+            chart_TsharePrice.render();
+
+            var options_TshareRate = {
+                chart: {
+                    type: 'area',
+                    height: 400,
+                    toolbar: {
+                        show: true,
+                        offsetY: 0,
+                    },
+                },
+                title: {
+                    text: 'T-Share Rate (HEX)',
+                    style: {
+                        color:  'white'
+                    },
+                },
+                series: [{
+                    name: 'T-Share Rate',
+                    data: result_TshareRate
+                }],
+                xaxis: {
+                    type: 'datetime',
+                    labels: { style: { colors: 'white', }, },
+                },
+                yaxis: {
+                    labels: { style: { colors: 'white', }, formatter: function (value) { return value.toFixed(1); }, },
+                    logarithmic: false,
+                    opposite: true,
+                },
+                markers: {
+                    size: 0
+                },
+                tooltip: {
+                    theme: 'dark'
+                },
+                stroke: {
+                    show: true,
+                    width: 3,
+                },
+                dataLabels: {
+                    enabled: false,
+                }
+            }
+            var chart_TshareRate = new ApexCharts(document.querySelector("#chart_TshareRate"), options_TshareRate);
+            chart_TshareRate.render();
+
+            var options_PayoutPerTshare = {
+                chart: {
+                    type: 'area',
+                    height: 400,
+                    toolbar: {
+                        show: true,
+                        offsetY: 0,
+                    },
+                },
+                title: {
+                    text: 'Payout Per T-Share (HEX) - ' + payoutPerTshares[payoutPerTshares.length - 1].toFixed(3),
+                    style: {
+                        color:  'white'
+                    },
+                },
+                series: [{
+                    name: 'HEX Payout',
+                    data: result_PayoutPerTshare
+                }],
+                xaxis: {
+                    type: 'datetime',
+                    labels: { style: { colors: 'white', }, },
+                },
+                yaxis: [{
+                    labels: { style: { colors: 'white', }, formatter: function (value) { return value.toFixed(3); } },
+                    opposite: true,
+                }],
+                markers: {
+                    size: 0.5
+                },
+                tooltip: {
+                    theme: 'dark'
+                },
+                stroke: {
+                    show: true,
+                    width: 2,
+                },
+                dataLabels: {
+                    enabled: false,
+                }
+            }
+            var chart_PayoutPerTshare = new ApexCharts(document.querySelector("#chart_PayoutPerTshare"), options_PayoutPerTshare);
+            chart_PayoutPerTshare.render();
+
+            /////////////////////////// PIE CHART STAKED
+            var options = {
+                series: [data[0][27], (100.0 - data[0][27])],
+                chart: {
+                width: 500,
+                type: 'pie',
+                },
+                labels: ['Staked HEX', 'Circulating HEX'],
+                responsive: [{
+                breakpoint: 480,
+                options: {
+                    chart: {
+                    width: 500
+                    },
+                    legend: {
+                    position: 'bottom'
+                    }
+                }
+                }]
+            };
+
+            var chart_StakedVsCirculating = new ApexCharts(document.querySelector("#chart_StakedVsCirculating"), options);
+            //chart.render();
+        }
         
         function createDataTable(data) {
             $('#dataTable').on('draw.dt', function () {
@@ -479,6 +712,10 @@
             $('#divAbout').toggle();
         }
 
+        function openCharts(){
+            $('#divCharts').toggle();
+        }
+
         function display_c(){
             var refresh=1000; // Refresh rate in milli seconds
             mytime=setTimeout('display_ct()',refresh)
@@ -496,8 +733,22 @@
             }
         });
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <style>
-        
+        .divLive {
+            background-color: black;
+            /* background-image: linear-gradient( 135deg, #ABDCFF 10%, #0396FF 100%); */
+        }
+
+        .divLive {
+            padding-top: 10px;
+            padding-bottom: 10px;
+            text-shadow: 0 1px 1px 1px #666;
+            box-shadow: 0px 1px 15px 1px rgba(69, 65, 78, 0.08);
+            position: relative;
+            border-radius: 5px;
+        }
+
         .colDate            { min-width: calc(86px - 36px) !important; }
         .colPrice           { min-width: calc(86px - 36px) !important; }
         .colPriceChange     { min-width: calc(96px - 36px) !important; }
@@ -604,7 +855,9 @@
         <a href="https://twitter.com/HEXDailyStats">Twitter</a> |
         <a href="https://t.me/HEXDailyStats">Telegram</a>
         </div></center>
+        <center><button id="buttonCharts" onclick="openCharts()" style="padding: 6px 40px; margin-bottom: 10px; outline: none;">Charts</button></center>
 
+        <center><div id="divLiveSection" class="divLive" style="text-align:center; color:white; font-size: 16px; background-color: #10172d; max-width: 484px; margin-bottom: 6px;"></div></center> <!--style="display: none;"-->
         <div id="divAbout" style="display: none;">
             <div id="aboutSection">
                 <center><div><div class="text" style="max-width: 620px"><b>About:</b> Created to keep historical records of the HEX ecosystem, for research, education and analysis</div>
@@ -631,6 +884,14 @@
                 <center><button style="padding: 20px 160px; cursor: pointer" onclick="closeAbout()">Close</button></center>
                 </br> 
             </div>
+        </div>
+
+        <div id="divCharts" style="display: none; margin-left: 10px; margin-right: 10px;">
+            <div id="chart_TsharePrice" style="margin-right: 0px;"></div>
+            <div id="chart_TshareRate" style="margin-right: 0px;"></div>
+            <div id="chart_PayoutPerTshare" style="margin-right: 0px;"></div>
+            <div id="chart_StakedVsCirculating" style="margin-right: 0px;"></div>
+            <center><button onclick="openCharts()" style="padding: 6px 40px; margin-bottom: 10px; outline: none;">Close</button></center>
         </div>
 
         <div id="tablecontainer"><table id="dataTable" class="display" width="100%" data-page-length='10'></table></div>

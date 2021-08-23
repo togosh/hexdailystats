@@ -391,7 +391,10 @@ async function runLiveData() {
     if (liveDataNew && (JSON.stringify(liveDataNew) !== JSON.stringify(liveData))){
       liveData = liveDataNew;
       io.emit("liveData", liveData);
-      io.emit("hexPrice", liveData.price.toFixed(4));
+      if (liveData.price) {
+				hexPrice = liveData.price.toFixed(4);
+				io.emit("hexPrice", hexPrice);
+			}
     }
   }
 }

@@ -100,6 +100,16 @@ async function getAndSet_currentGlobalDay(){
   }
 }
 
+async function getAndSet_currentGlobalDayEmit(){
+  var currentDay = await getCurrentDay();
+  var newDay = currentDay + 1;
+
+  if (newDay != currentDayGlobal && newDay > currentDayGlobal) {
+    currentDayGlobal = newDay;
+    io.emit("currentDay", currentDayGlobal);
+  }
+}
+
 const httpServer = http.createServer(app);
 var httpsServer = undefined;
 if(!DEBUG){ httpsServer = https.createServer(httpsOptions, app);}
@@ -264,14 +274,25 @@ const job2 = schedule.scheduleJob(rule2, function(){
 }
 
 
-if (CONFIG.price.enabled) {
-	var priceTimer = CONFIG.price.timer * 60 * 1000;
-	setInterval(function() {
-		updatePrice();
-	}, priceTimer); }
+//if (CONFIG.price.enabled) {
+//	var priceTimer = CONFIG.price.timer * 60 * 1000;
+//	setInterval(function() {
+//		updatePrice();
+//	}, priceTimer); }
 
 var job3 = schedule.scheduleJob("*/1 * * * *", function() { 
   runLiveData();
+});
+
+const rule4 = new schedule.RecurrenceRule();
+rule4.hour = 0;
+rule4.minute = 0;
+rule4.second = 5;
+rule4.tz = 'Etc/UTC';
+
+const job4 = schedule.scheduleJob(rule4, function(){
+  log('**** DAILY DATA TIMER 4!');
+  getAndSet_currentGlobalDayEmit();
 });
 
 //////////////////////
@@ -370,6 +391,7 @@ async function runLiveData() {
     if (liveDataNew && (JSON.stringify(liveDataNew) !== JSON.stringify(liveData))){
       liveData = liveDataNew;
       io.emit("liveData", liveData);
+      io.emit("hexPrice", liveData.price.toFixed(4));
     }
   }
 }

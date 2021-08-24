@@ -694,7 +694,10 @@ async function getDailyData() {
     });
 
     if (!getRowDataRunning){ getRowData(); }
-    
+
+    if (CONFIG.twitter.enabled) {
+      tweet(dailyStat);
+    }
   } catch (err) {
     log('getDailyData() ----- SAVE --- ' + err);
   }
@@ -757,6 +760,31 @@ const objectsEqual = (o1, o2) =>
 const arraysEqual = (a1, a2) => 
    a1.length === a2.length && a1.every((o, idx) => objectsEqual(o, a2[idx]));
 
+function nFormatter(num, digits) {
+  try {
+      const lookup = [
+          { value: 1, symbol: "" },
+          { value: 1e3, symbol: "k" },
+          { value: 1e6, symbol: "M" },
+          { value: 1e9, symbol: "B" },
+          { value: 1e12, symbol: "T" }
+      ];
+      const rx = /\.0+$|(\.[0-9]*[1-9])0+$/;
+      var item = lookup.slice().reverse().find(function(item) {
+          return num >= item.value;
+      });
+
+      return { 
+          amount: (num / item.value).toFixed(digits).replace(rx, "$1"),
+          symbol: item.symbol
+      }
+  } catch {
+      return {
+          amount: 0,
+          symbol: ''
+      };
+  }
+}
 
 //////////////////////////////////////
 //// ETHERSCAN
@@ -3536,4 +3564,76 @@ async function getCurrencyRates(){
     }
     return undefined;
   });
+}
+
+///////////////////////////////////////////////////
+// TWITTER
+
+/* 
+ds.currentDay, ds.date, 
+2 ds.priceUV2UV3, ds.priceChangeUV2UV3, ds.roiMultiplierFromATL,
+5 ds.payoutPerTshareHEX, ds.tshareRateUSD, ds.tshareRateHEX, ds.tshareRateIncrease,
+9 ds.averageStakeLength, ds.actualAPYRate,
+11 ds.liquidityUV2UV3_HEX, ds.liquidityUV2UV3_USDC, ds.liquidityUV2UV3_ETH,
+14 ds.totalValueLocked, ds.marketCap, ds.tshareMarketCap,
+17 ds.totalTshares, ds.totalTsharesChange,
+19 ds.totalHEX, ds.dailyMintedInflationTotal,
+21 ds.circulatingHEX, ds.circulatingSupplyChange,
+23 ds.stakedHEX, ds.stakedSupplyChange, ds.stakedHEXGA, ds.stakedHEXGAChange, ds.stakedHEXPercent,
+28 ds.dailyPayoutHEX, ds.penaltiesHEX,
+30 ds.numberOfHolders, ds.numberOfHoldersChange,
+32 ds.uniqueStakerCount, ds.uniqueStakerCountChange,
+34 ds.totalStakerCount, ds.totalStakerCountChange
+*/
+
+async function tweet(dailyStat){
+  console.log("tweet()");
+	if (CONFIG.twitter.enabled && !DEBUG && dailyStat){
+	try {
+    console.log("tweet() ---- ENABLED");
+	var mediaId = ''; 
+
+  var tweetStatus = "Day " + dailyStat.currentDay + "\r\n";
+	tweetStatus += "\r\n";
+
+  tweetStatus += "HEX Price - $" + Number(dailyStat.priceUV2UV3).toLocaleString(undefined,{minimumFractionDigits:3, maximumFractionDigits:3}) + "\r\n";
+  tweetStatus += "ROI - " + Number(dailyStat.roiMultiplierFromATL).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + "\r\n";
+  tweetStatus += "\r\n";
+
+  tweetStatus += "Tshare Price - $" + Number(dailyStat.tshareRateUSD).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + "\r\n";
+  tweetStatus += "Payout Per Tshare - " + Number(dailyStat.payoutPerTshareHEX).toLocaleString(undefined,{minimumFractionDigits:3, maximumFractionDigits:3}) + "\r\n";
+  tweetStatus += "\r\n";
+
+  tweetStatus += "Avg Stake Length - " + Number(dailyStat.averageStakeLength).toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2}) + " yrs\r\n";
+  tweetStatus += "APY Rate - " + Number(dailyStat.actualAPYRate).toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2}) + "%\r\n";
+  tweetStatus += "\r\n";
+
+  var {amount, symbol} = nFormatter(dailyStat.liquidityUV2UV3_HEX, 0);
+  tweetStatus += "HEX Liquidity - " + Number(amount).toLocaleString(undefined) + symbol + "\r\n";
+  var liquidityUSDCFormatted = nFormatter(dailyStat.liquidityUV2UV3_USDC, 0);
+  tweetStatus += "USDC Liquidity - " + Number(liquidityUSDCFormatted.amount).toLocaleString(undefined) + liquidityUSDCFormatted.symbol + "\r\n";
+  tweetStatus += "\r\n";
+
+  tweetStatus += "Total Holders - " + Number(dailyStat.numberOfHolders).toLocaleString(undefined) + " (+" + Number(dailyStat.numberOfHoldersChange).toLocaleString(undefined) + ")" + "\r\n";
+  tweetStatus += "Total Stakers - " + Number(dailyStat.totalStakerCount).toLocaleString(undefined) + " (+" + Number(dailyStat.totalStakerCountChange).toLocaleString(undefined) + ")" + "\r\n";
+  tweetStatus += "\r\n";
+
+  tweetStatus += "#HEX $HEX #Tshare";
+
+  console.log("tweetStats ----------");
+  console.log(tweetStatus);
+	// https://developer.twitter.com/en/docs/twitter-api/v1/tweets/post-and-engage/api-reference/post-statuses-update
+	//const data = await twitterClient.tweets.statusesUpdate({ 
+	//	status: tweetStatus,
+	//	media_ids: mediaId
+	//});
+	log('TWITTER - TWEET'); // + JSON.stringify(data));
+  return;
+
+	} catch (err){
+		log('TWITTER - ERROR: ' + err);
+	}
+	}
+
+	return '';
 }

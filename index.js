@@ -318,7 +318,7 @@ const job4 = schedule.scheduleJob(rule4, function(){
   getAndSet_currentGlobalDayEmit();
 });
 
-var job5 = schedule.scheduleJob("* */1 * * *", function() { 
+var job5 = schedule.scheduleJob("0 * * * *", function() { 
   if (!getCurrencyDataRunning) { getCurrencyData(); };
 });
 

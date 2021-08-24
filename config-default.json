@@ -18,5 +18,13 @@
 	},
 	"exchangerates": {
 		"key": "AAA"
+	},
+	"twitter": {
+		"enabled": false,
+		"username": "AAA",
+		"apiKey": "AAA",
+		"apiSecret": "BBB",
+		"accessToken": "CCC",
+		"accessTokenSecret": "DDD"
 	}
 }

@@ -15,5 +15,8 @@
 		"enabled": false,
 		"nomicsKey": "AAA",
 		"timer": 5
+	},
+	"exchangerates": {
+		"key": "AAA"
 	}
 }

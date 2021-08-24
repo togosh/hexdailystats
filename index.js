@@ -38,6 +38,8 @@ var getStakeStartGAHistorical = false;
 var getStakeStartsCountHistorical = false;
 var getLiveDataRUNNING = false;
 var liveData = undefined;
+var currencyRates = undefined;
+var getCurrencyDataRunning = false;
 
 var hostname = CONFIG.hostname;
 if (DEBUG){ hostname = '127.0.0.1'; }
@@ -101,8 +103,10 @@ async function getAndSet_currentGlobalDay(){
 }
 
 async function getAndSet_currentGlobalDayEmit(){
+  log("getAndSet_currentGlobalDayEmit()");
   var currentDay = await getCurrentDay();
   var newDay = currentDay + 1;
+  log("newDay: " + newDay);
 
   if (newDay != currentDayGlobal && newDay > currentDayGlobal) {
     currentDayGlobal = newDay;
@@ -130,6 +134,7 @@ app.get('/grabdata', function (req, res) {
   if (!getDataRunning){ getDailyData(); }
   res.send(new Date().toISOString() + ' - Grab Data!');
   if (!getRowDataRunning){ getRowData(); }
+  if (!getCurrencyDataRunning) { getCurrencyData(); };
 });
 
 httpServer.listen(httpPort, hostname, () => { log(`Server running at http://${hostname}:${httpPort}/`);});
@@ -147,6 +152,7 @@ io.on('connection', (socket) => {
   socket.emit("hexPrice", hexPrice);
   socket.emit("currentDay", currentDayGlobal);
   socket.emit("liveData", liveData);
+  socket.emit("currencyRates", currencyRates);
 
   //createAllRows();
   //create_dailyUpdates();
@@ -251,6 +257,23 @@ io.on('connection', (socket) => {
   //if (!getStakeStartsCountHistorical){create_stakeStartsCountHistorical();}
 });
 
+async function getCurrencyData() {
+  log("getCurrencyData() - START");
+  getCurrencyDataRunning = true;
+  try {
+    var rates = await getCurrencyRates();
+    if (rates) {
+      currencyRates = rates;
+      log('SOCKET -- ****EMIT: currencyRates');
+      io.emit("currencyRates", currencyRates);
+    }
+  } catch (error) {
+    log("getCurrencyData() - ERROR: " + error);
+  } finally {
+    getCurrencyDataRunning = false;
+  }
+}
+
 if(!DEBUG){
 const rule = new schedule.RecurrenceRule();
 rule.hour = 0;
@@ -287,13 +310,18 @@ var job3 = schedule.scheduleJob("*/1 * * * *", function() {
 const rule4 = new schedule.RecurrenceRule();
 rule4.hour = 0;
 rule4.minute = 0;
-rule4.second = 5;
+rule4.second = 30;
 rule4.tz = 'Etc/UTC';
 
 const job4 = schedule.scheduleJob(rule4, function(){
   log('**** DAILY DATA TIMER 4!');
   getAndSet_currentGlobalDayEmit();
 });
+
+var job5 = schedule.scheduleJob("* */1 * * *", function() { 
+  if (!getCurrencyDataRunning) { getCurrencyData(); };
+});
+
 
 //////////////////////
 // DATABASE
@@ -3489,4 +3517,23 @@ async function create_totalStakerCountChanges(){
       
       await sleep(100);
     } } catch (error) { log("ERROR"); log(error); }
+}
+
+
+///////////////////////////////////////////////////
+// CURRENCY RATES
+
+async function getCurrencyRates(){
+  var url = "http://api.exchangeratesapi.io/v1/latest?access_key=" + CONFIG.exchangerates.key + "&format=1"; // + "&base=" + base; // Paid Plan
+  return await fetch(url, {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' }
+  })
+  .then(res => res.json())
+  .then(res => {
+    if (res && res.success && res.rates) {
+      return res.rates;
+    }
+    return undefined;
+  });
 }

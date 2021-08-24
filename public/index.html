@@ -366,6 +366,27 @@
                 dom: 'Bfrtip',
                 stateSave: true,
                 deferRender: true,
+                initComplete: function (settings) {
+                    $('table thead tr th').each(function () {
+                        var $th = $(this);
+                        var text = $(this).text()
+                        if (text == "Minted Inflation (HEX)") {
+                            $th.attr('title', 'Difference in Total HEX');
+                        } else if (text == "Staked Supply GA (HEX)") {
+                            $th.attr('title', 'Stakes Good Accounted but not Ended, Subset of Staked Supply');
+                        } else if (text == "APY Rate (Interest + EES Penalties)") {
+                            $th.attr('title', '(Daily Payout / Staked Supply) * 365.25');
+                        } else if (text == "ROI Multiplier from All Time Low") {
+                            $th.attr('title', 'All Time Low Price: $0.00005645');
+                        } else if (text == "Staked Supply GA (HEX)") {
+                            $th.attr('title', 'Stakes Good Accounted but not Ended, Subset of Staked Supply');
+                        } else if (text == "Total Holders") {
+                            $th.attr('title', 'All holders past and present');
+                        } else if (text == "Total Stakers") {
+                            $th.attr('title', 'All stakers past and present');
+                        } 
+                    });
+                },
                 buttons: [
                     {
                         extend: "copy",
@@ -910,7 +931,7 @@
         </div></center>
         <center><button id="buttonCharts" onclick="openCharts()" style="width: 150px; padding: 6px 40px; margin-bottom: 10px; outline: none;">Charts</button><button id="buttonCalculator" onclick="openCalculator()" style="width: 150px; padding: 6px 40px; margin-bottom: 10px; outline: none;">Calculator</button></center>
 
-        <center><div id="divLiveSection" class="divLive" style="text-align:center; color:white; font-size: 16px; background-color: #10172d; max-width: 484px; margin-bottom: 6px;"></div></center> <!--style="display: none;"-->
+        <center><div id="divLiveSection" class="divLive" title="Live Data" style="text-align:center; color:white; font-size: 16px; background-color: #10172d; max-width: 484px; margin-bottom: 6px;"></div></center> <!--style="display: none;"-->
         <div id="divAbout" style="display: none;">
             <div id="aboutSection">
                 <center><div><div class="text" style="max-width: 620px"><b>About:</b> Created to keep historical records of the HEX ecosystem, for research, education and analysis</div>

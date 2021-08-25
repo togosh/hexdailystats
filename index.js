@@ -131,11 +131,16 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.get("/", function(req, res){ res.sendFile('/index.html', {root: __dirname}); });
 
 app.get('/grabdata', function (req, res) {
-  if (!getDataRunning){ getDailyData(); }
+  grabData();
   res.send(new Date().toISOString() + ' - Grab Data!');
-  if (!getRowDataRunning){ getRowData(); }
-  if (!getCurrencyDataRunning) { getCurrencyData(); };
 });
+
+async function grabData() {
+  if (!getRowDataRunning){ getRowData(); }
+  if (!getLiveDataRUNNING){ await runLiveData(); }
+  if (!getCurrencyDataRunning){ getCurrencyData(); };
+  if (!getDataRunning){ getDailyData(); }
+}
 
 httpServer.listen(httpPort, hostname, () => { log(`Server running at http://${hostname}:${httpPort}/`);});
 if(!DEBUG){ httpsServer.listen(httpsPort, hostname, () => { log('listening on *:' + httpsPort); }); }

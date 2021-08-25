@@ -59,6 +59,7 @@
         var liveData = "";
         var currencyRates = undefined;
         var currencyCode = "USD";
+        var calculatorOutputValue = 0;
 
         var socket = io.connect();
 
@@ -92,6 +93,11 @@
                     symbol: ''
                 };
             }
+        }
+
+        function nFormatterLocale(num, digits){
+            var { amount, symbol } = nFormatter(num, digits);
+            return Number(amount).toLocaleString(undefined,{minimumFractionDigits:digits, maximumFractionDigits:digits}) + symbol;
         }
 
         const objectsEqual = (o1, o2) =>
@@ -371,7 +377,7 @@
                         var $th = $(this);
                         var text = $(this).text()
                         if (text == "Minted Inflation (HEX)") {
-                            $th.attr('title', 'Difference in Total HEX');
+                            $th.attr('title', 'Difference in Total Supply');
                         } else if (text == "Staked Supply GA (HEX)") {
                             $th.attr('title', 'Stakes Good Accounted but not Ended, Subset of Staked Supply');
                         } else if (text == "APY Rate (Interest + EES Penalties)") {
@@ -784,11 +790,14 @@
 
         function calculatorConvert() {
             try {
+                $("#divStake").hide();
                 if (liveData && currencyCode && !isEmpty(currencyRates)){
                     var price = liveData.price;
                     var amount = $('#calculatorAmount').val();
                     var output = (amount / currencyRates[currencyCode] / (price / currencyRates["USD"])).toFixed(0);
+                    calculatorOutputValue = output;
                     $('#calculatorOutput').html(output + " HEX");
+                    $("#stakeButton").show();
                 }
             } catch (error){
                 console.log("calculatorConvert()");
@@ -802,6 +811,106 @@
                 localStorage.setItem('currency', currencyCode);
             } catch (error){
                 console.log("calculatorCurrencySelect()");
+                console.log(error);
+            }
+        }
+
+        function longerPaysBetter(inputHEX, days) {
+            return inputHEX * (days - 1) / 1820;
+        }
+
+        function biggerPaysBetter(inputHEX, days) {
+            return inputHEX * (Math.min(inputHEX, 150000000)/1500000000);
+        }
+
+        function calculatorTshares(days) {
+            try {
+                var tshares = (Number(calculatorOutputValue) + Number(longerPaysBetter(Number(calculatorOutputValue), days)) + Number(biggerPaysBetter(Number(calculatorOutputValue), days))) / liveData.tshareRateHEX;
+                return tshares;
+            } catch (error) {
+                console.log(error);
+            }
+        }
+
+        function calculatorStake() {   
+            try {
+            var payoutPerTshare = rowData[0][5];
+
+            var tsharesYear1 = calculatorTshares(365 * 1);
+            var tsharesYear3 = calculatorTshares(365 * 3);
+            var tsharesYear5 = calculatorTshares(365 * 5);
+            var tsharesYear10 = calculatorTshares(365 * 10);
+            var tsharesYear15 = calculatorTshares(365 * 15);
+
+            //console.log("calculatorOutputValue " + calculatorOutputValue);
+            //console.log("tsharesYear1 " + tsharesYear1);
+            //console.log("payoutPerTshare " + payoutPerTshare);
+            //console.log("liveData.price" + liveData.price);
+
+            var html = `<center>
+                    <table style="text-align: right">
+                    <tr>
+                      <th style="text-align: left; padding: 0px 4px;">Years</th>
+                      <th style="text-align: center; padding: 0px 4px;">1</th>
+                      <th style="text-align: center; padding: 0px 4px;">3</th>
+                      <th style="text-align: center; padding: 0px 4px;">5</th>
+                      <th style="text-align: center; padding: 0px 4px;">10</th>
+                      <th style="text-align: center; padding: 0px 4px;">15</th>
+                    </tr>
+                    <tr>
+                      <td style="text-align: left; padding: 0px 4px;">Tshares</td>
+                      <td style="padding: 0px 4px;">` + Number(tsharesYear1).toLocaleString(undefined,{minimumFractionDigits:3, maximumFractionDigits:3}) + `</td>
+                      <td style="padding: 0px 4px;">` + Number(tsharesYear3).toLocaleString(undefined,{minimumFractionDigits:3, maximumFractionDigits:3}) + `</td>
+                      <td style="padding: 0px 4px;">` + Number(tsharesYear5).toLocaleString(undefined,{minimumFractionDigits:3, maximumFractionDigits:3}) + `</td>
+                      <td style="padding: 0px 4px;">` + Number(tsharesYear10).toLocaleString(undefined,{minimumFractionDigits:3, maximumFractionDigits:3}) + `</td>
+                      <td style="padding: 0px 4px;">` + Number(tsharesYear15).toLocaleString(undefined,{minimumFractionDigits:3, maximumFractionDigits:3}) + `</td>
+                    </tr>
+                    <!--<tr>
+                        <td style="text-align: left; padding: 0px 4px;"><b></b>Bshares</td>
+                        <td style="padding: 0px 4px;">` + Number((tsharesYear1 * 1000)).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + `</td>
+                        <td style="padding: 0px 4px;">` + Number((tsharesYear3 * 1000)).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + `</td>
+                        <td style="padding: 0px 4px;">` + Number((tsharesYear5 * 1000)).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + `</td>
+                        <td style="padding: 0px 4px;">` + Number((tsharesYear10 * 1000)).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + `</td>
+                        <td style="padding: 0px 4px;">` + Number((tsharesYear15 * 1000)).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + `</td>
+                    </tr>-->
+                    <tr>
+                        <td style="text-align: left; padding: 0px 4px;"><b></b>Price 1x</td>
+                        <td style="padding: 0px 4px;">` + nFormatterLocale((Number(calculatorOutputValue) + (tsharesYear1 * payoutPerTshare * 365)) * liveData.price, 0) + `</td>
+                        <td style="padding: 0px 4px;">` + nFormatterLocale((Number(calculatorOutputValue) + (tsharesYear3 * payoutPerTshare * 365 * 3)) * liveData.price, 0) + `</td>
+                        <td style="padding: 0px 4px;">` + nFormatterLocale((Number(calculatorOutputValue) + (tsharesYear5 * payoutPerTshare * 365 * 5)) * liveData.price, 0) + `</td>
+                        <td style="padding: 0px 4px;">` + nFormatterLocale((Number(calculatorOutputValue) + (tsharesYear10 * payoutPerTshare * 365 * 10)) * liveData.price, 0) + `</td>
+                        <td style="padding: 0px 4px;">` + nFormatterLocale((Number(calculatorOutputValue) + (tsharesYear15 * payoutPerTshare * 365 * 15)) * liveData.price, 0) + `</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left; padding: 0px 4px;"><b></b>Price 2x</td>
+                        <td style="padding: 0px 4px;">` + nFormatterLocale((Number(calculatorOutputValue) + (tsharesYear1 * payoutPerTshare * 365)) * 2 * liveData.price, 0) + `</td>
+                        <td style="padding: 0px 4px;">` + nFormatterLocale((Number(calculatorOutputValue) + (tsharesYear3 * payoutPerTshare * 365 * 3)) * 2 * liveData.price, 0) + `</td>
+                        <td style="padding: 0px 4px;">` + nFormatterLocale((Number(calculatorOutputValue) + (tsharesYear5 * payoutPerTshare * 365 * 5)) * 2 * liveData.price, 0) + `</td>
+                        <td style="padding: 0px 4px;">` + nFormatterLocale((Number(calculatorOutputValue) + (tsharesYear10 * payoutPerTshare * 365 * 10)) * 2 * liveData.price, 0) + `</td>
+                        <td style="padding: 0px 4px;">` + nFormatterLocale((Number(calculatorOutputValue) + (tsharesYear15 * payoutPerTshare * 365 * 15)) * 2 * liveData.price, 0) + `</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left; padding: 0px 4px;"><b></b>Price 10x</td>
+                        <td style="padding: 0px 4px;">` + nFormatterLocale((Number(calculatorOutputValue) + (tsharesYear1 * payoutPerTshare * 365)) * 10 * liveData.price, 1) + `</td>
+                        <td style="padding: 0px 4px;">` + nFormatterLocale((Number(calculatorOutputValue) + (tsharesYear3 * payoutPerTshare * 365 * 3)) * 10 * liveData.price, 1) + `</td>
+                        <td style="padding: 0px 4px;">` + nFormatterLocale((Number(calculatorOutputValue) + (tsharesYear5 * payoutPerTshare * 365 * 5)) * 10 * liveData.price, 1) + `</td>
+                        <td style="padding: 0px 4px;">` + nFormatterLocale((Number(calculatorOutputValue) + (tsharesYear10 * payoutPerTshare * 365 * 10)) * 10 * liveData.price, 1) + `</td>
+                        <td style="padding: 0px 4px;">` + nFormatterLocale((Number(calculatorOutputValue) + (tsharesYear15 * payoutPerTshare * 365 * 15)) * 10 * liveData.price, 1) + `</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left; padding: 0px 4px;"><b></b>Price 50x</td>
+                        <td style="padding: 0px 4px;">` + nFormatterLocale((Number(calculatorOutputValue) + (tsharesYear1 * payoutPerTshare * 365)) * 50 * liveData.price, 1) + `</td>
+                        <td style="padding: 0px 4px;">` + nFormatterLocale((Number(calculatorOutputValue) + (tsharesYear3 * payoutPerTshare * 365 * 3)) * 50 * liveData.price, 1) + `</td>
+                        <td style="padding: 0px 4px;">` + nFormatterLocale((Number(calculatorOutputValue) + (tsharesYear5 * payoutPerTshare * 365 * 5)) * 50 * liveData.price, 1) + `</td>
+                        <td style="padding: 0px 4px;">` + nFormatterLocale((Number(calculatorOutputValue) + (tsharesYear10 * payoutPerTshare * 365 * 10)) * 50 * liveData.price, 1) + `</td>
+                        <td style="padding: 0px 4px;">` + nFormatterLocale((Number(calculatorOutputValue) + (tsharesYear15 * payoutPerTshare * 365 * 15)) * 50 * liveData.price, 1) + `</td>
+                    </tr>
+                    </table>
+                    </center>`;
+
+                $("#divStake").html(html);
+                $("#divStake").show();
+            } catch (error) {
                 console.log(error);
             }
         }
@@ -1126,7 +1235,9 @@
                 </select>
                 <input id="calculatorAmount" style="color: black !important; width: 100px;" placeholder="0" onkeypress='return event.charCode >= 48 && event.charCode <= 57'>
                 <button onclick="calculatorConvert()" style="height: 40px; padding: 0px 20px; margin: 0px 6px; outline: none;">Convert</button>
-                <span id="calculatorOutput" style="color: white; width: 100px;">0.00 HEX</span></center>
+                <span id="calculatorOutput" style="color: white; width: 100px;">0.00 HEX</span>
+                <button id="stakeButton" onclick="calculatorStake()" style="display: none; height: 40px; padding: 0px 20px; margin: 0px 6px; outline: none;">Stake</button></center>
+                <div id="divStake" style="display: none; color: white"></div>
         </div>
 
         <div id="divCharts" style="display: none; margin-left: 10px; margin-right: 10px;">
@@ -1152,9 +1263,9 @@
         <button id="buttonLegend" style="width: 150px; height: 48px; ">Legend</button>
         <ul id="divLegend" style="display: none; text-align: left; max-width: 360px; margin-bottom: 0px; margin-top: 16px;">
             <li>All Time Low: ($0.00005645)</li></br>
-            <li>APY Rate: ((Daily Payout / Staked) * 365.25)</li></br>
+            <li>APY Rate: ((Daily Payout / Staked Supply) * 365.25)</li></br>
             <li>Total Value Locked: (Price * Staked)</li></br>
-            <li>Minted Inflation: (Difference in Total HEX)</li></br>
+            <li>Minted Inflation: (Difference in Total Supply)</li></br>
         </ul>
         <ul id="divLegendLinks" style="display: none; text-align: left; max-width: 360px; margin-bottom: 0px; margin-top: 16px;">
             <li><a href="https://apphex.win/charts/">Apphex.win/charts</a></li></br>
@@ -1163,6 +1274,7 @@
             <li><a href="https://hexgraphs.com/">HexGraphs.com</a></li></br>
             <li><a href="https://www.whalesonly.com/charts">WhalesOnly.com/charts</a></li></br>
             <li><a href="https://www.hexcalc.net/">HexCalc.net</a></li></br>
+            <li><a href="https://www.reddit.com/r/HEXcrypto/comments/o04mzm/new_to_hex_staking_ladder_tool/">Staking Ladder Tool</a></li></br>
             <li><a href="https://info.uniswap.org/#/pools/0x69d91b94f0aaf8e8a2586909fa77a5c2c89818d5">Info.Uniswap.org</a></li></br>
         </ul>
     </center>

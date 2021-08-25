@@ -848,17 +848,17 @@
             //console.log("liveData.price" + liveData.price);
 
             var html = `<center>
-                    <table style="text-align: right">
+                    <table style="text-align: right; margin-top: 10px;">
                     <tr>
-                      <th style="text-align: left; padding: 0px 4px;">Years</th>
-                      <th style="text-align: center; padding: 0px 4px;">1</th>
-                      <th style="text-align: center; padding: 0px 4px;">3</th>
-                      <th style="text-align: center; padding: 0px 4px;">5</th>
-                      <th style="text-align: center; padding: 0px 4px;">10</th>
-                      <th style="text-align: center; padding: 0px 4px;">15</th>
+                      <th style="text-align: left; padding: 0px 4px; background-color: #171717">Years</th>
+                      <th style="text-align: center; padding: 0px 4px; background-color: #171717">1</th>
+                      <th style="text-align: center; padding: 0px 4px; background-color: #171717">3</th>
+                      <th style="text-align: center; padding: 0px 4px; background-color: #171717">5</th>
+                      <th style="text-align: center; padding: 0px 4px; background-color: #171717">10</th>
+                      <th style="text-align: center; padding: 0px 4px; background-color: #171717">15</th>
                     </tr>
                     <tr>
-                      <td style="text-align: left; padding: 0px 4px;">Tshares</td>
+                      <td style="text-align: left; padding: 0px 4px;">T-Shares</td>
                       <td style="padding: 0px 4px;">` + Number(tsharesYear1).toLocaleString(undefined,{minimumFractionDigits:3, maximumFractionDigits:3}) + `</td>
                       <td style="padding: 0px 4px;">` + Number(tsharesYear3).toLocaleString(undefined,{minimumFractionDigits:3, maximumFractionDigits:3}) + `</td>
                       <td style="padding: 0px 4px;">` + Number(tsharesYear5).toLocaleString(undefined,{minimumFractionDigits:3, maximumFractionDigits:3}) + `</td>
@@ -866,7 +866,7 @@
                       <td style="padding: 0px 4px;">` + Number(tsharesYear15).toLocaleString(undefined,{minimumFractionDigits:3, maximumFractionDigits:3}) + `</td>
                     </tr>
                     <!--<tr>
-                        <td style="text-align: left; padding: 0px 4px;"><b></b>Bshares</td>
+                        <td style="text-align: left; padding: 0px 4px;"><b></b>B-Shares</td>
                         <td style="padding: 0px 4px;">` + Number((tsharesYear1 * 1000)).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + `</td>
                         <td style="padding: 0px 4px;">` + Number((tsharesYear3 * 1000)).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + `</td>
                         <td style="padding: 0px 4px;">` + Number((tsharesYear5 * 1000)).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + `</td>
@@ -1263,7 +1263,7 @@
         <button id="buttonLegend" style="width: 150px; height: 48px; ">Legend</button>
         <ul id="divLegend" style="display: none; text-align: left; max-width: 360px; margin-bottom: 0px; margin-top: 16px;">
             <li>All Time Low: ($0.00005645)</li></br>
-            <li>APY Rate: ((Daily Payout / Staked Supply) * 365.25)</li></br>
+            <li>APY: (Daily Payout / Staked Supply * 365.25)</li></br>
             <li>Total Value Locked: (Price * Staked)</li></br>
             <li>Minted Inflation: (Difference in Total Supply)</li></br>
         </ul>

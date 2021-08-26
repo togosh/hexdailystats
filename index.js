@@ -3591,6 +3591,17 @@ ds.currentDay, ds.date,
 34 ds.totalStakerCount, ds.totalStakerCountChange
 */
 
+const twitterAPI = require('twitter-api-client');
+
+var twitterClient = undefined;
+if (CONFIG.twitter.enabled){
+twitterClient = new twitterAPI.TwitterClient({
+	apiKey: CONFIG.twitter.apiKey,
+	apiSecret: CONFIG.twitter.apiSecret,
+  accessToken: CONFIG.twitter.accessToken,
+  accessTokenSecret: CONFIG.twitter.accessTokenSecret,
+});}
+
 async function tweet(dailyStat){
   console.log("tweet()");
 	if (CONFIG.twitter.enabled && !DEBUG && dailyStat){

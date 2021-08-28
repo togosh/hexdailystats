@@ -3648,7 +3648,8 @@ async function tweet(dailyStat){
   return;
 
 	} catch (err){
-		log('TWITTER - ERROR: ' + err);
+		log('TWITTER - ERROR: ');
+    console.log(err);
 	}
 	}
 

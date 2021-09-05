@@ -290,13 +290,23 @@ const job = schedule.scheduleJob(rule, function(){
   if (!getDataRunning){ getDailyData(); }
 });
 
-const rule2 = new schedule.RecurrenceRule();
-rule2.hour = 0;
-rule2.minute = 40;
-rule2.tz = 'Etc/UTC';
+const rule20 = new schedule.RecurrenceRule();
+rule20.hour = 0;
+rule20.minute = 20;
+rule20.tz = 'Etc/UTC';
 
-const job2 = schedule.scheduleJob(rule2, function(){
-  log('**** DAILY DATA TIMER 2!');
+const job20 = schedule.scheduleJob(rule20, function(){
+  log('**** DAILY DATA TIMER 20!');
+  if (!getDataRunning){ getDailyData(); }
+});
+
+const rule40 = new schedule.RecurrenceRule();
+rule40.hour = 0;
+rule40.minute = 40;
+rule40.tz = 'Etc/UTC';
+
+const job40 = schedule.scheduleJob(rule40, function(){
+  log('**** DAILY DATA TIMER 40!');
   if (!getDataRunning){ getDailyData(); }
 });
 }
@@ -308,17 +318,17 @@ const job2 = schedule.scheduleJob(rule2, function(){
 //		updatePrice();
 //	}, priceTimer); }
 
-var job3 = schedule.scheduleJob("*/1 * * * *", function() { 
+var jobLive = schedule.scheduleJob("*/1 * * * *", function() { 
   runLiveData();
 });
 
-const rule4 = new schedule.RecurrenceRule();
-rule4.hour = 0;
-rule4.minute = 0;
-rule4.second = 30;
-rule4.tz = 'Etc/UTC';
+const ruleCurrentDay = new schedule.RecurrenceRule();
+ruleCurrentDay.hour = 0;
+ruleCurrentDay.minute = 0;
+ruleCurrentDay.second = 30;
+ruleCurrentDay.tz = 'Etc/UTC';
 
-const job4 = schedule.scheduleJob(rule4, function(){
+const jobCurrentDay = schedule.scheduleJob(ruleCurrentDay, function(){
   log('**** DAILY DATA TIMER 4!');
   getAndSet_currentGlobalDayEmit();
 });
@@ -436,13 +446,13 @@ async function getLiveData() {
   getLiveDataRUNNING = true;
   try {
   if (!getDataRunning){
-    var priceUV2 = await getUniswapV2HEXDailyPrice(); await sleep(250);
-    var priceUV3 = await getUniswapV3HEXDailyPrice(); await sleep(250);
+    var priceUV2 = await getUniswapV2HEXDailyPrice(); await sleep(1000);
+    var priceUV3 = await getUniswapV3HEXDailyPrice(); await sleep(1000);
     
-    var { liquidityUV2_HEXUSDC, liquidityUV2_USDC } = await getUniswapV2HEXUSDC(); await sleep(250);
-    var { liquidityUV2_HEXETH, liquidityUV2_ETH } = await getUniswapV2HEXETH(); await sleep(250);
+    var { liquidityUV2_HEXUSDC, liquidityUV2_USDC } = await getUniswapV2HEXUSDC(); await sleep(1000);
+    var { liquidityUV2_HEXETH, liquidityUV2_ETH } = await getUniswapV2HEXETH(); await sleep(1000);
     
-    var { liquidityUV3_HEX, liquidityUV3_USDC, liquidityUV3_ETH } = await getUniswapV3(); await sleep(250);
+    var { liquidityUV3_HEX, liquidityUV3_USDC, liquidityUV3_ETH } = await getUniswapV3(); await sleep(1000);
     
     var liquidityUV2UV3_HEX = parseInt(liquidityUV2_HEXUSDC + liquidityUV2_HEXETH + liquidityUV3_HEX);
     var liquidityUV2UV3_USDC = parseInt(liquidityUV2_USDC + liquidityUV3_USDC);
@@ -451,8 +461,12 @@ async function getLiveData() {
     var priceUV2UV3 = parseFloat(((priceUV2 * (liquidityUV2_USDC / liquidityUV2UV3_USDC)) + 
     (priceUV3 * (liquidityUV3_USDC / liquidityUV2UV3_USDC))).toFixed(8));
     
-    var tshareRateHEX = await get_shareRateChange(); await sleep(250);
+    var tshareRateHEX = await get_shareRateChange(); await sleep(500);
     var tshareRateUSD = parseFloat((tshareRateHEX * priceUV2).toFixed(4));
+
+    if (liquidityUV2_HEXUSDC == 0 || liquidityUV2_USDC == 0 || liquidityUV2_HEXETH == 0 || liquidityUV2_ETH == 0) {
+      return undefined;
+    }
 
     return {
       price: priceUV2UV3,
@@ -533,7 +547,7 @@ async function getDailyData() {
     return;
   }
 
-  var blockNumber = await getEthereumBlock(currentDay)
+  var blockNumber = await getEthereumBlock(currentDay);  await sleep(250);
 
   // Get Previous Row of Data
   var previousDay = (currentDay - 1);
@@ -545,19 +559,19 @@ async function getDailyData() {
 
   var { circulatingHEX, stakedHEX } = await getGlobalInfo(); await sleep(250);
 
-  var priceUV2 = await getUniswapV2HEXDailyPrice(); await sleep(250);
-  var priceUV3 = await getUniswapV3HEXDailyPrice(); await sleep(250);
+  var priceUV2 = await getUniswapV2HEXDailyPrice(); await sleep(1000);
+  var priceUV3 = await getUniswapV3HEXDailyPrice(); await sleep(1000);
 
-  var { liquidityUV2_HEXUSDC, liquidityUV2_USDC } = await getUniswapV2HEXUSDC(); await sleep(250);
-  var { liquidityUV2_HEXETH, liquidityUV2_ETH } = await getUniswapV2HEXETH(); await sleep(250);
+  var { liquidityUV2_HEXUSDC, liquidityUV2_USDC } = await getUniswapV2HEXUSDC(); await sleep(1000); // getUniswapV2HEXUSDC_Polling();
+  var { liquidityUV2_HEXETH, liquidityUV2_ETH } = await getUniswapV2HEXETH(); await sleep(1000);
 
-  var { liquidityUV3_HEX, liquidityUV3_USDC, liquidityUV3_ETH } = await getUniswapV3(); await sleep(250);
+  var { liquidityUV3_HEX, liquidityUV3_USDC, liquidityUV3_ETH } = await getUniswapV3(); await sleep(500);
 
 
   // Core Historical
-  var penaltiesHEX = await get_dailyPenalties(); await sleep(250);
+  var penaltiesHEX = await get_dailyPenalties(); await sleep(500);
 
-  var { dailyPayoutHEX, totalTshares } = await get_dailyDataUpdatePolling(currentDay); await sleep(250);
+  var { dailyPayoutHEX, totalTshares } = await get_dailyDataUpdatePolling(currentDay); await sleep(500);
 
 
   // Core Live Long Running

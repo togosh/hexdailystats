@@ -40,6 +40,7 @@ var getLiveDataRUNNING = false;
 var liveData = undefined;
 var currencyRates = undefined;
 var getCurrencyDataRunning = false;
+var getAndSet_currentGlobalDay_Running = false;
 
 var hostname = CONFIG.hostname;
 if (DEBUG){ hostname = '127.0.0.1'; }
@@ -88,30 +89,29 @@ app.use(function(req, res, next) {
 		log('APP ----- Connection ' + error);
 	}
 
-  getAndSet_currentGlobalDay();
+  if (!getAndSet_currentGlobalDay_Running) { getAndSet_currentGlobalDay(); }
   //if (!getRowDataRunning){ getRowData(); }
 
 	next();
 });
 
 async function getAndSet_currentGlobalDay(){
-  var currentDay = await getCurrentDay() + 1;
+  getAndSet_currentGlobalDay_Running = true;
+  try {
+    var currentDay = await getCurrentDay() + 1;
+    log("currentDay: " + currentDay);
 
-  if (currentDay != currentDayGlobal && currentDay > currentDayGlobal) {
-    currentDayGlobal = currentDay;
+    if (currentDay != currentDayGlobal && currentDay > currentDayGlobal) {
+      currentDayGlobal = currentDay;
+      io.emit("currentDay", currentDayGlobal);
+    } 
+  } catch (error){
+    log("ERROR: " + "getAndSet_currentGlobalDay()");
+    console.log(error);
+  } finally {
+    getAndSet_currentGlobalDay_Running = false;
   }
-}
-
-async function getAndSet_currentGlobalDayEmit(){
-  log("getAndSet_currentGlobalDayEmit()");
-  var currentDay = await getCurrentDay();
-  var newDay = currentDay + 1;
-  log("newDay: " + newDay);
-
-  if (newDay != currentDayGlobal && newDay > currentDayGlobal) {
-    currentDayGlobal = newDay;
-    io.emit("currentDay", currentDayGlobal);
-  }
+  await sleep(300);
 }
 
 const httpServer = http.createServer(app);
@@ -160,67 +160,7 @@ io.on('connection', (socket) => {
   socket.emit("currencyRates", currencyRates);
 
   //createAllRows();
-  //create_dailyUpdates();
-  //create_totalTshareChanges();
-  //get_shareRateChangeByDay(3);
-  //create_tshareRateHEXs();
-  //create_tshareRateHEXIncreases();
   //update_shiftRowsDown();
-
-  //create_tshareRateHEXs();
-  //create_dailyUpdates();
-  //create_tshareRateHEXs();
-  //create_tshareRateHEXIncreases();
-  //create_dailyUpdates();
-
-  //create_uniswapV2HEXPrice();
-  //create_uniswapV3HEXPrice();
-
-  //createUV2UV3Liquidity();
-  //create_uniswapV2V3CombinedHEXPrice();
-  //create_uniswapV2V3CombinedHEXPrice();
-  //create_priceChangeUV2UV3s();
-  //create_priceChangeUV2UV3s();
-  //create_roiMultiplierFromATLs();
-
-  //if(!getStakeStartHistorical){create_stakeStartsHistorical();}
-
-  //create_stakedSupplyChanges();
-  //create_uniqueStakerCountChanges();
-  //create_totalValueLockeds();
-  //create_tshareMarketCaps();
-  //create_actualAPYRates();
-
-  //create_stakeEnds_stakeGoodAccountings_Historical();
-  //create_numberOfHolders();
-  //create_numberOfHoldersChanges();
-  //create_circulatingSupplys();
-
-  //create_totalHEXs();
-  //create_stakedHEXPercents();
-  //create_marketCaps();
-  //create_circulatingSupplyChanges();
-  //create_dailyMintedInflationTotals();
-
-  //create_circulatingSupplys();
-  //update_shiftCirculatingSupply();
-  //create_circulatingSupplyChanges();
-  //create_dailyMintedInflationTotals();
-
-  ////create_totalHEXs();
-  //create_marketCaps();
-  //create_stakedHEXPercents()
-
-  //if (!getStakeStartGAHistorical) {create_stakeStartGAsHistorical();}
-  //create_stakedSupplyGAChanges();
-  //update_stakedSupplyWithGA();
-  //create_totalHEXs();
-  //create_stakedHEXPercents();
-
-  //create_dailyMintedInflationTotals();
-  //create_stakedSupplyChanges();
-  //create_totalValueLockeds();
-  //create_actualAPYRates();
 
   //////////////////////////////////////////////////////////////////
   // Create New Row
@@ -280,13 +220,13 @@ async function getCurrencyData() {
 }
 
 if(!DEBUG){
-const rule = new schedule.RecurrenceRule();
-rule.hour = 0;
-rule.minute = 5;
-rule.tz = 'Etc/UTC';
+const rule5 = new schedule.RecurrenceRule();
+rule5.hour = 0;
+rule5.minute = 5;
+rule5.tz = 'Etc/UTC';
 
-const job = schedule.scheduleJob(rule, function(){
-  log('**** DAILY DATA TIMER!');
+const job5 = schedule.scheduleJob(rule5, function(){
+  log('**** DAILY DATA TIMER 5!');
   if (!getDataRunning){ getDailyData(); }
 });
 
@@ -330,10 +270,10 @@ ruleCurrentDay.tz = 'Etc/UTC';
 
 const jobCurrentDay = schedule.scheduleJob(ruleCurrentDay, function(){
   log('**** DAILY DATA TIMER 4!');
-  getAndSet_currentGlobalDayEmit();
+  if (!getAndSet_currentGlobalDay_Running) { getAndSet_currentGlobalDay(); }
 });
 
-var job5 = schedule.scheduleJob("0 * * * *", function() { 
+var jobCurrencyRates = schedule.scheduleJob("0 * * * *", function() { 
   if (!getCurrencyDataRunning) { getCurrencyData(); };
 });
 
@@ -988,6 +928,8 @@ async function get_stakeStartData(){
   var $lastStakeId = 0;
   var stakedDaysSum = 0;
   var stakedCount = 0;
+  var stakedHEXSum = 0;
+  var weightedAverageSum = 0;
 
   var count = 0;
 
@@ -1000,6 +942,8 @@ async function get_stakeStartData(){
     stakedDaysSum += data.stakedDaysSum;
     $lastStakeId = data.lastStakeId;
     uniqueAddressList = uniqueAddressList.concat(data.uniqueAddresses);
+    stakedHEXSum += data.stakedHEX;
+    weightedAverageSum += data.weightedAverageSum;
 
     count += 1;
     await sleep(100);
@@ -1010,9 +954,17 @@ async function get_stakeStartData(){
 
   uniqueAddressCount = uniqueAddressList.filter(onlyUnique).length;
 
+  var averageStakeLengthWeighted = 0.0;
+  var averageStakeLengthWeightedYears = 0.0
+
+  if (stakedCount && weightedAverageSum && stakedHEXSum) {
+    averageStakeLengthWeighted = weightedAverageSum / stakedHEXSum;
+    averageStakeLengthWeightedYears = averageStakeLengthWeighted / 365.0;
+  }
+
   return {
-    averageStakeLength: parseFloat(averageStakeLengthYears.toFixed(2)),
-    uniqueStakerCount: uniqueAddressCount
+    averageStakeLength: averageStakeLengthWeightedYears, //parseFloat(averageStakeLengthYears.toFixed(2)),
+    uniqueStakerCount: uniqueAddressCount,
   }
 }
 
@@ -1032,6 +984,7 @@ async function get_stakeStarts($lastStakeId){
           stakeId
           stakedDays
           stakerAddr
+          stakedHearts
         }
       }` 
     }),
@@ -1050,8 +1003,14 @@ async function get_stakeStarts($lastStakeId){
       var stakeStartsReduced = res.data.stakeStarts.reduce(function(previousValue, currentValue) {
         return {
           stakedDays: parseInt(previousValue.stakedDays, 10) + parseInt(currentValue.stakedDays, 10),
+          stakedHearts: parseInt(previousValue.stakedHearts, 10) + parseInt(currentValue.stakedHearts, 10),
         }
       });
+
+      var weightedAverageSum = 0.0;
+      for (let i = 0; i < res.data.stakeStarts.length; i++) {
+        weightedAverageSum += res.data.stakeStarts[i].stakedDays * (res.data.stakeStarts[i].stakedHearts / 100000000.0);
+      }
 
       var lastStakeId = res.data.stakeStarts[(stakeCount - 1)].stakeId;
 
@@ -1061,7 +1020,9 @@ async function get_stakeStarts($lastStakeId){
         count: stakeCount, 
         stakedDaysSum: stakeStartsReduced.stakedDays,
         lastStakeId: lastStakeId,
-        uniqueAddresses: uniqueAddresses
+        uniqueAddresses: uniqueAddresses,
+        stakedHEX: stakeStartsReduced.stakedHearts / 100000000,
+        weightedAverageSum: weightedAverageSum,
       };
 
       return data;
@@ -2517,11 +2478,11 @@ async function create_stakeStartsHistorical(){
   //log("create_uniswapV3HEXPrice - TEST: " + priceUV3 + " ------ " + day + " " + startTime);
   //return;
   
-    for (var day = 595; day <= 603; day++) {  // Starts on Day 522 14 167
+    for (var day = 1; day <= 643; day++) {
       try {
         var rowFind = await DailyStat.findOne({currentDay: { $eq: day}});
         if (!isEmpty(rowFind)) {
-          var blockNumber = await getEthereumBlock(day + 1)
+          var blockNumber = await getEthereumBlock(day)
           var { averageStakeLength, uniqueStakerCount, stakedHEX } = await get_stakeStartDataHistorical(blockNumber);
 
           rowFind.averageStakeLength = averageStakeLength;
@@ -2553,6 +2514,7 @@ async function get_stakeStartDataHistorical(blockNumber){
   var stakedCount = 0;
   var uniqueAddressList = [];
   var stakedHEXSum = 0;
+  var weightedAverageSum = 0;
 
   while (true) {
     var data = await get_stakeStartsHistorical($lastStakeId, blockNumber);
@@ -2562,6 +2524,7 @@ async function get_stakeStartDataHistorical(blockNumber){
     $lastStakeId = data.lastStakeId;
     uniqueAddressList = uniqueAddressList.concat(data.uniqueAddresses);
     stakedHEXSum += data.stakedHEX;
+    weightedAverageSum += data.weightedAverageSum;
 
     log($lastStakeId);
     await sleep(250);
@@ -2575,12 +2538,20 @@ async function get_stakeStartDataHistorical(blockNumber){
     averageStakeLengthYears = averageStakeLength / 365.0;
   } 
 
+  var averageStakeLengthWeighted = 0.0;
+  var averageStakeLengthWeightedYears = 0.0
+
+  if (stakedCount && weightedAverageSum && stakedHEXSum) {
+    averageStakeLengthWeighted = weightedAverageSum / stakedHEXSum;
+    averageStakeLengthWeightedYears = averageStakeLengthWeighted / 365.0;
+  }
+
   uniqueAddressCount = uniqueAddressList.filter(onlyUnique).length;
 
   return {
-    averageStakeLength: parseFloat(averageStakeLengthYears.toFixed(2)),
+    averageStakeLength: averageStakeLengthWeightedYears, //parseFloat(averageStakeLengthYears.toFixed(2)),
     uniqueStakerCount: uniqueAddressCount,
-    stakedHEX: stakedHEXSum
+    stakedHEX: stakedHEXSum,
   }
 }
 
@@ -2623,6 +2594,11 @@ async function get_stakeStartsHistorical($lastStakeId, blockNumber){
       }
     });
 
+    var weightedAverageSum = 0.0;
+    for (let i = 0; i < res.data.stakeStarts.length; i++) {
+      weightedAverageSum += res.data.stakeStarts[i].stakedDays * (res.data.stakeStarts[i].stakedHearts / 100000000.0);
+    }
+
     var lastStakeId = res.data.stakeStarts[(stakeCount - 1)].stakeId;
 
     var uniqueAddresses = res.data.stakeStarts.map(a => a.stakerAddr).filter(onlyUnique);
@@ -2633,6 +2609,7 @@ async function get_stakeStartsHistorical($lastStakeId, blockNumber){
       lastStakeId: lastStakeId,
       uniqueAddresses: uniqueAddresses,
       stakedHEX: stakeStartsReduced.stakedHearts / 100000000,
+      weightedAverageSum: weightedAverageSum,
     };
 
     return data;
@@ -3635,9 +3612,9 @@ async function tweet(dailyStat){
   tweetStatus += "Payout Per Tshare - " + Number(dailyStat.payoutPerTshareHEX).toLocaleString(undefined,{minimumFractionDigits:3, maximumFractionDigits:3}) + "\r\n";
   tweetStatus += "\r\n";
 
-  //tweetStatus += "Avg Stake Length - " + Number(dailyStat.averageStakeLength).toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2}) + " yrs\r\n";
+  tweetStatus += "Avg Stake Length - " + Number(dailyStat.averageStakeLength).toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2}) + " yrs\r\n";
   //tweetStatus += "APY Rate - " + Number(dailyStat.actualAPYRate).toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2}) + "%\r\n";
-  //tweetStatus += "\r\n";
+  tweetStatus += "\r\n";
 
   var {amount, symbol} = nFormatter(dailyStat.liquidityUV2UV3_HEX, 1);
   tweetStatus += "HEX Liquidity - " + Number(amount).toLocaleString(undefined) + symbol + "\r\n";

@@ -380,6 +380,8 @@
                             $th.attr('title', 'Difference in Total Supply');
                         } else if (text == "Staked Supply GA (HEX)") {
                             $th.attr('title', 'Stakes Good Accounted but not Ended, Subset of Staked Supply');
+                        } else if (text == "Avg Stake Length (Years)") {
+                            $th.attr('title', 'Weighted by HEX Staked');
                         } else if (text == "APY Rate (Interest + EES Penalties)") {
                             $th.attr('title', '(Daily Payout / Staked Supply) * 365.25');
                         } else if (text == "ROI Multiplier from All Time Low") {
@@ -488,9 +490,10 @@
 
                     { title: "Avg Stake Length (Years)", className: "text-center colAvgStakeLength purple", render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
-                                return Number(data).toLocaleString(undefined,{minimumFractionDigits:2}); } 
+                                return Number(data).toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2}); } 
                             return data;
-                        } },
+                        } 
+                    },
                     { title: "APY Rate (Interest + EES Penalties)", className: "text-center colAPYRate purple" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data/100).toLocaleString(undefined,{style: 'percent', minimumFractionDigits:2}); } 

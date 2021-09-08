@@ -89,7 +89,7 @@ app.use(function(req, res, next) {
 		log('APP ----- Connection ' + error);
 	}
 
-  if (!getAndSet_currentGlobalDay_Running) { getAndSet_currentGlobalDay(); }
+  if (!getAndSet_currentGlobalDay_Running && !getDataRunning) { getAndSet_currentGlobalDay(); }
   //if (!getRowDataRunning){ getRowData(); }
 
 	next();
@@ -111,7 +111,7 @@ async function getAndSet_currentGlobalDay(){
   } finally {
     getAndSet_currentGlobalDay_Running = false;
   }
-  await sleep(300);
+  await sleep(1000);
 }
 
 const httpServer = http.createServer(app);
@@ -471,7 +471,7 @@ async function getDailyData() {
   getDataRunning = true;
   console.log("getDailyData()");
   try {
-
+  await sleep(5000);
   var currentDay = await getCurrentDay();
   var newDay = currentDay + 1;
 

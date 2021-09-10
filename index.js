@@ -188,7 +188,7 @@ io.on('connection', (socket) => {
   //create_stakedSupplyGAChanges();
   //update_stakedSupplyWithGA();
   //create_stakedSupplyChanges();
-  //create_uniqueStakerCountChanges();
+  //create_currentStakerCountChanges();
   //create_tshareMarketCaps();
   //create_totalValueLockeds();
   //create_actualAPYRates();
@@ -361,8 +361,6 @@ var DailyStatSchema = new Schema({
 
   roiMultiplierFromATL:             { type: Number, required: true },
 
-  uniqueStakerCount:        { type: Number, required: true },
-  uniqueStakerCountChange:  { type: Number, required: true },
   currentStakerCount:        { type: Number, },
   currentStakerCountChange:  { type: Number, },
   totalStakerCount:         { type: Number,},
@@ -454,7 +452,7 @@ async function getRowData() {
         ds.stakedHEX, ds.stakedSupplyChange, ds.stakedHEXGA, ds.stakedHEXGAChange, ds.stakedHEXPercent,
         ds.dailyPayoutHEX, ds.penaltiesHEX,
         ds.numberOfHolders, ds.numberOfHoldersChange,
-        ds.uniqueStakerCount, ds.uniqueStakerCountChange,
+        ds.currentStakerCount, ds.currentStakerCountChange,
         ds.totalStakerCount, ds.totalStakerCountChange
       ];
       rowDataNew.push(row);
@@ -525,10 +523,8 @@ async function getDailyData() {
   // Core Live Long Running
   var { stakedHEXGA } = await get_stakeStartGADataHistorical(blockNumber);
 
-  var { averageStakeLength, uniqueStakerCount } = await get_stakeStartData();
-  var uniqueStakerCountChange = (uniqueStakerCount - getNum(previousDailyStat.uniqueStakerCount));
-  var currentStakerCount = uniqueStakerCount;
-  var currentStakerCountChange = uniqueStakerCountChange;
+  var { averageStakeLength, currentStakerCount } = await get_stakeStartData();
+  var currentStakerCountChange = (currentStakerCount - getNum(previousDailyStat.currentStakerCount));
 
   var totalStakerCount = await get_stakeStartsCountHistorical(currentDay);
   console.log("totalStakerCount: " + totalStakerCount);
@@ -643,8 +639,6 @@ async function getDailyData() {
       tshareMarketCapToMarketCapRatio:  tshareMarketCapToMarketCapRatio,
       roiMultiplierFromATL:             roiMultiplierFromATL,
 
-      uniqueStakerCount:        uniqueStakerCount,
-      uniqueStakerCountChange:  uniqueStakerCountChange,
       currentStakerCount:        currentStakerCount,
       currentStakerCountChange:  currentStakerCountChange,
       totalStakerCount:         totalStakerCount,
@@ -976,7 +970,7 @@ async function get_stakeStartData(){
 
   return {
     averageStakeLength: averageStakeLengthWeightedYears, //parseFloat(averageStakeLengthYears.toFixed(2)),
-    uniqueStakerCount: uniqueAddressCount,
+    currentStakerCount: uniqueAddressCount,
   }
 }
 
@@ -1737,8 +1731,6 @@ async function createRow(day){
 
       roiMultiplierFromATL:             0,
 
-      uniqueStakerCount:        0,
-      uniqueStakerCountChange:  0,
       currentStakerCount:        0,
       currentStakerCountChange:  0,
 
@@ -1826,8 +1818,6 @@ async function createAllRows(){
 
         roiMultiplierFromATL:             0,
 
-        uniqueStakerCount:        0,
-        uniqueStakerCountChange:  0,
         currentStakerCount:        0,
         currentStakerCountChange:  0,
 
@@ -2502,7 +2492,6 @@ async function create_stakeStartsHistorical(){
           var { averageStakeLength, uniqueStakerCount, stakedHEX } = await get_stakeStartDataHistorical(blockNumber);
 
           rowFind.averageStakeLength = averageStakeLength;
-          rowFind.uniqueStakerCount = uniqueStakerCount;
           rowFind.currentStakerCount = uniqueStakerCount;
           rowFind.stakedHEX = stakedHEX
 
@@ -2657,28 +2646,25 @@ async function create_stakedSupplyChanges(){
     } } catch (error) { log("ERROR"); log(error); }
 }
 
-async function create_uniqueStakerCountChanges(){
-  log("create_uniqueStakerCountChanges");
+async function create_currentStakerCountChanges(){
+  log("create_currentStakerCountChanges");
   try { for (var day = 1; day <= 595; day++) {
 
       var rowFind = await DailyStat.findOne({currentDay: { $eq: day}}); sleep(100);
       var rowFind2 = await DailyStat.findOne({currentDay: { $eq: day + 1}});
 
       if (!isEmpty(rowFind) && !isEmpty(rowFind2)){
-        if (rowFind.uniqueStakerCount && rowFind2.uniqueStakerCount) {
-          rowFind2.uniqueStakerCountChange = rowFind2.uniqueStakerCount - getNum(rowFind.uniqueStakerCount);
-        } else if (!rowFind.uniqueStakerCount && rowFind2.uniqueStakerCount) {
-          rowFind2.uniqueStakerCountChange = rowFind2.uniqueStakerCount;
+        if (rowFind.currentStakerCount && rowFind2.currentStakerCount) {
+          rowFind2.currentStakerCountChange = rowFind2.currentStakerCount - getNum(rowFind.currentStakerCount);
+        } else if (!rowFind.currentStakerCount && rowFind2.currentStakerCount) {
+          rowFind2.currentStakerCountChange = rowFind2.currentStakerCount;
         }else {
-          rowFind2.uniqueStakerCountChange = 0.0;
+          rowFind2.currentStakerCountChange = 0.0;
         }
 
-        rowFind2.currentStakerCount = rowFind2.uniqueStakerCount;
-        rowFind2.currentStakerCountChange = rowFind2.uniqueStakerCountChange;
-
-        log("create_uniqueStakerCountChanges - SAVE: " + rowFind2.uniqueStakerCountChange + " ------ " + day);
-        rowFind2.save(function (err) { if (err) return log("create_uniqueStakerCountChanges - SAVE ERROR: " + err);});
-      } else { log("create_uniqueStakerCountChanges- MISSING DAY: " + day); }
+        log("create_currentStakerCountChanges - SAVE: " + rowFind2.currentStakerCountChange + " ------ " + day);
+        rowFind2.save(function (err) { if (err) return log("create_currentStakerCountChanges - SAVE ERROR: " + err);});
+      } else { log("create_currentStakerCountChanges- MISSING DAY: " + day); }
       
       await sleep(100);
     } } catch (error) { log("ERROR"); log(error); }
@@ -3598,7 +3584,7 @@ ds.currentDay, ds.date,
 23 ds.stakedHEX, ds.stakedSupplyChange, ds.stakedHEXGA, ds.stakedHEXGAChange, ds.stakedHEXPercent,
 28 ds.dailyPayoutHEX, ds.penaltiesHEX,
 30 ds.numberOfHolders, ds.numberOfHoldersChange,
-32 ds.uniqueStakerCount, ds.uniqueStakerCountChange,
+32 ds.currentStakerCount, ds.currentStakerCountChange,
 34 ds.totalStakerCount, ds.totalStakerCountChange
 */
 

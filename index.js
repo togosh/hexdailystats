@@ -363,6 +363,8 @@ var DailyStatSchema = new Schema({
 
   uniqueStakerCount:        { type: Number, required: true },
   uniqueStakerCountChange:  { type: Number, required: true },
+  currentStakerCount:        { type: Number, },
+  currentStakerCountChange:  { type: Number, },
   totalStakerCount:         { type: Number,},
   totalStakerCountChange:   { type: Number,},
 
@@ -525,6 +527,8 @@ async function getDailyData() {
 
   var { averageStakeLength, uniqueStakerCount } = await get_stakeStartData();
   var uniqueStakerCountChange = (uniqueStakerCount - getNum(previousDailyStat.uniqueStakerCount));
+  var currentStakerCount = uniqueStakerCount;
+  var currentStakerCountChange = uniqueStakerCountChange;
 
   var totalStakerCount = await get_stakeStartsCountHistorical(currentDay);
   console.log("totalStakerCount: " + totalStakerCount);
@@ -641,6 +645,8 @@ async function getDailyData() {
 
       uniqueStakerCount:        uniqueStakerCount,
       uniqueStakerCountChange:  uniqueStakerCountChange,
+      currentStakerCount:        currentStakerCount,
+      currentStakerCountChange:  currentStakerCountChange,
       totalStakerCount:         totalStakerCount,
       totalStakerCountChange:   totalStakerCountChange,
 
@@ -1733,6 +1739,8 @@ async function createRow(day){
 
       uniqueStakerCount:        0,
       uniqueStakerCountChange:  0,
+      currentStakerCount:        0,
+      currentStakerCountChange:  0,
 
       totalValueLocked:        0,
     });
@@ -1820,6 +1828,8 @@ async function createAllRows(){
 
         uniqueStakerCount:        0,
         uniqueStakerCountChange:  0,
+        currentStakerCount:        0,
+        currentStakerCountChange:  0,
 
         totalValueLocked:        0,
       });
@@ -2493,6 +2503,7 @@ async function create_stakeStartsHistorical(){
 
           rowFind.averageStakeLength = averageStakeLength;
           rowFind.uniqueStakerCount = uniqueStakerCount;
+          rowFind.currentStakerCount = uniqueStakerCount;
           rowFind.stakedHEX = stakedHEX
 
           log("create_stakeStartsHistorical - SAVE: " + blockNumber + " - " + averageStakeLength + " - " + uniqueStakerCount + " - " + stakedHEX + " ------ " + day);
@@ -2661,6 +2672,9 @@ async function create_uniqueStakerCountChanges(){
         }else {
           rowFind2.uniqueStakerCountChange = 0.0;
         }
+
+        rowFind2.currentStakerCount = rowFind2.uniqueStakerCount;
+        rowFind2.currentStakerCountChange = rowFind2.uniqueStakerCountChange;
 
         log("create_uniqueStakerCountChanges - SAVE: " + rowFind2.uniqueStakerCountChange + " ------ " + day);
         rowFind2.save(function (err) { if (err) return log("create_uniqueStakerCountChanges - SAVE ERROR: " + err);});

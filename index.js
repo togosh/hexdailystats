@@ -137,7 +137,7 @@ app.get('/grabdata', function (req, res) {
 });
 
 app.get('/fulldata', function (req, res) {
-  res.json(JSON.stringify(rowDataObjects));
+  res.send(JSON.parse(JSON.stringify(rowDataObjects)))
 });
 
 async function grabData() {

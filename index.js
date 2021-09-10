@@ -28,6 +28,7 @@ const UNISWAP_V3_HEXUSDC = "0x69d91b94f0aaf8e8a2586909fa77a5c2c89818d5";
 const UNISWAP_V3_HEXETH = "0x9e0905249ceefffb9605e034b534544684a58be6";
 
 var rowData = undefined;
+var rowDataObjects = undefined;
 var getDataRunning = false;
 var getRowDataRunning = false;
 var connections = {};
@@ -133,6 +134,10 @@ app.get("/", function(req, res){ res.sendFile('/index.html', {root: __dirname});
 app.get('/grabdata', function (req, res) {
   grabData();
   res.send(new Date().toISOString() + ' - Grab Data!');
+});
+
+app.get('/fulldata', function (req, res) {
+  res.json(JSON.stringify(rowDataObjects));
 });
 
 async function grabData() {
@@ -455,6 +460,7 @@ async function getRowData() {
 
     if (rowData === undefined || !(JSON.stringify(rowData) === JSON.stringify(rowDataNew))){ //!arraysEqual(rowData, rowDataNew)) {
       rowData = rowDataNew;
+      rowDataObjects = dailyStats;
       log('SOCKET -- ****EMIT: rowData');
       io.emit("rowData", rowData);
     }

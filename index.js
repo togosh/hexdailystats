@@ -7,6 +7,7 @@ const path = require('path');
 const fs = require('fs');
 const https = require('https');
 const schedule = require('node-schedule');
+var cors = require('cors');
 
 const { JSDOM } = require( "jsdom" );
 const { window } = new JSDOM( "" );
@@ -136,7 +137,7 @@ app.get('/grabdata', function (req, res) {
   res.send(new Date().toISOString() + ' - Grab Data!');
 });
 
-app.get('/fulldata', function (req, res) {
+app.get('/fulldata', cors(), function (req, res) {
   res.send(JSON.parse(JSON.stringify(rowDataObjects)))
 });
 

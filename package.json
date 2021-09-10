@@ -5,6 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "apexcharts": "^3.27.3",
+    "cors": "^2.8.5",
     "express": "^4.17.1",
     "isomorphic-fetch": "^3.0.0",
     "jquery": "^3.6.0",

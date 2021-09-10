@@ -361,6 +361,8 @@ var DailyStatSchema = new Schema({
 
   roiMultiplierFromATL:             { type: Number, required: true },
 
+  uniqueStakerCount:         { type: Number, select: false, },
+  uniqueStakerCountChange:   { type: Number, select: false, },
   currentStakerCount:        { type: Number, },
   currentStakerCountChange:  { type: Number, },
   totalStakerCount:         { type: Number,},

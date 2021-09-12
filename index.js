@@ -91,7 +91,7 @@ app.use(function(req, res, next) {
 		log('APP ----- Connection ' + error);
 	}
 
-  if (!getAndSet_currentGlobalDay_Running && !getDataRunning) { getAndSet_currentGlobalDay(); }
+  if (!getAndSet_currentGlobalDay_Running && !getDataRunning && !getLiveDataRUNNING) { getAndSet_currentGlobalDay(); }
   //if (!getRowDataRunning){ getRowData(); }
 
 	next();
@@ -416,6 +416,12 @@ async function getLiveData() {
       return undefined;
     }
 
+    var penaltiesHEX = await get_dailyPenalties(false); await sleep(500);
+    var { circulatingHEX, stakedHEX, totalTshares } = await getGlobalInfo(); await sleep(500);
+
+    var payout = ((circulatingHEX + stakedHEX) * 10000 / 100448995) + (penaltiesHEX / 2.0);
+    var payoutPerTshare = (payout / totalTshares);
+    
     return {
       price: priceUV2UV3,
       tsharePrice: tshareRateUSD,
@@ -423,6 +429,8 @@ async function getLiveData() {
       liquidityHEX: liquidityUV2UV3_HEX,
       liquidityUSDC: liquidityUV2UV3_USDC,
       liquidityETH: liquidityUV2UV3_ETH,
+      penaltiesHEX: penaltiesHEX,
+      payoutPerTshare: payoutPerTshare,
     };
   }
   } catch (error){
@@ -798,9 +806,13 @@ async function getGlobalInfo(){
     var lockedHEX = parseInt(chunks[0], 16).toString();
     lockedHEX = lockedHEX.substring(0, lockedHEX.length - 8);
 
+    var totalTshares = parseInt(chunks[5], 16).toString();
+    totalTshares = totalTshares.substring(0, totalTshares.length - 12) + "." + totalTshares.substring(totalTshares.length - 12);
+
     return {
       circulatingHEX: parseInt(circulatingSupply),
-      stakedHEX: parseInt(lockedHEX)
+      stakedHEX: parseInt(lockedHEX),
+      totalTshares: parseFloat(totalTshares),
     };
   });
 }

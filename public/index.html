@@ -138,7 +138,12 @@
                 "<b>Price</b> $" + Number(data.price).toLocaleString(undefined,{minimumFractionDigits:5, maximumFractionDigits:5}) + 
                 " &nbsp; <b>T-Share</b> $" + Number(data.tsharePrice).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + 
                 " &nbsp; <b>Rate</b> " +  Number(data.tshareRateHEX).toLocaleString(undefined,{minimumFractionDigits:1, maximumFractionDigits:1}) + " " + 
-                "</div><div>" + 
+                "</div>" +
+                "<div>" +
+                "<b>Payout per T-Share</b> " + Number(data.payoutPerTshare).toLocaleString(undefined,{minimumFractionDigits:3, maximumFractionDigits:3}) + 
+                " &nbsp; <b>Penalties</b> " + getLiqiudityString(data.penaltiesHEX, 1) + " " + 
+                "</div>" +
+                "<div>" + 
                 " &nbsp; <b>HEX</b> " + getLiqiudityString(data.liquidityHEX) +
                 " &nbsp; <b>USDC</b> " + getLiqiudityString(data.liquidityUSDC) + 
                 " &nbsp; <b>ETH</b> " + getLiqiudityString(data.liquidityETH)

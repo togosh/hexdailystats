@@ -141,7 +141,7 @@
                 "</div>" +
                 "<div>" +
                 "<b>Payout per T-Share</b> " + Number(data.payoutPerTshare).toLocaleString(undefined,{minimumFractionDigits:3, maximumFractionDigits:3}) + 
-                " &nbsp; <b>Penalties</b> " + getLiqiudityString(data.penaltiesHEX, 1) + " " + 
+                " &nbsp; <b>Penalties</b> " + getLiqiudityString(data.penaltiesHEX, 2) + " " + 
                 "</div>" +
                 "<div>" + 
                 " &nbsp; <b>HEX</b> " + getLiqiudityString(data.liquidityHEX) +
@@ -397,6 +397,8 @@
                             $th.attr('title', 'All holders past and present');
                         } else if (text == "Total Stakers") {
                             $th.attr('title', 'All stakers past and present');
+                        }  else if (text == "Current Stakers") {
+                            $th.attr('title', 'Unique addresses with active stakes (not ended and not good accounted)');
                         } 
                     });
                 },
@@ -1290,6 +1292,7 @@
     
     <div id="nomicsSection" style="padding-top: 10px;">
         <div><center><a href="https://codeakk.medium.com/hex-development-data-a1b1822446fa" target="_blank">Codeak</a> | 
+            <a href="https://gist.github.com/togosh/5ff8a9a51740f30c96b3ee013e44b798" target="_blank">API</a> | 
             <a href="https://etherscan.io/address/0x2b591e99afe9f32eaa6214f7b7629768c40eeb39#readContract" target="_blank">Etherscan</a> | 
             <a href="https://thegraph.com/legacy-explorer/subgraph/uniswap/uniswap-v2" target="_blank">Uniswap</a> | 
             <a href="https://nomics.com" target="_blank">Nomics</a></center></div>

@@ -1103,6 +1103,10 @@ async function get_dailyPenalties(yesterday = true){
   var penaltyString = parseInt(penaltiesSum, 10).toString();
   penaltiesSum = penaltyString.substring(0, penaltyString.length - 8);
 
+  if (isNaN(parseFloat(penaltiesSum))) {
+    return 0.0;
+  }
+
   return parseFloat(penaltiesSum);
 }
 

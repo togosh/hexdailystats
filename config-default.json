@@ -1,5 +1,8 @@
 {
 	"hostname": "AAA",
+	"urls": {
+		"grabdata": "AAA"
+	},
 	"etherscan": {
 		"apiKey": "AAA"
 	},

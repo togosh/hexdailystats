@@ -132,7 +132,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.get("/", function(req, res){ res.sendFile('/index.html', {root: __dirname}); });
 
-app.get('/grabdata', function (req, res) {
+app.get("/" + CONFIG.urls.grabdata, function (req, res) {
   grabData();
   res.send(new Date().toISOString() + ' - Grab Data!');
 });

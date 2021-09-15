@@ -167,6 +167,7 @@ io.on('connection', (socket) => {
 
   //createAllRows();
   //update_shiftRowsDown();
+  //copyColumns();
 
   //////////////////////////////////////////////////////////////////
   // Create New Row
@@ -3563,6 +3564,34 @@ async function create_totalStakerCountChanges(){
         log("create_totalStakerCountChanges - SAVE: " + rowFind2.totalStakerCountChange + " ------ " + day);
         rowFind2.save(function (err) { if (err) return log("create_totalStakerCountChanges - SAVE ERROR: " + err);});
       } else { log("create_totalStakerCountChanges- MISSING DAY: " + day); }
+      
+      await sleep(100);
+    } } catch (error) { log("ERROR"); log(error); }
+}
+
+
+
+
+////////////////////////////////////////////
+// Copy Columns
+
+async function copyColumns(){
+  log("copyColumns");
+  try { for (var day = 1; day <= 647; day++) {
+      var rowFind = await DailyStat.findOne({currentDay: { $eq: day}}); sleep(100);
+
+      if (!isEmpty(rowFind)){
+        if (rowFind.uniqueStakerCount && rowFind.uniqueStakerCountChange) {
+          rowFind.currentStakerCount = rowFind.uniqueStakerCount;
+          rowFind.currentStakerCountChange = rowFind.uniqueStakerCountChange;
+        } else {
+          rowFind.currentStakerCount = 0;
+          rowFind.currentStakerCountChange = 0
+        }
+
+        log("copyColumns - SAVE: " + rowFind.currentStakerCount + " - " + rowFind.currentStakerCountChange + " ------ " + day);
+        rowFind.save(function (err) { if (err) return log("copyColumns - SAVE ERROR: " + err);});  
+      } else { log("copyColumns- MISSING DAY: " + day); }
       
       await sleep(100);
     } } catch (error) { log("ERROR"); log(error); }

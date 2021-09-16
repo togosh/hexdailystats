@@ -350,6 +350,8 @@ var DailyStatSchema = new Schema({
   liquidityUV2UV3_ETH:  { type: Number, required: true },
   liquidityUV2UV3_HEX:  { type: Number, required: true },
 
+  currentHolders:        { type: Number, },
+  currentHoldersChange:  { type: Number, },
   numberOfHolders:        { type: Number, required: true },
   numberOfHoldersChange:  { type: Number, required: true },
 
@@ -465,7 +467,8 @@ async function getRowData() {
         ds.dailyPayoutHEX, ds.penaltiesHEX,
         ds.numberOfHolders, ds.numberOfHoldersChange,
         ds.currentStakerCount, ds.currentStakerCountChange,
-        ds.totalStakerCount, ds.totalStakerCountChange
+        ds.totalStakerCount, ds.totalStakerCountChange,
+        ds.currentHolders, ds.currentHoldersChange,
       ];
       rowDataNew.push(row);
     }
@@ -545,6 +548,8 @@ async function getDailyData() {
   var numberOfHolders = await get_numberOfHolders();
   var numberOfHoldersChange = (numberOfHolders - previousDailyStat.numberOfHolders);
 
+  var currentHolders = await get_currentHolders(blockNumber);
+  var currentHoldersChange = (currentHolders - previousDailyStat.currentHolders);
 
   // Calculated Values
   var totalTsharesChange      = (totalTshares - previousDailyStat.totalTshares);
@@ -642,6 +647,8 @@ async function getDailyData() {
 
       numberOfHolders:          numberOfHolders,
       numberOfHoldersChange:    numberOfHoldersChange,
+      currentHolders:           currentHolders,
+      currentHoldersChange:     currentHoldersChange,
 
       dailyMintedInflationTotal: dailyMintedInflationTotal,
       totalHEX: totalHEX,
@@ -841,6 +848,16 @@ async function get_numberOfHolders(){
 
     return numberOfHolders;
   });
+}
+
+async function get_currentHolders(blockNumber) {
+  try {
+    var { circulatingSupply, currentHolders } = await get_tokenHoldersData_Historical(blockNumber);
+    if (currentHolders) { return currentHolders; }
+  } catch (error) {
+    log(error);
+  }
+  return 0;
 }
 
 async function get_shareRateChange(){
@@ -1740,6 +1757,8 @@ async function createRow(day){
 
       numberOfHolders:        0,
       numberOfHoldersChange:  0,
+      currentHolders:         0,
+      currentHoldersChange:   0,
 
       dailyMintedInflationTotal:  0,
 
@@ -1827,6 +1846,8 @@ async function createAllRows(){
 
         numberOfHolders:        0,
         numberOfHoldersChange:  0,
+        currentHolders:         0,
+        currentHoldersChange:   0,
 
         dailyMintedInflationTotal:  0,
 
@@ -3018,6 +3039,30 @@ async function create_numberOfHoldersChanges(){
     } } catch (error) { log("ERROR"); log(error); }
 }
 
+async function create_currentHoldersChanges(){
+  log("create_currentHoldersChanges");
+  try { for (var day = 1; day <= 652; day++) {
+
+      var rowFind = await DailyStat.findOne({currentDay: { $eq: day}}); sleep(100);
+      var rowFind2 = await DailyStat.findOne({currentDay: { $eq: day + 1}});
+
+      if (!isEmpty(rowFind) && !isEmpty(rowFind2)){
+        if (rowFind.currentHolders && rowFind2.currentHolders) {
+          rowFind2.currentHoldersChange = rowFind2.currentHolders - getNum(rowFind.currentHolders);
+        } else if (!rowFind.currentHolders && rowFind2.currentHolders) {
+          rowFind2.currentHoldersChange = rowFind2.currentHolders;
+        }else {
+          rowFind2.currentHoldersChange = 0.0;
+        }
+
+        log("create_currentHoldersChanges - SAVE: " + rowFind2.currentHoldersChange + " ------ " + (day + 1));
+        rowFind2.save(function (err) { if (err) return log("create_currentHoldersChanges - SAVE ERROR: " + err);});
+      } else { log("create_currentHoldersChanges- MISSING DAY: " + day); }
+      
+      await sleep(100);
+    } } catch (error) { log("ERROR"); log(error); }
+}
+
 
 //////////////////////////////////////////////
 
@@ -3028,20 +3073,17 @@ async function create_circulatingSupplys(){
       var rowFind = await DailyStat.findOne({currentDay: { $eq: day}});
 
       if (!isEmpty(rowFind)){
-        var blockNumber = await getEthereumBlock(day + 1);
+        var blockNumber = await getEthereumBlock(day);
         await sleep(300);
-        var { circulatingSupply } = await get_tokenHoldersData_Historical(blockNumber);
-        if (circulatingSupply) {
-          rowFind.circulatingHEX = circulatingSupply;
-        } else {
-          rowFind.circulatingHEX = 0;
-        }
+        var { circulatingSupply, currentHolders } = await get_tokenHoldersData_Historical(blockNumber);
+        if (circulatingSupply) { rowFind.circulatingHEX = circulatingSupply; } else { rowFind.circulatingHEX = 0; }
+        if (currentHolders) { rowFind.currentHolders = currentHolders; } else { rowFind.currentHolders = 0; }
 
-        log("create_circulatingSupplys - SAVE: " + rowFind.circulatingHEX + " ------ " + day);
+        log("create_circulatingSupplys - SAVE: " + rowFind.circulatingHEX + " -- " + rowFind.currentHolders + " ------ " + day);
         rowFind.save(function (err) { if (err) return log("create_circulatingSupplys - SAVE ERROR: " + err);});
       } else { log("create_circulatingSupplys- MISSING DAY: " + day); }
       
-      await sleep(1000);
+      await sleep(500);
     } catch (error) { log("ERROR"); log(error); await sleep(30000); day--; }
   }
 }
@@ -3050,19 +3092,40 @@ async function get_tokenHoldersData_Historical(blockNumber){
   var $lastNumeralIndex = 0;
   var circulatingSum = 0;
   var count = 0;
+  var uniqueAddressList = [];
+  var uniqueAddressCount = 0;
 
   while (true) {
-    var data = await get_tokenHolders_Historical(blockNumber, $lastNumeralIndex);
+    var data = undefined;
+    var retrieveCount = 0;
+    while (true) {
+      try {
+        data = await get_tokenHolders_Historical(blockNumber, $lastNumeralIndex);
+        break;
+      } catch (error) {
+        log("get_tokenHoldersData_Historical() ----- ERROR - Trying again -" + retrieveCount);
+        retrieveCount += 1;
+        await sleep(1000 * retrieveCount);
+
+        if (retrieveCount > 3){
+          throw error;
+        }
+      }
+    }
     if (data.count <= 0) { break; }
     circulatingSum += data.circulatingHEX;
+    uniqueAddressList = uniqueAddressList.concat(data.uniqueAddresses);
     $lastNumeralIndex = data.lastNumeralIndex;
     log($lastNumeralIndex);
 
     await sleep(300);
   }
 
+  uniqueAddressCount = (new Set(uniqueAddressList)).size;
+
   return {
     circulatingSupply: circulatingSum,
+    currentHolders: uniqueAddressCount,
   }
 }
 
@@ -3081,6 +3144,7 @@ async function get_tokenHolders_Historical(blockNumber, $lastNumeralIndex){
         ) {
           numeralIndex
           tokenBalance
+          holderAddress
         }
       }` 
     }),
@@ -3102,11 +3166,14 @@ async function get_tokenHolders_Historical(blockNumber, $lastNumeralIndex){
       }
     });
 
+    var uniqueAddresses = res.data.tokenHolders.map(a => a.holderAddress).filter(onlyUnique);
+
     var lastNumeralIndex = res.data.tokenHolders[(tokenHolders - 1)].numeralIndex;
 
     var data = {  
       count: tokenHolders, 
       circulatingHEX: tokenHoldersReduced.tokenBalance / 100000000,
+      uniqueAddresses: uniqueAddresses,
       lastNumeralIndex: lastNumeralIndex
     };
 
@@ -3633,7 +3700,8 @@ ds.currentDay, ds.date,
 28 ds.dailyPayoutHEX, ds.penaltiesHEX,
 30 ds.numberOfHolders, ds.numberOfHoldersChange,
 32 ds.currentStakerCount, ds.currentStakerCountChange,
-34 ds.totalStakerCount, ds.totalStakerCountChange
+34 ds.totalStakerCount, ds.totalStakerCountChange,
+36 ds.currentHolders, ds.currentHoldersChange
 */
 
 const twitterAPI = require('twitter-api-client');

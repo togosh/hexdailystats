@@ -682,13 +682,29 @@
                             return data;
                         }
                     },
-                    { title: "Total Stakers", className: "text-center colTotalStakers purple" , render: function(data, type, row) {
+                    { title: "Total Stakers", className: "text-center colTotalStakers" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;
                         }
                     },
                     { title: "Change in Total Stakers", className: "text-center colTotalStakersChange blue" , render: function(data, type, row) {
+                            if (type === "display" || type === "filter") {
+                                if (data < 0) { 
+                                    return '<div class="red-negative">' + "(" + Math.abs(Number(data)).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + ")" + '</div>';
+                                } 
+                                return Number(data).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}); 
+                            }
+                            return data;
+                        }
+                    },
+                    { title: "Current Holders", className: "text-center colCurrentHolders purple" , render: function(data, type, row) {
+                            if (type === "display" || type === "filter") { 
+                                return Number(data).toLocaleString(); }
+                            return data;
+                        }
+                    },
+                    { title: "Change in Current Holders", className: "text-center colCurrentHoldersChange blue" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") {
                                 if (data < 0) { 
                                     return '<div class="red-negative">' + "(" + Math.abs(Number(data)).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + ")" + '</div>';
@@ -986,6 +1002,8 @@
         .colCurrentStakersChange    { min-width: calc(94px - 36px) !important; }
         .colTotalStakers            { min-width: calc(92px - 36px) !important; }
         .colTotalStakersChange      { min-width: calc(94px - 36px) !important; }
+        .colCurrentHolders          { min-width: calc(96px - 36px) !important; }
+        .colCurrentHoldersChange    { min-width: calc(96px - 36px) !important; }
 
         a { color:black; }
 

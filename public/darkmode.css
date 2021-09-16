@@ -20,6 +20,14 @@ a, span, button, label, li, .dataTables_info, input, .text {
   color: #ddd !important;
 }
 
+button.dt-button.buttons-columnVisibility.active {
+  background: #000 !important;
+}
+
+.dt-button-collection {
+  background: #10172d !important;
+}
+
 .dataTable_previous, .dataTable_next {
   color: white !important;
 }

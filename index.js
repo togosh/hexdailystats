@@ -205,6 +205,7 @@ io.on('connection', (socket) => {
   //create_circulatingSupplyChanges();
   //create_dailyMintedInflationTotals();
   //create_totalStakerCountChanges();
+  //create_currentHoldersChanges();
   
   //if (!getStakeStartsCountHistorical){create_stakeStartsCountHistorical();}
 });
@@ -276,7 +277,7 @@ ruleCurrentDay.second = 30;
 ruleCurrentDay.tz = 'Etc/UTC';
 
 const jobCurrentDay = schedule.scheduleJob(ruleCurrentDay, function(){
-  log('**** DAILY DATA TIMER 4!');
+  log('**** DAILY DATA TIMER 30S!');
   if (!getAndSet_currentGlobalDay_Running) { getAndSet_currentGlobalDay(); }
 });
 

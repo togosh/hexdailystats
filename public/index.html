@@ -144,8 +144,10 @@
                 " &nbsp; <b>Rate</b> " +  Number(data.tshareRateHEX).toLocaleString(undefined,{minimumFractionDigits:1, maximumFractionDigits:1}) + " " + 
                 "</div>" +
                 "<div>" +
-                "<b>Payout per T-Share</b> " + Number(data.payoutPerTshare).toLocaleString(undefined,{minimumFractionDigits:3, maximumFractionDigits:3}) + 
-                " &nbsp; <b>Penalties</b> " + getLiqiudityString(data.penaltiesHEX, 2) + " " + 
+                "<b>Pending Payout per T-Share</b> " + Number(data.payoutPerTshare).toLocaleString(undefined,{minimumFractionDigits:3, maximumFractionDigits:3}) + 
+                "</div>" +
+                "<div>" +
+                "<b>Penalties</b> " + getLiqiudityString(data.penaltiesHEX, 2) +
                 "</div>" +
                 "<div>" + 
                 " &nbsp; <b>HEX</b> " + getLiqiudityString(data.liquidityHEX) +

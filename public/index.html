@@ -138,7 +138,7 @@
                 //console.log(data);
                 liveData = data;
 
-                var htmlNew = "<div>" +
+                var htmlNew = "<div><b>LIVE DATA</b></div><div>" +
                 "<b>Price</b> $" + Number(data.price).toLocaleString(undefined,{minimumFractionDigits:5, maximumFractionDigits:5}) + 
                 " &nbsp; <b>T-Share</b> $" + Number(data.tsharePrice).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + 
                 " &nbsp; <b>Rate</b> " +  Number(data.tshareRateHEX).toLocaleString(undefined,{minimumFractionDigits:1, maximumFractionDigits:1}) + " " + 

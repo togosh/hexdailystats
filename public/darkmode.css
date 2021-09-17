@@ -20,6 +20,10 @@ a, span, button, label, li, .dataTables_info, input, .text {
   color: #ddd !important;
 }
 
+button.dt-button.button-page-length.active {
+  background: #000 !important;
+}
+
 button.dt-button.buttons-columnVisibility.active {
   background: #000 !important;
 }

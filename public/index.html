@@ -63,6 +63,7 @@
         var currencyRates = undefined;
         var currencyCode = "USD";
         var calculatorOutputValue = 0;
+        var table = undefined;
 
         var socket = io.connect();
 
@@ -119,7 +120,7 @@
                 console.log(data);
                 rowData = data;
                 createChart(data);
-                createDataTable(data);
+                table = createDataTable(data);
             }
         });
 
@@ -368,7 +369,7 @@
         }
         
         function createDataTable(data) {
-            $('#dataTable').on('draw.dt', function () {
+            return $('#dataTable').on('draw.dt', function () {
                 $("#loadercontainer").css("display","none");
             }).DataTable({
                 destroy: true,
@@ -739,6 +740,10 @@
         }
 
         $(document).ready(function() {
+            $(window).resize( function () {
+                if (table) { table.columns.adjust().draw(); }
+            });
+
             $('#buttonLegend').click(function() { 
                 $('#divLegend').toggle();
                 $('#divLegend').get(0).scrollIntoView();

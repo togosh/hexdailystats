@@ -411,7 +411,18 @@
                     //    extend: "copy",
                     //    exportOptions: { orthogonal: "exportcopy" }
                     //},
-                    { extend: 'colvis', text: 'Columns' },
+                    { extend: 'colvis', text: 'Columns', }, //columns: ":not(':first')"
+                    {
+                        extend: 'colvisGroup',
+                        text: 'Hide all',
+                        hide: ':visible'
+                    },
+                    {
+                        extend: 'colvisGroup',
+                        text: 'Show all',
+                        show: ':hidden'
+                    },
+                     
                     {
                         extend: "csvHtml5",
                         exportOptions: { orthogonal: "exportcsv" },

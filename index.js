@@ -535,10 +535,13 @@ async function getDailyData() {
 
   var { dailyPayoutHEX, totalTshares } = await get_dailyDataUpdatePolling(currentDay); await sleep(500);
 
-
-  // Core Live Long Running
   var { stakedHEXGA } = await get_stakeStartGADataHistorical(blockNumber);
 
+  var currentHolders = await get_currentHolders(blockNumber);
+  var currentHoldersChange = (currentHolders - previousDailyStat.currentHolders);
+
+
+  // Core Live Long Running
   var { averageStakeLength, currentStakerCount } = await get_stakeStartData();
   var currentStakerCountChange = (currentStakerCount - getNum(previousDailyStat.currentStakerCount));
 
@@ -548,9 +551,7 @@ async function getDailyData() {
 
   var numberOfHolders = await get_numberOfHolders();
   var numberOfHoldersChange = (numberOfHolders - previousDailyStat.numberOfHolders);
-
-  var currentHolders = await get_currentHolders(blockNumber);
-  var currentHoldersChange = (currentHolders - previousDailyStat.currentHolders);
+  
 
   // Calculated Values
   var totalTsharesChange      = (totalTshares - previousDailyStat.totalTshares);

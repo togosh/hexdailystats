@@ -406,7 +406,9 @@
                             $th.attr('title', 'All stakers past and present');
                         }  else if (text == "Current Stakers") {
                             $th.attr('title', 'Unique addresses with active stakes (not ended and not good accounted)');
-                        } 
+                        } else if (text == "Payout Per T-Share (HEX)") {
+                            $th.attr('title', '((Circulating Supply + Staked Supply) * 10000 / 100448995) + (Penalties / 2)');
+                        }
                     });
                 },
                 buttons: [
@@ -1317,6 +1319,7 @@
             <li>APY: (Daily Payout / Staked Supply * 365.25)</li></br>
             <li>Total Value Locked: (Price * Staked)</li></br>
             <li>Minted Inflation: (Difference in Total Supply)</li></br>
+            <li>Payout Per Tshare: ((Circulating Supply + Staked Supply) * 10000 / 100448995) + (Penalties / 2)</li></br>
         </ul>
         <ul id="divLegendLinks" style="display: none; text-align: left; max-width: 360px; margin-bottom: 0px; margin-top: 16px;">
             <li><a href="https://apphex.win/charts/">Apphex.win/charts</a></li></br>

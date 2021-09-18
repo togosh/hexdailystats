@@ -401,7 +401,7 @@ async function getLiveData() {
     var priceUV2 = await getUniswapV2HEXDailyPrice(); await sleep(1000);
     var priceUV3 = await getUniswapV3HEXDailyPrice(); await sleep(1000);
     
-    var { liquidityUV2_HEXUSDC, liquidityUV2_USDC } = await getUniswapV2HEXUSDC(); await sleep(1000);
+    var { liquidityUV2_HEXUSDC, liquidityUV2_USDC } = await getUniswapV2HEXUSDC_Polling(); await sleep(1000);
     var { liquidityUV2_HEXETH, liquidityUV2_ETH } = await getUniswapV2HEXETH(); await sleep(1000);
     
     var { liquidityUV3_HEX, liquidityUV3_USDC, liquidityUV3_ETH } = await getUniswapV3(); await sleep(1000);
@@ -524,7 +524,7 @@ async function getDailyData() {
   var priceUV2 = await getUniswapV2HEXDailyPrice(); await sleep(1000);
   var priceUV3 = await getUniswapV3HEXDailyPrice(); await sleep(1000);
 
-  var { liquidityUV2_HEXUSDC, liquidityUV2_USDC } = await getUniswapV2HEXUSDC(); await sleep(1000); // getUniswapV2HEXUSDC_Polling();
+  var { liquidityUV2_HEXUSDC, liquidityUV2_USDC } = await getUniswapV2HEXUSDC_Polling(); await sleep(1000);
   var { liquidityUV2_HEXETH, liquidityUV2_ETH } = await getUniswapV2HEXETH(); await sleep(1000);
 
   var { liquidityUV3_HEX, liquidityUV3_USDC, liquidityUV3_ETH } = await getUniswapV3(); await sleep(500);
@@ -1339,6 +1339,23 @@ async function getUniswapV2HEXETHHistorical(dateEpoch){
       }
     }
   });
+}
+
+async function getUniswapV2HEXUSDC_Polling(){
+  var count = 0;
+  while (true){
+    var { liquidityUV2_HEXUSDC, liquidityUV2_USDC } = await getUniswapV2HEXUSDC(); await sleep(1000);
+    if ( liquidityUV2_HEXUSDC != 0 && liquidityUV2_USDC != 0){
+      break;
+    }
+    count += 1;
+    if (count > 3) {
+      break;
+    }
+    log("getUniswapV2HEXUSDC_Polling() --- RETRY " + count);
+    await sleep(1000);
+  }
+  return { liquidityUV2_HEXUSDC, liquidityUV2_USDC };
 }
 
 async function getUniswapV2HEXUSDC(){

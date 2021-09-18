@@ -993,7 +993,7 @@ async function get_stakeStartData(){
   var averageStakeLength = stakedDaysSum/stakedCount;
   var averageStakeLengthYears = averageStakeLength / 365.0;
 
-  uniqueAddressCount = uniqueAddressList.filter(onlyUnique).length;
+  uniqueAddressCount = (new Set(uniqueAddressList)).size;
 
   var averageStakeLengthWeighted = 0.0;
   var averageStakeLengthWeightedYears = 0.0
@@ -2595,7 +2595,7 @@ async function get_stakeStartDataHistorical(blockNumber){
     averageStakeLengthWeightedYears = averageStakeLengthWeighted / 365.0;
   }
 
-  uniqueAddressCount = uniqueAddressList.filter(onlyUnique).length;
+  uniqueAddressCount = (new Set(uniqueAddressList)).size;
 
   return {
     averageStakeLength: averageStakeLengthWeightedYears, //parseFloat(averageStakeLengthYears.toFixed(2)),
@@ -3556,7 +3556,8 @@ async function getAll_stakeStartsCountHistorical(blockNumber){
     console.log($lastStakeId);
     await sleep(250);
   }
-  var uniqueAddressCount = uniqueAddressList.filter(onlyUnique).length;
+  var uniqueAddressCount = (new Set(uniqueAddressList)).size;
+
   return {
     uniqueStakerCount: uniqueAddressCount,
   }

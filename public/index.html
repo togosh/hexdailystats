@@ -138,22 +138,39 @@
                 //console.log(data);
                 liveData = data;
 
-                var htmlNew = "<div><b>LIVE DATA</b></div><div>" +
-                "<b>Price</b> $" + Number(data.price).toLocaleString(undefined,{minimumFractionDigits:5, maximumFractionDigits:5}) + 
-                " &nbsp; <b>T-Share</b> $" + Number(data.tsharePrice).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + 
-                " &nbsp; <b>Rate</b> " +  Number(data.tshareRateHEX).toLocaleString(undefined,{minimumFractionDigits:1, maximumFractionDigits:1}) + " " + 
+                var htmlNew = "<div><b>LIVE DATA</b></div><div style='padding: 0px 40px;'>" +
+                "<div style='height: 24px'>" +
+                    "<div style='float: left;'><b>HEX Price</b></div>" +
+                    "<div style='float: right;'>" + Number(data.price).toLocaleString(undefined,{minimumFractionDigits:3, maximumFractionDigits:3}) + " USD</div>" +
                 "</div>" +
-                "<div>" +
-                "<b>Pending Payout per T-Share</b> " + Number(data.payoutPerTshare).toLocaleString(undefined,{minimumFractionDigits:3, maximumFractionDigits:3}) + 
+                "<div style='height: 24px'>" +
+                    "<div style='float: left;'><b>T-Share Price</b></div>" +
+                    "<div style='float: right;'>" + Number(data.tsharePrice).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + " USD</div>" +
                 "</div>" +
-                "<div>" +
-                "<b>Penalties</b> " + getLiqiudityString(data.penaltiesHEX, 2) +
+                "<div style='height: 24px'>" +
+                    "<div style='float: left;'><b>T-Share Rate</b></div>" +
+                    "<div style='float: right;'>" + Number(data.tshareRateHEX).toLocaleString(undefined,{minimumFractionDigits:1, maximumFractionDigits:1}) + " HEX</div>" +
                 "</div>" +
-                "<div>" + 
-                " &nbsp; <b>HEX</b> " + getLiqiudityString(data.liquidityHEX) +
-                " &nbsp; <b>USDC</b> " + getLiqiudityString(data.liquidityUSDC) + 
-                " &nbsp; <b>ETH</b> " + getLiqiudityString(data.liquidityETH)
-                + "</div>";
+                "<div style='height: 24px'>" +
+                    "<div style='float: left;'><b>Payout per T-Share</b></div>" +
+                    "<div style='float: right;'>" + Number(data.payoutPerTshare).toLocaleString(undefined,{minimumFractionDigits:3, maximumFractionDigits:3}) + " HEX</div>" +
+                "</div>" +
+                "<div style='height: 24px'>" +
+                    "<div style='float: left;'><b>Penalties</b></div>" +
+                    "<div style='float: right;'>" + getLiqiudityString(data.penaltiesHEX, 1) + " HEX</div>" +
+                "</div>" +
+                "<div style='height: 24px'>" +
+                    "<div style='float: left;'><b>Liquidity HEX</b></div>" +
+                    "<div style='float: right;'>" + getLiqiudityString(data.liquidityHEX, 1) + " HEX</div>" +
+                "</div>" +
+                "<div style='height: 24px'>" +
+                    "<div style='float: left;'><b>Liquidity USDC</b></div>" +
+                    "<div style='float: right;'>" + getLiqiudityString(data.liquidityUSDC, 1) + " USD</div>" +
+                "</div>" +
+                "<div style='height: 24px'>" +
+                    "<div style='float: left;'><b>Liquidity ETH</b></div>" +
+                    "<div style='float: right;'>" + getLiqiudityString(data.liquidityETH, 1) + " ETH</div>" +
+                "</div>";
 
                 $("#divLiveSection").html(htmlNew);
             }
@@ -408,7 +425,9 @@
                             $th.attr('title', 'Unique addresses with active stakes (not ended and not good accounted)');
                         } else if (text == "Payout Per T-Share (HEX)") {
                             $th.attr('title', '((Circulating Supply + Staked Supply) * 10000 / 100448995) + (Penalties / 2)');
-                        }
+                        } else if (text == "Total Value Locked (USD)") {
+                            $th.attr('title', '(Price * Staked Supply)');
+                        } 
                     });
                 },
                 buttons: [
@@ -1093,7 +1112,7 @@
         </div></center>
         <center><button id="buttonCharts" onclick="openCharts()" style="width: 150px; padding: 6px 40px; margin-bottom: 10px; outline: none;">Charts</button><button id="buttonCalculator" onclick="openCalculator()" style="width: 150px; padding: 6px 40px; margin-bottom: 10px; outline: none;">Calculator</button></center>
 
-        <center><div id="divLiveSection" class="divLive" title="Live Data - Updated every minute" style="text-align:center; color:white; font-size: 16px; background-color: #10172d; max-width: 484px; margin-bottom: 6px;"></div></center> <!--style="display: none;"-->
+        <center><div id="divLiveSection" class="divLive" title="Live Data - Updated every minute" style="text-align:center; color:white; font-size: 16px; background-color: #10172d; max-width: 340px; margin-bottom: 10px;"></div></center> <!--max-width: 484px; style="display: none;"-->
         <div id="divAbout" style="display: none;">
             <div id="aboutSection">
                 <center><div><div class="text" style="max-width: 620px"><b>About:</b> Created to keep historical records of the HEX ecosystem, for research, education and analysis</div>

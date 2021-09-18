@@ -149,7 +149,7 @@
                 "</div>" +
                 "<div style='height: 24px'>" +
                     "<div style='float: left;'><b>T-Share Rate</b></div>" +
-                    "<div style='float: right;'>" + Number(data.tshareRateHEX).toLocaleString(undefined,{minimumFractionDigits:1, maximumFractionDigits:1}) + " HEX</div>" +
+                    "<div style='float: right;'>" + Number(data.tshareRateHEX).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + " HEX</div>" +
                 "</div>" +
                 "<div style='height: 24px'>" +
                     "<div style='float: left;'><b>Payout per T-Share</b></div>" +
@@ -722,7 +722,7 @@
                             return data;
                         }
                     },
-                    { title: "Total Stakers", className: "text-center colTotalStakers" , render: function(data, type, row) {
+                    { title: "Total Stakers", className: "text-center colTotalStakers purple" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;

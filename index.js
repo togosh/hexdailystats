@@ -75,6 +75,8 @@ const Connection = mongoose.model('Connection', ConnectionSchema);
 
 const app = express();
 
+const getAndSet_currentGlobalDayThrottled = throttle(getAndSet_currentGlobalDay, 30000);
+
 app.use(function(req, res, next) {
 	try {
 	if (!DEBUG && req.path === "/" && req.ip){
@@ -93,7 +95,7 @@ app.use(function(req, res, next) {
 		log('APP ----- Connection ' + error);
 	}
 
-  if (!getAndSet_currentGlobalDay_Running && !getDataRunning && !getLiveDataRUNNING) { getAndSet_currentGlobalDay(); }
+  if (!getAndSet_currentGlobalDay_Running && !getDataRunning && !getLiveDataRUNNING) { getAndSet_currentGlobalDayThrottled() }
   //if (!getRowDataRunning){ getRowData(); }
 
 	next();
@@ -771,6 +773,19 @@ function nFormatter(num, digits) {
           amount: 0,
           symbol: ''
       };
+  }
+}
+
+function throttle (callback, limit) {
+  var wait = false;                  // Initially, we're not waiting
+  return function () {               // We return a throttled function
+      if (!wait) {                   // If we're not waiting
+          callback.call();           // Execute users function
+          wait = true;               // Prevent future invocations
+          setTimeout(function () {   // After a period of time
+              wait = false;          // And allow future invocations
+          }, limit);
+      }
   }
 }
 

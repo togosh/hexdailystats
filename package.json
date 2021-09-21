@@ -6,7 +6,9 @@
   "dependencies": {
     "apexcharts": "^3.27.3",
     "cors": "^2.8.5",
+    "es6-promise": "^4.2.8",
     "express": "^4.17.1",
+    "fetch-retry": "^5.0.1",
     "isomorphic-fetch": "^3.0.0",
     "jquery": "^3.6.0",
     "jsdom": "^16.6.0",

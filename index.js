@@ -1431,6 +1431,7 @@ async function getUniswapV2HEXUSDC(){
         liquidityUV2_USDC: parseInt(pairDayData.reserve1), //parseFloat(parseFloat(pairDayData.reserve1).toFixed(4))
       }   
     } catch (error){
+      log("getUniswapV2HEXUSDC() --- ERROR --- " + error.toString() + " --- " + error.stack);
       return {
         liquidityUV2_HEXUSDC: 0,
         liquidityUV2_USDC: 0,

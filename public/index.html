@@ -397,7 +397,7 @@
                 //scrollY: "380px",
                 scrollCollapse: true,
                 order: [[ 0, "desc" ]],
-                dom: 'Bfrtip',
+                dom: 'Brtip',
                 stateSave: true,
                 colReorder: true,
                 deferRender: true,
@@ -1107,16 +1107,16 @@
 <div style="width: 100%; height: 32px; padding-bottom: 10px;"><div style="float:left; padding: 0px 2px; margin-top: 4px;"><span id='currentDay' style="margin-left: 5px;"></span></div><div style="float:right;"><button id="buttonDark" onlick="toggleDark()" style="padding: 2px 36px; margin-right: 10px;">Light Mode</button><span id='ct' style="margin-right: 5px;"></span></div></div>
 <div>
     <div id="mainSection" style="padding-bottom: 10px;">
-        <center><a href="https://t.me/HEXDailyStats"><img src="hexdailystatslogo.png" style="max-width: 100%"></img></a></center>
+        <center><a href="https://t.me/HEXDailyStats" target="_blank"><img src="hexdailystatslogo.png" style="max-width: 100%"></img></a></center>
         <center><div style="font-size:20px; padding-bottom: 10px">
         <a href="#" onclick="aboutClick();">About</a> | 
-        <a href="https://hex.com/">HEX.com</a> |
-        <a href="https://twitter.com/HEXDailyStats">Twitter</a> |
-        <a href="https://t.me/HEXDailyStats">Telegram</a>
+        <a href="https://hex.com/" target="_blank">HEX.com</a> |
+        <a href="https://twitter.com/HEXDailyStats" target="_blank">Twitter</a> |
+        <a href="https://t.me/HEXDailyStats" target="_blank">Telegram</a>
         </div></center>
         <center><button id="buttonCharts" onclick="openCharts()" style="width: 150px; padding: 6px 40px; margin-bottom: 10px; outline: none;">Charts</button><button id="buttonCalculator" onclick="openCalculator()" style="width: 150px; padding: 6px 40px; margin-bottom: 10px; outline: none;">Calculator</button></center>
 
-        <center><div id="divLiveSection" class="divLive" title="Live Data - Updated every minute" style="text-align:center; color:white; font-size: 16px; background-color: #10172d; max-width: 340px; margin-bottom: 10px;"></div></center> <!--max-width: 484px; style="display: none;"-->
+        <center><div id="divLiveSection" class="divLive" style="text-align:center; color:white; font-size: 16px; background-color: #10172d; max-width: 340px; margin-bottom: 10px;"></div></center> <!--max-width: 484px; style="display: none;"-->
         <div id="divAbout" style="display: none;">
             <div id="aboutSection">
                 <center><div><div class="text" style="max-width: 620px"><b>About:</b> Created to keep historical records of the HEX ecosystem, for research, education and analysis</div>
@@ -1125,18 +1125,18 @@
                     <b>The Team:</b> Ryan and Togosh met randomly in Las Vegas at the 1st HEX Meetup!</div></div></center>
                 <div style="display: flex; justify-content: center; flex-wrap: wrap;">
                     <div style="padding: 20px 40px">
-                        <center><a href="https://twitter.com/RyanHEXLife"><img width="300" src="ryan.webp"></img></a></center>
+                        <center><a href="https://twitter.com/RyanHEXLife" target="_blank"><img width="300" src="ryan.webp"></img></a></center>
                         <center><div class="text">Ryan - HEX Analyst</br></br>
-                            <a href="https://twitter.com/RyanHEXLife">Twitter</a> | 
-                            <a href="https://www.youtube.com/channel/UCOG0DRACT4EGseHvJ11Q3oQ">Youtube</a>
+                            <a href="https://twitter.com/RyanHEXLife" target="_blank">Twitter</a> | 
+                            <a href="https://www.youtube.com/channel/UCOG0DRACT4EGseHvJ11Q3oQ" target="_blank">Youtube</a>
                         </div></center>
                     </div>
         
                     <div style="padding: 20px 40px">
-                        <center><a href="https://twitter.com/togoshigekata"><img width="300" src="togosh.webp"></img></a></center>
+                        <center><a href="https://twitter.com/togoshigekata" target="_blank"><img width="300" src="togosh.webp"></img></a></center>
                         <center><div class="text">Togosh - HEX Developer</br></br>  
-                            <a href="https://twitter.com/togoshigekata">Twitter</a> |
-                            <a href="https://github.com/togosh">Github</a>
+                            <a href="https://twitter.com/togoshigekata" target="_blank">Twitter</a> |
+                            <a href="https://github.com/togosh" target="_blank">Github</a>
                         </div></center>
                     </div>
                 </div> 
@@ -1345,15 +1345,18 @@
             <li>Payout Per Tshare: ((Circulating Supply + Staked Supply) * 10000 / 100448995) + (Penalties / 2)</li></br>
         </ul>
         <ul id="divLegendLinks" style="display: none; text-align: left; max-width: 360px; margin-bottom: 0px; margin-top: 16px;">
-            <li><a href="https://apphex.win/charts/">Apphex.win/charts</a></li></br>
-            <li><a href="https://hex.vision/">Hex.vision</a></li></br>
-            <li><a href="https://www.lookintohex.com/">LookIntoHex.com</a></li></br>
-            <li><a href="https://hexgraphs.com/">HexGraphs.com</a></li></br>
-            <li><a href="https://www.whalesonly.com/charts">WhalesOnly.com/charts</a></li></br>
-            <li><a href="https://www.hexcalc.net/">HexCalc.net</a></li></br>
-            <li><a href="https://www.reddit.com/r/HEXcrypto/comments/o04mzm/new_to_hex_staking_ladder_tool/">Staking Ladder Tool</a></li></br>
-            <li><a href="https://info.uniswap.org/#/pools/0x69d91b94f0aaf8e8a2586909fa77a5c2c89818d5">Info.Uniswap.org</a></li></br>
-            <li><a href="https://t.me/HexAudit">Hex Token Supply Audit</a></li></br>
+            <li><a href="https://apphex.win/charts/" target="_blank">Apphex.win/charts</a></li></br>
+            <li><a href="https://hex.vision/" target="_blank">Hex.vision</a></li></br>
+            <li><a href="https://lookintohex.com/" target="_blank">LookIntoHex.com</a></li></br>
+            <li><a href="https://hexgraphs.com/" target="_blank">HexGraphs.com</a></li></br>
+            <li><a href="https://whalesonly.com/charts" target="_blank">WhalesOnly.com/charts</a></li></br>
+            <li><a href="https://hexcalc.net/" target="_blank">HexCalc.net</a></li></br>
+            <li><a href="https://reddit.com/r/HEXcrypto/comments/o04mzm/new_to_hex_staking_ladder_tool/" target="_blank">Staking Ladder Tool</a></li></br>
+            <li><a href="https://hexnoob.com/end-stake-calculator" target="_blank">End Stake Calculator</a></li></br>
+            <li><a href="https://info.uniswap.org/#/pools/0x69d91b94f0aaf8e8a2586909fa77a5c2c89818d5" target="_blank">Info.Uniswap.org</a></li></br>
+            <li><a href="https://t.me/HexAudit" target="_blank">Hex Token Supply Audit</a></li></br>
+            <li><a href="https://everyhexlink.com/" target="_blank">EveryHexLink.com</a></li></br>
+            <li><a href="https://hexnoob.com/" target="_blank">HEXnoob.com</a></li></br>
         </ul>
     </center>
     
@@ -1367,5 +1370,6 @@
     <div id="footer" style="width: 100%; text-align: center; padding-top: 10px; padding-bottom: 20px;">
         <a href="https://etherscan.io/address/0xdee0A5da68ea787C5C441EB7482F61157fE8DEC5" target="_blank"><span>0xdee0A5da68ea787C5C441EB7482F61157fE8DEC5</span></a>
     </div>
-    <center><a href="https://www.google.com/maps/d/u/0/edit?mid=1R3Jmtymyia5hh59iM6gLYgHKHulyrMTK&usp=sharing"><img src="kryptosparbuch.webp" style="width:300px; padding-bottom:30px;"></a></center>
+    <center><a href="https://www.google.com/maps/d/u/0/edit?mid=1R3Jmtymyia5hh59iM6gLYgHKHulyrMTK&usp=sharing" target="_blank"><img src="kryptosparbuch.webp" style="width:300px; padding-bottom:10px;"></a></center>
+    <center><a href="https://t.me/USroadtrip" style="width:300px; padding-bottom:30px;" target="_blank">t.me/USroadtrip</a></center>
 </div>

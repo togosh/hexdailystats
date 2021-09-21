@@ -6,13 +6,27 @@ var originalFetch = require('isomorphic-fetch');
 var fetch = require('fetch-retry')(originalFetch, { 
   retries: 3, 
   retryDelay: 1000, 
-  retryOn: function(attempt, error, response) {
-    if (attempt > 3) return false;
-    // retry on any network error, or 4xx or 5xx status codes
-    if (error !== null || response.status >= 400) {
-      log(`retrying, attempt number ${attempt + 1}`);
+  retryOn: async function(attempt, error, response) {
+    if (attempt > 3) { return false; }
+
+    if (error !== null) {
+      log(`FETCH --- RETRY ${attempt + 1} --- ERROR --- ` + error.toString());
       return true;
     } 
+
+    if (response.status >= 400) {
+      log(`FETCH --- RETRY ${attempt + 1} --- STATUS --- ` + response.status);
+      return true;
+    }
+
+    try {
+      var response2 = await response.clone();
+      var json = await response2.json();
+      return false;
+    } catch (error2) {
+      log(`FETCH --- RETRY ${attempt + 1} --- JSON ---` + error2.toString());
+      return true;
+    }
   }
 });
 const express = require('express');
@@ -453,8 +467,7 @@ async function getLiveData() {
     };
   }
   } catch (error){
-    log("getLiveData()");
-    log(error);
+    log("getLiveData() --- ERROR --- " + error.toString());
   } finally {
     getLiveDataRUNNING = false;
   }
@@ -1408,10 +1421,7 @@ async function getUniswapV2HEXUSDC(){
       }` 
     }),
   })
-  .then(res => { 
-    log("getUniswapV2HEXUSDC() - Status: " + res.status + " - Ok: " + res.ok);
-    return res.json(); 
-  })
+  .then(res => res.json())
   .then(res => {
     try {
       var pairDayData = res.data.pairDayDatas[0];

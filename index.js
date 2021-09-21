@@ -1,7 +1,9 @@
 var DEBUG = false;
 var CONFIG = require('./config.json');
 const http = require('http');
-require('isomorphic-fetch');
+require('es6-promise').polyfill();
+var originalFetch = require('isomorphic-fetch');
+var fetch = require('fetch-retry')(originalFetch, { retries: 3, retryDelay: 1000 });
 const express = require('express');
 const path = require('path');
 const fs = require('fs');

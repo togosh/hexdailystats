@@ -3,7 +3,17 @@ var CONFIG = require('./config.json');
 const http = require('http');
 require('es6-promise').polyfill();
 var originalFetch = require('isomorphic-fetch');
-var fetch = require('fetch-retry')(originalFetch, { retries: 3, retryDelay: 1000 });
+var fetch = require('fetch-retry')(originalFetch, { 
+  retries: 3, 
+  retryDelay: 1000, 
+  retryOn: function(attempt, error, response) {
+    // retry on any network error, or 4xx or 5xx status codes
+    if (error !== null || response.status >= 400) {
+      log(`retrying, attempt number ${attempt + 1}`);
+      return true;
+    } 
+  }
+});
 const express = require('express');
 const path = require('path');
 const fs = require('fs');

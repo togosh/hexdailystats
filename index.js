@@ -28,6 +28,13 @@ var fetchRetry = require('fetch-retry')(fetch, {
 
       const json = JSON.parse(response2);
       //log(`FETCH --- SUCCESS ${attempt + 1}`);
+
+      if (json.errors && Object.keys(json.errors).length > 0) {
+          if (json.errors[0].message) {
+            log(`FETCH --- INTERNAL JSON ERROR --- ${attempt + 1} --- ` + json.errors[0].message);
+            return true;
+          }
+      }
       
       return false;
     } catch (error) {

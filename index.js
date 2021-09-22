@@ -2,12 +2,12 @@ var DEBUG = false;
 var CONFIG = require('./config.json');
 const http = require('http');
 require('es6-promise').polyfill();
-var originalFetch = require('isomorphic-fetch');
-var fetch = require('fetch-retry')(originalFetch, { 
+const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
+var fetchRetry = require('fetch-retry')(fetch, { 
   retries: 3, 
   retryDelay: 1000, 
-  /*retryOn: async function(attempt, error, response) {
-    log(`FETCH --- START ${attempt + 1}`);
+  retryOn: async function(attempt, error, response) {
+    //log(`FETCH --- START ${attempt + 1}`);
     if (attempt > 3) { return false; }
 
     if (error !== null) {
@@ -21,15 +21,23 @@ var fetch = require('fetch-retry')(originalFetch, {
     }
 
     try {
-      var response2 = await response.clone();
-      var json = await response2.json();
+      //log(`FETCH --- TEST ${attempt + 1}`);
+
+      var response2 = await response.clone().buffer();
+      //log(`FETCH --- CLONE ${attempt + 1}`);
+
+      const json = JSON.parse(response2);
+      //log(`FETCH --- SUCCESS ${attempt + 1}`);
+      
       return false;
-    } catch (error2) {
-      log(`FETCH --- RETRY ${attempt + 1} --- JSON ---` + error2.toString());
+    } catch (error) {
+      log(`FETCH --- RETRY ${attempt + 1} --- JSON ---` + error.toString());
       return true;
     }
-  }*/
+  }
 });
+
+
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
@@ -55,6 +63,8 @@ const UNISWAP_V2_HEXETH = "0x55d5c232d921b9eaa6b37b5845e439acd04b4dba";
 
 const UNISWAP_V3_HEXUSDC = "0x69d91b94f0aaf8e8a2586909fa77a5c2c89818d5";
 const UNISWAP_V3_HEXETH = "0x9e0905249ceefffb9605e034b534544684a58be6";
+
+const FETCH_SIZE = 1048576;
 
 var rowData = undefined;
 var rowDataObjects = undefined;
@@ -426,6 +436,7 @@ async function runLiveData() {
 
 async function getLiveData() {
   getLiveDataRUNNING = true;
+  log("getLiveData()");
   try {
   if (!getDataRunning){
     var priceUV2 = await getUniswapV2HEXDailyPrice(); await sleep(1000);
@@ -520,7 +531,7 @@ async function getRowData() {
 async function getDailyData() {
   
   getDataRunning = true;
-  console.log("getDailyData()");
+  log("getDailyData() --- START ****************");
   try {
   await sleep(5000);
   var currentDay = await getCurrentDay();
@@ -535,64 +546,64 @@ async function getDailyData() {
   // Check if Current Row of Data already exists
   var currentDailyStat = await DailyStat.findOne({currentDay: { $eq: currentDay }});
   if (!isEmpty(currentDailyStat)) {
-    log('WARNING - Current Daily Stat already set - Day#: ' + currentDay);
+    log('getDailyData() --- WARNING - Current Daily Stat already set - Day#: ' + currentDay);
     return;
   }
-  log("*** 002 *** - currentDay Row doesnt exist!");
+  log("*** 002 - currentDay row doesnt exist!");
 
   var blockNumber = await getEthereumBlock(currentDay);  await sleep(250);
-  log("*** 003 *** - blockNumber: " + blockNumber);
+  log("*** 003 - blockNumber: " + blockNumber);
 
   // Get Previous Row of Data
   var previousDay = (currentDay - 1);
   var previousDailyStat = await DailyStat.findOne({currentDay: { $eq: previousDay }});
-  log("*** 004 *** - previousDay: " + previousDay);
+  log("*** 004 - previousDay: " + previousDay);
 
   // Core Live
   var tshareRateHEX = await get_shareRateChange(); await sleep(250);
-  log("*** 005 *** - tshareRateHEX: " + tshareRateHEX);
+  log("*** 005 - tshareRateHEX: " + tshareRateHEX);
 
   var { circulatingHEX, stakedHEX } = await getGlobalInfo(); await sleep(250);
-  log("*** 006 *** - circulatingHEX: " + circulatingHEX + " - " + stakedHEX);
+  log("*** 006 - circulatingHEX: " + circulatingHEX + " - stakedHEX: " + stakedHEX);
 
   var priceUV2 = await getUniswapV2HEXDailyPrice(); await sleep(1000);
-  log("*** 007 *** - priceUV2: " + priceUV2);
+  log("*** 007 - priceUV2: " + priceUV2);
   var priceUV3 = await getUniswapV3HEXDailyPrice(); await sleep(1000);
-  log("*** 008 *** - priceUV3: " + priceUV3);
+  log("*** 008 - priceUV3: " + priceUV3);
 
   var { liquidityUV2_HEXUSDC, liquidityUV2_USDC } = await getUniswapV2HEXUSDC_Polling(); await sleep(1000);
-  log("*** 009 *** - liquidityUV2_HEXUSDC: " + liquidityUV2_HEXUSDC + " - liquidityUV2_USDC: " + liquidityUV2_USDC);
+  log("*** 009 - liquidityUV2_HEXUSDC: " + liquidityUV2_HEXUSDC + " - liquidityUV2_USDC: " + liquidityUV2_USDC);
   var { liquidityUV2_HEXETH, liquidityUV2_ETH } = await getUniswapV2HEXETH(); await sleep(1000);
-  log("*** 010 *** - liquidityUV2_HEXETH: " + liquidityUV2_HEXETH + " - liquidityUV2_ETH: " + liquidityUV2_ETH);
+  log("*** 010 - liquidityUV2_HEXETH: " + liquidityUV2_HEXETH + " - liquidityUV2_ETH: " + liquidityUV2_ETH);
   var { liquidityUV3_HEX, liquidityUV3_USDC, liquidityUV3_ETH } = await getUniswapV3(); await sleep(500);
-  log("*** 011 *** - liquidityUV3_HEX: " + liquidityUV3_HEX + " - liquidityUV3_USDC: " + liquidityUV3_ETH + " - liquidityUV3_USDC: " + liquidityUV3_ETH);
-
-  // Core Historical
-  var penaltiesHEX = await get_dailyPenalties(); await sleep(500);
-  log("*** 012 *** - penaltiesHEX: " + penaltiesHEX);
-
-  var { dailyPayoutHEX, totalTshares } = await get_dailyDataUpdatePolling(currentDay); await sleep(500);
-  log("*** 013 *** - dailyPayoutHEX: " + dailyPayoutHEX + " - totalTshares: " + totalTshares);
-
-  var { stakedHEXGA } = await get_stakeStartGADataHistorical(blockNumber);
-  log("*** 014 *** - stakedHEXGA: " + stakedHEXGA);
-
-  var currentHolders = await get_currentHolders(blockNumber);
-  var currentHoldersChange = (currentHolders - previousDailyStat.currentHolders);
-  log("*** 015 *** - currentHolders: " + currentHolders);
-
-  // Core Live Long Running
-  var { averageStakeLength, currentStakerCount } = await get_stakeStartData();
-  var currentStakerCountChange = (currentStakerCount - getNum(previousDailyStat.currentStakerCount));
-  log("*** 016 *** - averageStakeLength: " + averageStakeLength + " - currentStakerCount: " + currentStakerCount);
-
-  var totalStakerCount = await get_stakeStartsCountHistorical(currentDay);
-  var totalStakerCountChange = (getNum(totalStakerCount) - getNum(previousDailyStat.totalStakerCount))
-  log("*** 017 *** - totalStakerCount: " + totalStakerCount + " - totalStakerCountChange: " + totalStakerCountChange);
+  log("*** 011 - liquidityUV3_HEX: " + liquidityUV3_HEX + " - liquidityUV3_USDC: " + liquidityUV3_ETH + " - liquidityUV3_USDC: " + liquidityUV3_ETH);
 
   var numberOfHolders = await get_numberOfHolders();
   var numberOfHoldersChange = (numberOfHolders - previousDailyStat.numberOfHolders);
-  
+  log("*** 012 - numberOfHolders: " + numberOfHolders + " - numberOfHoldersChange: " + numberOfHoldersChange);
+
+  var { averageStakeLength, currentStakerCount } = await get_stakeStartData();
+  var currentStakerCountChange = (currentStakerCount - getNum(previousDailyStat.currentStakerCount));
+  log("*** 013 - averageStakeLength: " + averageStakeLength + " - currentStakerCount: " + currentStakerCount);
+
+  // Core Historical
+  var penaltiesHEX = await get_dailyPenalties(); await sleep(500);
+  log("*** 014 - penaltiesHEX: " + penaltiesHEX);
+
+  var { dailyPayoutHEX, totalTshares } = await get_dailyDataUpdatePolling(currentDay); await sleep(500);
+  log("*** 015 - dailyPayoutHEX: " + dailyPayoutHEX + " - totalTshares: " + totalTshares);
+
+  var { stakedHEXGA } = await get_stakeStartGADataHistorical(blockNumber);
+  log("*** 016 - stakedHEXGA: " + stakedHEXGA);
+
+  var currentHolders = await get_currentHolders(blockNumber);
+  var currentHoldersChange = (currentHolders - previousDailyStat.currentHolders);
+  log("*** 017 - currentHolders: " + currentHolders);
+
+  var totalStakerCount = await get_stakeStartsCountHistorical(currentDay);
+  var totalStakerCountChange = (getNum(totalStakerCount) - getNum(previousDailyStat.totalStakerCount))
+  log("*** 018 - totalStakerCount: " + totalStakerCount + " - totalStakerCountChange: " + totalStakerCountChange);
+
 
   // Calculated Values
   var totalTsharesChange      = (totalTshares - previousDailyStat.totalTshares);
@@ -709,10 +720,13 @@ async function getDailyData() {
       totalValueLocked:         totalValueLocked,
     });
 
+    log("*** 100 - PRINT ************");
+    log(dailyStat);
+
     // Check if Current Row of Data already exists Again
     var currentDailyStat2 = await DailyStat.findOne({currentDay: { $eq: currentDay }});
     if (!isEmpty(currentDailyStat2)) {
-      log('WARNING - Current Daily Stat already set Again - Day#: ' + currentDay);
+      log('getDailyData() --- WARNING - Current Daily Stat already set Again - Day#: ' + currentDay);
       return;
     }
 
@@ -726,11 +740,11 @@ async function getDailyData() {
       tweet(dailyStat);
     }
   } catch (err) {
-    log('getDailyData() ----- SAVE --- ' + err);
+    log('getDailyData() ----- SAVE --- ' + err.toString() + " - " + err.stack);
   }
 
   } catch (err) {
-    log('getDailyData() ----- ' + err);
+    log('getDailyData() ----- ERROR ---' + err.toString() + " - " + err.stack);
   } finally {
     getDataRunning = false;
   }
@@ -837,8 +851,9 @@ async function getCurrentDay(){
   "&data=" + HEX_CONTRACT_CURRENTDAY +
   "&apikey=" + CONFIG.etherscan.apiKey;
 
-  return await fetch(etherScanURL, {
+  return await fetchRetry(etherScanURL, {
     method: 'GET',
+    highWaterMark: FETCH_SIZE,
     headers: { 'Content-Type': 'application/json' }
   })
   .then(res => res.json())
@@ -856,8 +871,9 @@ async function getGlobalInfo(){
   "&data=" + HEX_CONTRACT_GLOBALINFO +
   "&apikey=" + CONFIG.etherscan.apiKey;
 
-  return await fetch(etherScanURL, {
+  return await fetchRetry(etherScanURL, {
     method: 'GET',
+    highWaterMark: FETCH_SIZE,
     headers: { 'Content-Type': 'application/json' }
   })
   .then(res => res.json())
@@ -882,8 +898,9 @@ async function getGlobalInfo(){
 }
 
 async function get_numberOfHolders(){
-  return await fetch('https://api.thegraph.com/subgraphs/name/codeakk/hex', {
+  return await fetchRetry('https://api.thegraph.com/subgraphs/name/codeakk/hex', {
     method: 'POST',
+    highWaterMark: FETCH_SIZE,
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ query: `
       query {
@@ -917,8 +934,9 @@ async function get_currentHolders(blockNumber) {
 }
 
 async function get_shareRateChange(){
-  return await fetch('https://api.thegraph.com/subgraphs/name/codeakk/hex', {
+  return await fetchRetry('https://api.thegraph.com/subgraphs/name/codeakk/hex', {
     method: 'POST',
+    highWaterMark: FETCH_SIZE,
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ query: `
       query {
@@ -968,8 +986,9 @@ async function get_dailyDataUpdatePolling(currentDay) {
 
 async function get_dailyDataUpdate(currentDay){
   log("get_dailyDataUpdate");
-  return await fetch('https://api.thegraph.com/subgraphs/name/codeakk/hex', {
+  return await fetchRetry('https://api.thegraph.com/subgraphs/name/codeakk/hex', {
     method: 'POST',
+    highWaterMark: FETCH_SIZE,
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ query: `
       query {
@@ -1040,6 +1059,7 @@ async function get_stakeStartData(){
     stakedHEXSum += data.stakedHEX;
     weightedAverageSum += data.weightedAverageSum;
 
+    log("get_stakeStartData() --- " + $lastStakeId)
     count += 1;
     await sleep(100);
   }
@@ -1064,8 +1084,9 @@ async function get_stakeStartData(){
 }
 
 async function get_stakeStarts($lastStakeId){
-  return await fetch('https://api.thegraph.com/subgraphs/name/codeakk/hex', {
+  return await fetchRetry('https://api.thegraph.com/subgraphs/name/codeakk/hex', {
     method: 'POST',
+    highWaterMark: FETCH_SIZE,
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ query: `
       query {
@@ -1185,8 +1206,9 @@ async function get_dailyPenalties(yesterday = true){
 }
 
 async function get_stakeEnds($lastStakeId, unixTimestamp, unixTimestampEnd){
-  return await fetch('https://api.thegraph.com/subgraphs/name/codeakk/hex', {
+  return await fetchRetry('https://api.thegraph.com/subgraphs/name/codeakk/hex', {
     method: 'POST',
+    highWaterMark: FETCH_SIZE,
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ query: `
       query {
@@ -1233,8 +1255,9 @@ async function get_stakeEnds($lastStakeId, unixTimestamp, unixTimestampEnd){
 }
 
 async function get_stakeGoodAccountings($lastStakeId, unixTimestamp, unixTimestampEnd){
-  return await fetch('https://api.thegraph.com/subgraphs/name/codeakk/hex', {
+  return await fetchRetry('https://api.thegraph.com/subgraphs/name/codeakk/hex', {
     method: 'POST',
+    highWaterMark: FETCH_SIZE,
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ query: `
       query {
@@ -1285,8 +1308,9 @@ async function get_stakeGoodAccountings($lastStakeId, unixTimestamp, unixTimesta
 //// UNISWAP
 
 async function getUniswapV2() {
-  return await fetch('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2', {
+  return await fetchRetry('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2', {
     method: 'POST',
+    highWaterMark: FETCH_SIZE,
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ query: `
       query {
@@ -1312,8 +1336,9 @@ async function getUniswapV2() {
 }
 
 async function getUniswapV2HEXETH(){
-  return await fetch('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2', {
+  return await fetchRetry('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2', {
     method: 'POST',
+    highWaterMark: FETCH_SIZE,
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ query: `
       query {
@@ -1353,8 +1378,9 @@ async function getUniswapV2HEXETH(){
 
 async function getUniswapV2HEXETHHistorical(dateEpoch){
   console.log("getUniswapV2HEXETHHistorical() - START");
-  return await fetch('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2', {
+  return await fetchRetry('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2', {
     method: 'POST',
+    highWaterMark: FETCH_SIZE,
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ query: `
       query {
@@ -1413,8 +1439,9 @@ async function getUniswapV2HEXUSDC_Polling(){
 }
 
 async function getUniswapV2HEXUSDC(){
-  return await fetch('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2', {
+  return await fetchRetry('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2', {
     method: 'POST',
+    highWaterMark: FETCH_SIZE,
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ query: `
       query {
@@ -1445,6 +1472,8 @@ async function getUniswapV2HEXUSDC(){
       }   
     } catch (error){
       log("getUniswapV2HEXUSDC() --- ERROR --- " + error.toString() + " --- " + error.stack);
+      log(res);
+      log(JSON.stringify(res));
       return {
         liquidityUV2_HEXUSDC: 0,
         liquidityUV2_USDC: 0,
@@ -1454,8 +1483,9 @@ async function getUniswapV2HEXUSDC(){
 }
 
 async function getUniswapV2HEXUSDCHistorical(dateEpoch){
-  return await fetch('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2', {
+  return await fetchRetry('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2', {
     method: 'POST',
+    highWaterMark: FETCH_SIZE,
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ query: `
       query {
@@ -1498,8 +1528,9 @@ async function getUniswapV2HEXUSDCHistorical(dateEpoch){
 }
 
 async function getUniswapV2HEXDailyPrice(){
-  return await fetch('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2', {
+  return await fetchRetry('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2', {
     method: 'POST',
+    highWaterMark: FETCH_SIZE,
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ query: `
       query {
@@ -1526,8 +1557,9 @@ async function getUniswapV2HEXDailyPrice(){
 }
 
 async function getUniswapV3HEXDailyPrice(){
-  return await fetch('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3', {
+  return await fetchRetry('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3', {
     method: 'POST',
+    highWaterMark: FETCH_SIZE,
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ query: `
       query {
@@ -1554,8 +1586,9 @@ async function getUniswapV3HEXDailyPrice(){
 }
 
 async function getUniswapV3Pools() {
-  return await fetch('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3', {
+  return await fetchRetry('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3', {
     method: 'POST',
+    highWaterMark: FETCH_SIZE,
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ query: `
       query {
@@ -1590,8 +1623,9 @@ async function getUniswapV3Historical(blockNumber) {
 
   if (pools == undefined) {return;}
 
-  return await fetch('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3', {
+  return await fetchRetry('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3', {
     method: 'POST',
+    highWaterMark: FETCH_SIZE,
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ query: `
       query {
@@ -1661,8 +1695,9 @@ async function getUniswapV3() {
 
   if (pools == undefined) {return;}
 
-  return await fetch('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3', {
+  return await fetchRetry('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3', {
     method: 'POST',
+    highWaterMark: FETCH_SIZE,
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ query: `
       query {
@@ -1717,6 +1752,7 @@ async function getUniswapV3() {
 /////////////////////////////////////////////
 // PRICE
 
+/*
 var priceUrl = "https://api.nomics.com/v1/currencies/ticker?key=" + CONFIG.price.nomicsKey + "&ids=HEX";
 
 async function updatePrice(){
@@ -1735,6 +1771,7 @@ async function updatePrice(){
 		log("PRICE --- ERROR - updatePrice() - " + err + "\n" + err.stack);
 	}
 }
+*/
 
 
 
@@ -1745,8 +1782,9 @@ async function updatePrice(){
 async function getEthereumBlock(day){
   var startTime = day2Epoch + ((day - 2) * 86400) - 86400;
 
-  return await fetch('https://api.thegraph.com/subgraphs/name/blocklytics/ethereum-blocks', {
+  return await fetchRetry('https://api.thegraph.com/subgraphs/name/blocklytics/ethereum-blocks', {
     method: 'POST',
+    highWaterMark: FETCH_SIZE,
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ query: `
       query {
@@ -2024,8 +2062,9 @@ async function get_shareRateChangeByDay(day){
   var endTime = startTime + 86400;
   log("get_shareRateChangeByDay() --- startTime " + startTime + " endTime " + endTime + " day --- " + day);
 
-  return await fetch('https://api.thegraph.com/subgraphs/name/codeakk/hex', {
+  return await fetchRetry('https://api.thegraph.com/subgraphs/name/codeakk/hex', {
     method: 'POST',
+    highWaterMark: FETCH_SIZE,
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ query: `
       query {
@@ -2156,8 +2195,9 @@ async function update_shiftRowsDown(){
 
 
 async function getUniswapV2HEXDailyPriceHistorical(dateEpoch){
-  return await fetch('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2', {
+  return await fetchRetry('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2', {
     method: 'POST',
+    highWaterMark: FETCH_SIZE,
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ query: `
       query {
@@ -2223,8 +2263,9 @@ async function create_uniswapV2HEXPrice(){
 }
 
 async function getUniswapV3HEXDailyPriceHistorical(dateEpoch){
-  return await fetch('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3', {
+  return await fetchRetry('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3', {
     method: 'POST',
+    highWaterMark: FETCH_SIZE,
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ query: `
       query {
@@ -2503,8 +2544,9 @@ async function create_roiMultiplierFromATLs(){
 }
 
 async function getUniswapV1PriceAndLiquidityHistorical(timestamp){
-  return await fetch('https://api.thegraph.com/subgraphs/name/graphprotocol/uniswap', {
+  return await fetchRetry('https://api.thegraph.com/subgraphs/name/graphprotocol/uniswap', {
     method: 'POST',
+    highWaterMark: FETCH_SIZE,
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ query: `
       query {
@@ -2677,8 +2719,9 @@ async function get_stakeStartDataHistorical(blockNumber){
 }
 
 async function get_stakeStartsHistorical($lastStakeId, blockNumber){
-  return await fetch('https://api.thegraph.com/subgraphs/name/codeakk/hex', {
+  return await fetchRetry('https://api.thegraph.com/subgraphs/name/codeakk/hex', {
     method: 'POST',
+    highWaterMark: FETCH_SIZE,
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ query: `
       query {
@@ -2938,8 +2981,9 @@ async function get_dailyPenalties_Historical(day){
 }
 
 async function get_stakeEnds_Historical(blockNumber, $lastStakeId, unixTimestamp, unixTimestampEnd){
-  return await fetch('https://api.thegraph.com/subgraphs/name/codeakk/hex', {
+  return await fetchRetry('https://api.thegraph.com/subgraphs/name/codeakk/hex', {
     method: 'POST',
+    highWaterMark: FETCH_SIZE,
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ query: `
       query {
@@ -2987,8 +3031,9 @@ async function get_stakeEnds_Historical(blockNumber, $lastStakeId, unixTimestamp
 }
 
 async function get_stakeGoodAccountings_Historical(blockNumber, $lastStakeId, unixTimestamp, unixTimestampEnd){
-  return await fetch('https://api.thegraph.com/subgraphs/name/codeakk/hex', {
+  return await fetchRetry('https://api.thegraph.com/subgraphs/name/codeakk/hex', {
     method: 'POST',
+    highWaterMark: FETCH_SIZE,
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ query: `
       query {
@@ -3062,8 +3107,9 @@ async function create_numberOfHolders(){
 }
 
 async function get_numberOfHolders_Historical(blockNumber){
-  return await fetch('https://api.thegraph.com/subgraphs/name/codeakk/hex', {
+  return await fetchRetry('https://api.thegraph.com/subgraphs/name/codeakk/hex', {
     method: 'POST',
+    highWaterMark: FETCH_SIZE,
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ query: `
       query {
@@ -3190,7 +3236,7 @@ async function get_tokenHoldersData_Historical(blockNumber){
     circulatingSum += data.circulatingHEX;
     uniqueAddressList = uniqueAddressList.concat(data.uniqueAddresses);
     $lastNumeralIndex = data.lastNumeralIndex;
-    log($lastNumeralIndex);
+    log("get_tokenHoldersData_Historical() --- " + $lastNumeralIndex);
 
     await sleep(300);
   }
@@ -3204,8 +3250,9 @@ async function get_tokenHoldersData_Historical(blockNumber){
 }
 
 async function get_tokenHolders_Historical(blockNumber, $lastNumeralIndex){
-  return await fetch('https://api.thegraph.com/subgraphs/name/codeakk/hex', {
+  return await fetchRetry('https://api.thegraph.com/subgraphs/name/codeakk/hex', {
     method: 'POST',
+    highWaterMark: FETCH_SIZE,
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ query: `
       query {
@@ -3427,7 +3474,6 @@ async function create_stakeStartGAsHistorical(){
 }
 
 async function get_stakeStartGADataHistorical(blockNumber){
-  log("get_stakeStartGADataHistorical() --- START");
   var $lastStakeId = 0;
   //var stakedDaysSum = 0;
   //var stakedCount = 0;
@@ -3435,7 +3481,6 @@ async function get_stakeStartGADataHistorical(blockNumber){
   var stakedHEXGASum = 0;
 
   while (true) {
-    log("get_stakeStartGADataHistorical() --- ENTER WHILE");
     var data = await get_stakeStartGAsHistorical($lastStakeId, blockNumber);
     if (data.count <= 0) { break; }
     //stakedCount += data.count;
@@ -3444,10 +3489,9 @@ async function get_stakeStartGADataHistorical(blockNumber){
     //uniqueAddressList = uniqueAddressList.concat(data.uniqueAddresses);
     stakedHEXGASum += data.stakedHEXGA;
 
-    log($lastStakeId);
+    log("get_stakeStartGADataHistorical() --- " + $lastStakeId);
     await sleep(250);
   }
-  log("get_stakeStartGADataHistorical() --- END WHILE");
 
   //var averageStakeLength = 0.0;
   //var averageStakeLengthYears = 0.0;
@@ -3467,9 +3511,9 @@ async function get_stakeStartGADataHistorical(blockNumber){
 }
 
 async function get_stakeStartGAsHistorical($lastStakeId, blockNumber){
-  log("get_stakeStartGAsHistorical() --- ENTER GET");
-  return await fetch('https://api.thegraph.com/subgraphs/name/codeakk/hex', {
+  return await fetchRetry('https://api.thegraph.com/subgraphs/name/codeakk/hex', {
     method: 'POST',
+    highWaterMark: FETCH_SIZE,
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ query: `
       query {
@@ -3628,7 +3672,7 @@ async function getAll_stakeStartsCountHistorical(blockNumber){
     $lastStakeId = data.lastStakeId;
     uniqueAddressList = uniqueAddressList.concat(data.uniqueAddresses);
 
-    console.log($lastStakeId);
+    log("get_stakeStartsCountHistoricalBlock() --- " + $lastStakeId);
     await sleep(250);
   }
   var uniqueAddressCount = (new Set(uniqueAddressList)).size;
@@ -3639,9 +3683,9 @@ async function getAll_stakeStartsCountHistorical(blockNumber){
 }
 
 async function get_stakeStartsCountHistoricalBlock($lastStakeId, blockNumber){
-  console.log("get_stakeStartsCountHistoricalBlock()- START -" + " lastStakeID: " + $lastStakeId + " Block: " + blockNumber );
-  return await fetch('https://api.thegraph.com/subgraphs/name/codeakk/hex', {
+  return await fetchRetry('https://api.thegraph.com/subgraphs/name/codeakk/hex', {
     method: 'POST',
+    highWaterMark: FETCH_SIZE,
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ query: `
       query {
@@ -3748,8 +3792,9 @@ async function copyColumns(){
 
 async function getCurrencyRates(){
   var url = "http://api.exchangeratesapi.io/v1/latest?access_key=" + CONFIG.exchangerates.key + "&format=1"; // + "&base=" + base; // Paid Plan
-  return await fetch(url, {
+  return await fetchRetry(url, {
     method: 'GET',
+    highWaterMark: FETCH_SIZE,
     headers: { 'Content-Type': 'application/json' }
   })
   .then(res => res.json())

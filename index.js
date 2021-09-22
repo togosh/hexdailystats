@@ -6,7 +6,7 @@ var originalFetch = require('isomorphic-fetch');
 var fetch = require('fetch-retry')(originalFetch, { 
   retries: 3, 
   retryDelay: 1000, 
-  retryOn: async function(attempt, error, response) {
+  /*retryOn: async function(attempt, error, response) {
     log(`FETCH --- START ${attempt + 1}`);
     if (attempt > 3) { return false; }
 
@@ -28,7 +28,7 @@ var fetch = require('fetch-retry')(originalFetch, {
       log(`FETCH --- RETRY ${attempt + 1} --- JSON ---` + error2.toString());
       return true;
     }
-  }
+  }*/
 });
 const express = require('express');
 const path = require('path');

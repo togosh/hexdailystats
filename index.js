@@ -3427,7 +3427,7 @@ async function create_stakeStartGAsHistorical(){
 }
 
 async function get_stakeStartGADataHistorical(blockNumber){
-
+  log("get_stakeStartGADataHistorical() --- START");
   var $lastStakeId = 0;
   //var stakedDaysSum = 0;
   //var stakedCount = 0;
@@ -3435,6 +3435,7 @@ async function get_stakeStartGADataHistorical(blockNumber){
   var stakedHEXGASum = 0;
 
   while (true) {
+    log("get_stakeStartGADataHistorical() --- ENTER WHILE");
     var data = await get_stakeStartGAsHistorical($lastStakeId, blockNumber);
     if (data.count <= 0) { break; }
     //stakedCount += data.count;
@@ -3446,6 +3447,7 @@ async function get_stakeStartGADataHistorical(blockNumber){
     log($lastStakeId);
     await sleep(250);
   }
+  log("get_stakeStartGADataHistorical() --- END WHILE");
 
   //var averageStakeLength = 0.0;
   //var averageStakeLengthYears = 0.0;
@@ -3465,6 +3467,7 @@ async function get_stakeStartGADataHistorical(blockNumber){
 }
 
 async function get_stakeStartGAsHistorical($lastStakeId, blockNumber){
+  log("get_stakeStartGAsHistorical() --- ENTER GET");
   return await fetch('https://api.thegraph.com/subgraphs/name/codeakk/hex', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

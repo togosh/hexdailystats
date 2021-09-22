@@ -7,6 +7,7 @@ var fetch = require('fetch-retry')(originalFetch, {
   retries: 3, 
   retryDelay: 1000, 
   retryOn: async function(attempt, error, response) {
+    log(`FETCH --- START ${attempt + 1}`);
     if (attempt > 3) { return false; }
 
     if (error !== null) {
@@ -524,6 +525,7 @@ async function getDailyData() {
   await sleep(5000);
   var currentDay = await getCurrentDay();
   var newDay = currentDay + 1;
+  log("*** 001 *** - currentDay: " + currentDay);
 
   if (newDay != currentDayGlobal && newDay > currentDayGlobal) {
     currentDayGlobal = newDay;
@@ -536,46 +538,57 @@ async function getDailyData() {
     log('WARNING - Current Daily Stat already set - Day#: ' + currentDay);
     return;
   }
+  log("*** 002 *** - currentDay Row doesnt exist!");
 
   var blockNumber = await getEthereumBlock(currentDay);  await sleep(250);
+  log("*** 003 *** - blockNumber: " + blockNumber);
 
   // Get Previous Row of Data
   var previousDay = (currentDay - 1);
   var previousDailyStat = await DailyStat.findOne({currentDay: { $eq: previousDay }});
-
+  log("*** 004 *** - previousDay: " + previousDay);
 
   // Core Live
   var tshareRateHEX = await get_shareRateChange(); await sleep(250);
+  log("*** 005 *** - tshareRateHEX: " + tshareRateHEX);
 
   var { circulatingHEX, stakedHEX } = await getGlobalInfo(); await sleep(250);
+  log("*** 006 *** - circulatingHEX: " + circulatingHEX + " - " + stakedHEX);
 
   var priceUV2 = await getUniswapV2HEXDailyPrice(); await sleep(1000);
+  log("*** 007 *** - priceUV2: " + priceUV2);
   var priceUV3 = await getUniswapV3HEXDailyPrice(); await sleep(1000);
+  log("*** 008 *** - priceUV3: " + priceUV3);
 
   var { liquidityUV2_HEXUSDC, liquidityUV2_USDC } = await getUniswapV2HEXUSDC_Polling(); await sleep(1000);
+  log("*** 009 *** - liquidityUV2_HEXUSDC: " + liquidityUV2_HEXUSDC + " - liquidityUV2_USDC: " + liquidityUV2_USDC);
   var { liquidityUV2_HEXETH, liquidityUV2_ETH } = await getUniswapV2HEXETH(); await sleep(1000);
-
+  log("*** 010 *** - liquidityUV2_HEXETH: " + liquidityUV2_HEXETH + " - liquidityUV2_ETH: " + liquidityUV2_ETH);
   var { liquidityUV3_HEX, liquidityUV3_USDC, liquidityUV3_ETH } = await getUniswapV3(); await sleep(500);
-
+  log("*** 011 *** - liquidityUV3_HEX: " + liquidityUV3_HEX + " - liquidityUV3_USDC: " + liquidityUV3_ETH + " - liquidityUV3_USDC: " + liquidityUV3_ETH);
 
   // Core Historical
   var penaltiesHEX = await get_dailyPenalties(); await sleep(500);
+  log("*** 012 *** - penaltiesHEX: " + penaltiesHEX);
 
   var { dailyPayoutHEX, totalTshares } = await get_dailyDataUpdatePolling(currentDay); await sleep(500);
+  log("*** 013 *** - dailyPayoutHEX: " + dailyPayoutHEX + " - totalTshares: " + totalTshares);
 
   var { stakedHEXGA } = await get_stakeStartGADataHistorical(blockNumber);
+  log("*** 014 *** - stakedHEXGA: " + stakedHEXGA);
 
   var currentHolders = await get_currentHolders(blockNumber);
   var currentHoldersChange = (currentHolders - previousDailyStat.currentHolders);
-
+  log("*** 015 *** - currentHolders: " + currentHolders);
 
   // Core Live Long Running
   var { averageStakeLength, currentStakerCount } = await get_stakeStartData();
   var currentStakerCountChange = (currentStakerCount - getNum(previousDailyStat.currentStakerCount));
+  log("*** 016 *** - averageStakeLength: " + averageStakeLength + " - currentStakerCount: " + currentStakerCount);
 
   var totalStakerCount = await get_stakeStartsCountHistorical(currentDay);
-  console.log("totalStakerCount: " + totalStakerCount);
   var totalStakerCountChange = (getNum(totalStakerCount) - getNum(previousDailyStat.totalStakerCount))
+  log("*** 017 *** - totalStakerCount: " + totalStakerCount + " - totalStakerCountChange: " + totalStakerCountChange);
 
   var numberOfHolders = await get_numberOfHolders();
   var numberOfHoldersChange = (numberOfHolders - previousDailyStat.numberOfHolders);

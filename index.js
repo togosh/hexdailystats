@@ -4,19 +4,17 @@ const http = require('http');
 require('es6-promise').polyfill();
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 var fetchRetry = require('fetch-retry')(fetch, { 
-  retries: 3, 
-  retryDelay: 1000, 
   retryOn: async function(attempt, error, response) {
     //log(`FETCH --- START ${attempt + 1}`);
     if (attempt > 3) { return false; }
 
     if (error !== null) {
-      log(`FETCH --- RETRY ${attempt + 1} --- ERROR --- ` + error.toString());
+      log(`FETCH --- RETRY ${attempt + 1} --- ERROR --- ` + error.toString()); await sleep(500);
       return true;
     } 
 
     if (response.status >= 400) {
-      log(`FETCH --- RETRY ${attempt + 1} --- STATUS --- ` + response.status);
+      log(`FETCH --- RETRY ${attempt + 1} --- STATUS --- ` + response.status); await sleep(500);
       return true;
     }
 
@@ -31,14 +29,14 @@ var fetchRetry = require('fetch-retry')(fetch, {
 
       if (json.errors && Object.keys(json.errors).length > 0) {
           if (json.errors[0].message) {
-            log(`FETCH --- INTERNAL JSON ERROR --- ${attempt + 1} --- ` + json.errors[0].message);
+            log(`FETCH --- INTERNAL JSON ERROR --- ${attempt + 1} --- ` + json.errors[0].message); await sleep(500);
             return true;
           }
       }
       
       return false;
     } catch (error) {
-      log(`FETCH --- RETRY ${attempt + 1} --- JSON ---` + error.toString());
+      log(`FETCH --- RETRY ${attempt + 1} --- JSON ---` + error.toString()); await sleep(500);
       return true;
     }
   }

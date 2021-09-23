@@ -583,7 +583,7 @@ async function getDailyData() {
   var { liquidityUV2_HEXETH, liquidityUV2_ETH } = await getUniswapV2HEXETH(); await sleep(1000);
   log("*** 010 - liquidityUV2_HEXETH: " + liquidityUV2_HEXETH + " - liquidityUV2_ETH: " + liquidityUV2_ETH);
   var { liquidityUV3_HEX, liquidityUV3_USDC, liquidityUV3_ETH } = await getUniswapV3(); await sleep(500);
-  log("*** 011 - liquidityUV3_HEX: " + liquidityUV3_HEX + " - liquidityUV3_USDC: " + liquidityUV3_ETH + " - liquidityUV3_USDC: " + liquidityUV3_ETH);
+  log("*** 011 - liquidityUV3_HEX: " + liquidityUV3_HEX + " - liquidityUV3_USDC: " + liquidityUV3_USDC + " - liquidityUV3_ETH: " + liquidityUV3_ETH);
 
   var numberOfHolders = await get_numberOfHolders();
   var numberOfHoldersChange = (numberOfHolders - previousDailyStat.numberOfHolders);

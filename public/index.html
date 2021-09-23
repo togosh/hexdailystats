@@ -140,35 +140,35 @@
 
                 var htmlNew = "<div><b>LIVE DATA</b></div><div style='padding: 0px 40px;'>" +
                 "<div style='height: 24px'>" +
-                    "<div style='float: left;'><b>HEX Price</b></div>" +
+                    "<div style='float: left;'><b>HEX Price</b>&nbsp;</div>" +
                     "<div style='float: right;'>" + Number(data.price).toLocaleString(undefined,{minimumFractionDigits:3, maximumFractionDigits:3}) + " USD</div>" +
                 "</div>" +
                 "<div style='height: 24px'>" +
-                    "<div style='float: left;'><b>T-Share Price</b></div>" +
+                    "<div style='float: left;'><b>T-Share Price</b>&nbsp;</div>" +
                     "<div style='float: right;'>" + Number(data.tsharePrice).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + " USD</div>" +
                 "</div>" +
                 "<div style='height: 24px'>" +
-                    "<div style='float: left;'><b>T-Share Rate</b></div>" +
+                    "<div style='float: left;'><b>T-Share Rate</b>&nbsp;</div>" +
                     "<div style='float: right;'>" + Number(data.tshareRateHEX).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + " HEX</div>" +
                 "</div>" +
                 "<div style='height: 24px'>" +
-                    "<div style='float: left;'><b>Payout per T-Share</b></div>" +
+                    "<div style='float: left;'><b>Payout per T-Share</b>&nbsp;</div>" +
                     "<div style='float: right;'>" + Number(data.payoutPerTshare).toLocaleString(undefined,{minimumFractionDigits:3, maximumFractionDigits:3}) + " HEX</div>" +
                 "</div>" +
                 "<div style='height: 24px'>" +
-                    "<div style='float: left;'><b>Penalties</b></div>" +
+                    "<div style='float: left;'><b>Penalties</b>&nbsp;</div>" +
                     "<div style='float: right;'>" + getLiqiudityString(data.penaltiesHEX, 1) + " HEX</div>" +
                 "</div>" +
                 "<div style='height: 24px'>" +
-                    "<div style='float: left;'><b>Liquidity HEX</b></div>" +
+                    "<div style='float: left;'><b>Liquidity HEX</b>&nbsp;</div>" +
                     "<div style='float: right;'>" + getLiqiudityString(data.liquidityHEX, 1) + " HEX</div>" +
                 "</div>" +
                 "<div style='height: 24px'>" +
-                    "<div style='float: left;'><b>Liquidity USDC</b></div>" +
+                    "<div style='float: left;'><b>Liquidity USDC</b>&nbsp;</div>" +
                     "<div style='float: right;'>" + getLiqiudityString(data.liquidityUSDC, 1) + " USD</div>" +
                 "</div>" +
                 "<div style='height: 24px'>" +
-                    "<div style='float: left;'><b>Liquidity ETH</b></div>" +
+                    "<div style='float: left;'><b>Liquidity ETH</b>&nbsp;</div>" +
                     "<div style='float: right;'>" + getLiqiudityString(data.liquidityETH, 1) + " ETH</div>" +
                 "</div>";
 

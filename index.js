@@ -2,10 +2,11 @@ var DEBUG = false;
 var CONFIG = require('./config.json');
 const http = require('http');
 require('es6-promise').polyfill();
+
+
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 var fetchRetry = require('fetch-retry')(fetch, { 
   retryOn: async function(attempt, error, response) {
-    //log(`FETCH --- START ${attempt + 1}`);
     if (attempt > 3) { return false; }
 
     if (error !== null) {
@@ -19,13 +20,8 @@ var fetchRetry = require('fetch-retry')(fetch, {
     }
 
     try {
-      //log(`FETCH --- TEST ${attempt + 1}`);
-
       var response2 = await response.clone().buffer();
-      //log(`FETCH --- CLONE ${attempt + 1}`);
-
       const json = JSON.parse(response2);
-      //log(`FETCH --- SUCCESS ${attempt + 1}`);
 
       if (json.errors && Object.keys(json.errors).length > 0) {
           if (json.errors[0].message) {
@@ -326,7 +322,7 @@ const jobCurrentDay = schedule.scheduleJob(ruleCurrentDay, function(){
   if (!getAndSet_currentGlobalDay_Running) { getAndSet_currentGlobalDay(); }
 });
 
-var jobCurrencyRates = schedule.scheduleJob("0 * * * *", function() { 
+var jobCurrencyRates = schedule.scheduleJob("0 */3 * * *", function() { 
   if (!getCurrencyDataRunning) { getCurrencyData(); };
 });
 

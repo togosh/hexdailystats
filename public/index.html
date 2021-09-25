@@ -138,7 +138,8 @@
                 //console.log(data);
                 liveData = data;
 
-                var htmlNew = "<div><b>LIVE DATA</b></div><div style='padding: 0px 40px;'>" +
+                //  var htmlNew = "<div><b>LIVE DATA</b></div>
+                var htmlNew = "<div style='padding: 0px 40px;'>" +
                 "<div style='height: 24px'>" +
                     "<div style='float: left;'><b>HEX Price</b>&nbsp;</div>" +
                     "<div style='float: right;'>" + Number(data.price).toLocaleString(undefined,{minimumFractionDigits:3, maximumFractionDigits:3}) + " USD</div>" +
@@ -832,6 +833,10 @@
             $('#divCalculator').toggle();
         }
 
+        function divLiveSectionToggle(){
+            $('#divLiveSection').toggle();
+        }        
+
         function display_c(){
             var refresh=1000; // Refresh rate in milli seconds
             mytime=setTimeout('display_ct()',refresh)
@@ -994,7 +999,6 @@
         }
 
         .divLive {
-            padding-top: 10px;
             padding-bottom: 10px;
             text-shadow: 0 1px 1px 1px #666;
             box-shadow: 0px 1px 15px 1px rgba(69, 65, 78, 0.08);
@@ -1116,7 +1120,7 @@
         </div></center>
         <center><button id="buttonCharts" onclick="openCharts()" style="width: 150px; padding: 6px 40px; margin-bottom: 10px; outline: none;">Charts</button><button id="buttonCalculator" onclick="openCalculator()" style="width: 150px; padding: 6px 40px; margin-bottom: 10px; outline: none;">Calculator</button></center>
 
-        <center><div id="divLiveSection" class="divLive" style="text-align:center; color:white; font-size: 16px; background-color: #10172d; max-width: 340px; margin-bottom: 10px;"></div></center> <!--max-width: 484px; style="display: none;"-->
+        <center><div id="divLiveSectionHeader" style="text-align:center; color:white; font-size: 16px; background-color: #10172d; max-width: 340px; cursor: pointer;" onclick="divLiveSectionToggle();"><b>LIVE DATA</b></div><div id="divLiveSection" class="divLive" style="text-align:center; color:white; font-size: 16px; background-color: #10172d; max-width: 340px; margin-bottom: 10px;"></div></center> <!--max-width: 484px; style="display: none;"-->
         <div id="divAbout" style="display: none;">
             <div id="aboutSection">
                 <center><div><div class="text" style="max-width: 620px"><b>About:</b> Created to keep historical records of the HEX ecosystem, for research, education and analysis</div>

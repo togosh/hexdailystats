@@ -738,7 +738,7 @@ async function getDailyData() {
     if (!getRowDataRunning){ getRowData(); }
 
     if (CONFIG.twitter.enabled) {
-      tweet(dailyStat); await sleep(10000);
+      tweet(dailyStat); await sleep(30000);
       tweetBshare(dailyStat);
     }
   } catch (err) {
@@ -3914,9 +3914,9 @@ async function tweetBshare(dailyStat){
   //tweetStatus += "Tshare Price - $" + Number(dailyStat.tshareRateUSD).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + "\r\n";
   //tweetStatus += "Payout Per Tshare - " + Number(dailyStat.payoutPerTshareHEX).toLocaleString(undefined,{minimumFractionDigits:3, maximumFractionDigits:3}) + "\r\n";
   //tweetStatus += "\r\n";
-  tweetStatus += "Bshare Price - $" + Number(dailyStat.tshareRateUSD / 1000.0).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + "\r\n";
-  tweetStatus += "Bshare Rate - " + Number(dailyStat.tshareRateHEX  / 1000.0).toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2}) + "\r\n";
-  tweetStatus += "Payout Per Bshare - " + Number(dailyStat.payoutPerTshareHEX  / 1000.0).toLocaleString(undefined,{minimumFractionDigits:5, maximumFractionDigits:5}) + "\r\n";
+  tweetStatus += "Bshare Price - $" + Number(dailyStat.tshareRateUSD / 1000.0).toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2}) + "\r\n";
+  tweetStatus += "Bshare Rate - " + Number(dailyStat.tshareRateHEX  / 1000.0).toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2}) + " HEX\r\n";
+  tweetStatus += "Payout Per Bshare - " + Number(dailyStat.payoutPerTshareHEX  / 1000.0).toLocaleString(undefined,{minimumFractionDigits:5, maximumFractionDigits:5}) + " HEX\r\n";
   tweetStatus += "\r\n";
 
   //tweetStatus += "Avg Stake Length - " + Number(dailyStat.averageStakeLength).toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2}) + " yrs\r\n";

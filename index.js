@@ -3848,15 +3848,16 @@ async function tweet(dailyStat){
 	var mediaId = ''; 
   var tweetStatus = "";
 
-  tweetStatus += "Day " + dailyStat.currentDay + "\r\n";
-	tweetStatus += "\r\n";
+  //tweetStatus += "Day " + dailyStat.currentDay + "\r\n";
+	//tweetStatus += "\r\n";
 
   tweetStatus += "HEX Price - $" + Number(dailyStat.priceUV2UV3).toLocaleString(undefined,{minimumFractionDigits:3, maximumFractionDigits:3}) + "\r\n";
   //tweetStatus += "ROI - " + Number(dailyStat.roiMultiplierFromATL).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + "x\r\n";
-  //tweetStatus += "\r\n";
+  tweetStatus += "\r\n";
 
   tweetStatus += "Tshare Price - $" + Number(dailyStat.tshareRateUSD).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + "\r\n";
-  tweetStatus += "Payout Per Tshare - " + Number(dailyStat.payoutPerTshareHEX).toLocaleString(undefined,{minimumFractionDigits:3, maximumFractionDigits:3}) + "\r\n";
+  tweetStatus += "Tshare Rate - " + Number(dailyStat.tshareRateHEX).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + " HEX\r\n";
+  tweetStatus += "Payout Per Tshare - " + Number(dailyStat.payoutPerTshareHEX).toLocaleString(undefined,{minimumFractionDigits:3, maximumFractionDigits:3}) + " HEX\r\n";
   tweetStatus += "\r\n";
 
   tweetStatus += "Avg Stake Length - " + Number(dailyStat.averageStakeLength).toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2}) + " yrs\r\n";

@@ -464,12 +464,15 @@
                             return "HEXDailyStats_" + d.toISOString().slice(0,10).replace(/-/g,"") + "_" + d.toISOString().slice(11,18).replace(/-/g,""); }
                     },
                     'pageLength',
-                    {
-                        text: 'Reset Order',
-                        action: function ( e, dt, node, config ) {
-                            if (table) { table.colReorder.reset(); }
-                        }
-                    }
+                    //{
+                    //    text: 'Reset Order',
+                    //    action: function ( e, dt, node, config ) {
+                    //        if (table) { 
+                    //            table.state.clear();
+                    //            table.colReorder.reset(); 
+                    //        }
+                    //    }
+                    //}
                 ],
                 lengthMenu: [
                     [ 10, 15, 25, 50, 100, -1 ],

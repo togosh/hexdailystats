@@ -400,6 +400,7 @@
                 order: [[ 0, "desc" ]],
                 dom: 'Brtip',
                 stateSave: true,
+                stateDuration: 0,
                 colReorder: {
                     realtime: false
                 },
@@ -462,7 +463,13 @@
                         filename: function() { var d = new Date();
                             return "HEXDailyStats_" + d.toISOString().slice(0,10).replace(/-/g,"") + "_" + d.toISOString().slice(11,18).replace(/-/g,""); }
                     },
-                    'pageLength'
+                    'pageLength',
+                    {
+                        text: 'Reset Order',
+                        action: function ( e, dt, node, config ) {
+                            if (table) { table.colReorder.reset(); }
+                        }
+                    }
                 ],
                 lengthMenu: [
                     [ 10, 15, 25, 50, 100, -1 ],

@@ -6,19 +6,34 @@
     <meta name="description" content="HEX Price, HEX Stats, HEX Shares, HEX Crypto, HEX Interest, HEX Payouts, HEX Liquidity, HEX Data, HEX Users, HEX Daily & More!">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.25/b-1.7.1/b-html5-1.7.1/b-print-1.7.1/date-1.1.0/fh-3.1.9/kt-2.6.2/datatables.min.css"/>
+    <!-- JQUERY -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/v/dt/dt-1.10.25/b-1.7.1/b-html5-1.7.1/b-print-1.7.1/date-1.1.0/fh-3.1.9/kt-2.6.2/datatables.min.js"></script>
+
+    <!-- DATATABLE -->
+    <link href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+
+    <!-- SOCKETIO -->
     <script src="/socket.io/socket.io.js"></script>
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.7.1/css/buttons.dataTables.min.css"/> 
-    <script src="https://cdn.datatables.net/buttons/1.7.1/js/dataTables.buttons.min.js"></script>
+
+    <!-- BUTTONS -->
+    <link href="https://cdn.datatables.net/buttons/2.0.1/css/buttons.dataTables.min.css" rel="stylesheet" type="text/css" /> 
+    <script src="https://cdn.datatables.net/buttons/2.0.1/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.0.1/js/buttons.html5.min.js"></script>
+
+    <!-- JSZIP -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
-    <script src="https://cdn.datatables.net/fixedcolumns/3.3.3/js/dataTables.fixedColumns.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/fixedcolumns/3.3.3/css/fixedColumns.dataTables.min.css"/> 
+
+    <!-- FIXEDCOLUMNS -->
+    <link href="https://cdn.datatables.net/fixedcolumns/4.0.0/css/fixedColumns.dataTables.min.css" rel="stylesheet" type="text/css"/> 
+    <script src="https://cdn.datatables.net/fixedcolumns/4.0.0/js/dataTables.fixedColumns.min.js"></script>
+
+    <!-- COLREORDER -->
+    <link href="https://cdn.datatables.net/colreorder/1.5.4/css/colReorder.dataTables.min.css" rel="stylesheet" type="text/css/"> 
     <script src="https://cdn.datatables.net/colreorder/1.5.4/js/dataTables.colReorder.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/colreorder/1.5.4/css/colReorder.dataTables.min.css"/> 
-    <script src="https://cdn.datatables.net/buttons/2.0.0/js/buttons.colVis.min.js"></script>
+
+    <!-- COLVIS -->
+    <script src="https://cdn.datatables.net/buttons/2.0.1/js/buttons.colVis.min.js"></script>
 
     <link id="styleDark" rel="stylesheet" type="text/css" href="darkmode.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">
@@ -464,15 +479,14 @@
                             return "HEXDailyStats_" + d.toISOString().slice(0,10).replace(/-/g,"") + "_" + d.toISOString().slice(11,18).replace(/-/g,""); }
                     },
                     'pageLength',
-                    //{
-                    //    text: 'Reset Order',
-                    //    action: function ( e, dt, node, config ) {
-                    //        if (table) { 
-                    //            table.state.clear();
-                    //            table.colReorder.reset(); 
-                    //        }
-                    //    }
-                    //}
+                    {
+                        text: 'Reset Order',
+                        action: function ( e, dt, node, config ) {
+                            if (table) { 
+                                table.colReorder.reset();
+                            }
+                        }
+                    }
                 ],
                 lengthMenu: [
                     [ 10, 15, 25, 50, 100, -1 ],
@@ -483,8 +497,8 @@
                 },
                 autoWidth: false,
                 columns: [
-                    { title: "Day", className: "text-center" },
-                    { title: "Date", className: "text-center colDate", render: function (data, type, row) {
+                    { title: "Day", className: "text-center grey" },
+                    { title: "Date", className: "text-center colDate grey", render: function (data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 var date = new Date(data);
                                 date.setDate(date.getDate() - 1);
@@ -494,7 +508,7 @@
                             return data;
                         }
                     },
-                    { title: "Price (USD)", className: "text-center colPrice" , render: function(data, type, row) {
+                    { title: "Price (USD)", className: "text-center colPrice grey" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 //if ((Number(data) * 1000) < 1) {
                                 //    return currencyFormatterPriceFive.format(data);
@@ -508,7 +522,7 @@
                             return data;
                         }
                     },
-                    { title: "Price Change % (USD)", className: "text-center colPriceChange" , render: function(data, type, row) {
+                    { title: "Price Change % (USD)", className: "text-center colPriceChange grey" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 if (data < 0) { return '<div class="red-negative">' + Number(data/100).toLocaleString(undefined,{style: 'percent', minimumFractionDigits:1}) + '</div>'; }
                                 return Number(data/100).toLocaleString(undefined,{style: 'percent', minimumFractionDigits:1}); } 
@@ -561,19 +575,19 @@
                         }
                     },
 
-                    { title: "Liquidity Pool (HEX)", className: "text-center colLiquidity_HEX" , render: function(data, type, row) {
+                    { title: "Liquidity Pool (HEX)", className: "text-center colLiquidity_HEX grey" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}); }
                             return data;
                         }
                     },
-                    { title: "Liquidity Pool (USDC)", className: "text-center colLiquidity_USDC" , render: function(data, type, row) {
+                    { title: "Liquidity Pool (USDC)", className: "text-center colLiquidity_USDC grey" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}); }
                             return data;
                         }
                     },
-                    { title: "Liquidity Pool (ETH)", className: "text-center colLiquidity_ETH" , render: function(data, type, row) {
+                    { title: "Liquidity Pool (ETH)", className: "text-center colLiquidity_ETH grey" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}); }
                             return data;
@@ -587,7 +601,7 @@
                             return data;
                         }
                     },
-                    { title: "Market Cap (USD)", className: "text-center colMarketcap" , render: function(data, type, row) {
+                    { title: "Market Cap (USD)", className: "text-center colMarketcap grey" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 var { amount, symbol } = nFormatter(data, 2);
                                 return "$" + Number(amount).toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2}) + symbol; }
@@ -602,7 +616,7 @@
                         }
                     },
 
-                    { title: "T-Shares (SHARES)", className: "text-center colTshares" , render: function(data, type, row) {
+                    { title: "T-Shares (SHARES)", className: "text-center colTshares grey" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) }
                             return data;
@@ -619,7 +633,7 @@
                         }
                     },
 
-                    { title: "Total Supply (HEX)", className: "text-center colTotalSupply" , render: function(data, type, row) {
+                    { title: "Total Supply (HEX)", className: "text-center colTotalSupply grey" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}); }
                             return data;
@@ -636,7 +650,7 @@
                         }
                     },
                     
-                    { title: "Circulating Supply (HEX)", className: "text-center colCirculatingSupply" , render: function(data, type, row) {
+                    { title: "Circulating Supply (HEX)", className: "text-center colCirculatingSupply grey" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}); }
                             return data;
@@ -652,7 +666,7 @@
                             return data;
                         }
                     },
-                    { title: "Staked Supply (HEX)", className: "text-center colStakedSupply" , render: function(data, type, row) {
+                    { title: "Staked Supply (HEX)", className: "text-center colStakedSupply grey" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}); }
                             return data;
@@ -668,7 +682,7 @@
                             return data;
                         }
                     },
-                    { title: "Staked Supply GA (HEX)", className: "text-center colStakedSupplyGA" , render: function(data, type, row) {
+                    { title: "Staked Supply GA (HEX)", className: "text-center colStakedSupplyGA grey" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}); }
                             return data;
@@ -684,26 +698,26 @@
                             return data;
                         }
                     },
-                    { title: "Staked % of Coins", className: "text-center colStakedPercent" , render: function(data, type, row) {
+                    { title: "Staked % of Coins", className: "text-center colStakedPercent grey" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data/100).toLocaleString(undefined,{style: 'percent', minimumFractionDigits:2}); } 
                             return data;
                         }
                     },
 
-                    { title: "Payout (HEX)", className: "text-center colPayout" , render: function(data, type, row) {
+                    { title: "Payout (HEX)", className: "text-center colPayout grey" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}); }
                             return data;
                         }
                     },
-                    { title: "Penalties (HEX)", className: "text-center colPenalties" , render: function(data, type, row) {
+                    { title: "Penalties (HEX)", className: "text-center colPenalties grey" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}); }
                             return data;
                         }
                     },
-                    { title: "Total Holders", className: "text-center colTotalHolders" , render: function(data, type, row) {
+                    { title: "Total Holders", className: "text-center colTotalHolders grey" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;
@@ -794,21 +808,11 @@
                     $('#styleDark').removeAttr('disabled');
                     $('#buttonDark').text('Light Mode');
                     localStorage.setItem('theme', 'dark');
-
-                    //$('#dataTable').DataTable().clear();
-                    //$('#dataTable').DataTable().destroy();
-                    //createDataTable(rowData);
-
                     window.location.reload();
                 } else {
                     $('#styleDark').attr('disabled', 'disabled');
                     $('#buttonDark').text('Dark Mode');
                     localStorage.setItem('theme', 'light');
-
-                    //$('#dataTable').DataTable().clear();
-                    //$('#dataTable').DataTable().destroy();
-                    //createDataTable(rowData);
-
                     window.location.reload();
                 }
             });
@@ -1101,6 +1105,14 @@
 
         thead .blue {
             background-color: #0800609c !important; /* #0037ff8a */
+        }
+
+        .grey {
+            background-color: #1b1d1b !important;
+        }
+
+        thead .grey {
+            background-color: #000 !important;
         }
 
         #loadercontainer{

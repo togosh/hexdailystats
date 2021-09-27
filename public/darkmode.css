@@ -78,3 +78,21 @@ table.dataTable.display tbody tr.odd {
 table.dataTable thead th {
   background-image: none !important;
 }
+
+.grey {
+  background-color: #1b1d1b !important;
+}
+
+thead .grey {
+  background-color: #000 !important;
+}
+
+#divLiveSectionHeader {
+  color:white;
+  background-color: #10172d;
+}
+
+#divLiveSection {
+  color:white;
+  background-color: #10172d;
+}

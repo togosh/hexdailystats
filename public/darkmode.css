@@ -96,3 +96,17 @@ thead .grey {
   color:white;
   background-color: #10172d;
 }
+
+
+.dataTables_scrollBody::-webkit-scrollbar {
+  height: 50px;
+}
+
+.dataTables_scrollBody::-webkit-scrollbar-track {
+  background-color: #10172d;
+}
+
+.dataTables_scrollBody::-webkit-scrollbar-thumb {
+  background-color: #777;
+  border-radius: 10px;
+}

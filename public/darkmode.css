@@ -110,3 +110,17 @@ thead .grey {
   background-color: #777;
   border-radius: 10px;
 }
+
+*::-webkit-scrollbar {
+  height: 50px;
+  width: 30px;
+}
+
+*::-webkit-scrollbar-track {
+  background-color: #10172d;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: #777;
+  border-radius: 10px;
+}

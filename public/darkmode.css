@@ -124,3 +124,7 @@ thead .grey {
   background-color: #777;
   border-radius: 10px;
 }
+
+.dtfc-right-top-blocker {
+  width: 0px !important;
+}

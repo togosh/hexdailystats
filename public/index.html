@@ -1006,6 +1006,80 @@
             }
         }
 
+        // Set the name of the "hidden" property and the change event for visibility
+        var hidden, visibilityChange; 
+        if (typeof document.hidden !== "undefined") {
+          hidden = "hidden";
+          visibilityChange = "visibilitychange";
+        } else if (typeof document.mozHidden !== "undefined") { // Firefox up to v17
+          hidden = "mozHidden";
+          visibilityChange = "mozvisibilitychange";
+        } else if (typeof document.webkitHidden !== "undefined") { // Chrome up to v32, Android up to v4.4, Blackberry up to v10
+          hidden = "webkitHidden";
+          visibilityChange = "webkitvisibilitychange";
+        }
+
+        function throttle(callback, delay) {
+            let isThrottled = false, args, context;
+
+            function wrapper() {
+                if (isThrottled) {
+                args = arguments;
+                context = this;
+                return;
+                }
+
+                isThrottled = true;
+                callback.apply(this, arguments);
+                
+                setTimeout(() => {
+                isThrottled = false;
+                if (args) {
+                    wrapper.apply(context, args);
+                    args = context = null;
+                }
+                }, delay);
+            }
+
+            return wrapper;
+        }
+
+        function emitSendLatestData() {
+            if (rowData){
+                console.log("emit sendLatestData THROTTLED " + rowData[0][0]);
+                socket.emit("sendLatestData", rowData[0][0]);
+            }
+        }
+
+        const emitSendLatestData_Throttled = throttle(emitSendLatestData, 30000);
+
+        function handleVisibilityChange() {
+          if (document[hidden]) {
+            console.log("HIDDEN");
+          } else {
+            console.log("FOCUS");
+            if (rowData){
+                var start = new Date();
+                start.setUTCHours(0, 0, 0, 0);
+                var unixTimestamp = (start.valueOf() / 1000);
+                var day = (unixTimestamp - 1575417600 + (1 * 86400)) / 86400;
+                console.log("CurrentDay: " + day + " - LatestRowDay: " + rowData[0][0]);
+                if (day > rowData[0][0]) {
+                    console.log("emit sendLatestData TRY");
+                    emitSendLatestData_Throttled();
+                }
+            }
+          }
+        }
+
+        // Warn if the browser doesn't support addEventListener or the Page Visibility API
+        if (typeof document.addEventListener === "undefined" || typeof document[hidden] === "undefined") {
+          console.log("This browser does not support the Page Visibility API.");
+        } else {
+          // Handle page visibility change   
+          document.addEventListener(visibilityChange, handleVisibilityChange, false);
+        }
+
     </script>
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <style>

@@ -206,6 +206,16 @@ io.on('connection', (socket) => {
   socket.emit("liveData", liveData);
   socket.emit("currencyRates", currencyRates);
 
+  socket.on("sendLatestData", (arg) => {
+    if (rowData && arg && Number.isInteger(arg)) {
+      log("sendLatestData TRY - User: " + arg + " - Server: " + rowData[0][0]);
+      if (rowData[0][0] > arg) {
+        log("sendLatestData - SUCCESS");
+        socket.emit("liveData", liveData);
+      }
+    }
+  });
+
   //createAllRows();
   //update_shiftRowsDown();
   //copyColumns();

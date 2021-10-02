@@ -430,6 +430,7 @@ var DailyStatSchema = new Schema({
 const DailyStat = mongoose.model('DailyStat', DailyStatSchema);
 
 async function runLiveData() {
+  try {
   await sleep(300);
   if (!getDataRunning && !getLiveDataRUNNING){
     var liveDataNew = await getLiveData();
@@ -442,6 +443,11 @@ async function runLiveData() {
 				io.emit("hexPrice", hexPrice);
 			}
     }
+  }
+  } catch (error){
+    log("runLiveData() --- ERROR --- " + error.toString());
+  } finally {
+    getLiveDataRUNNING = false;
   }
 }
 

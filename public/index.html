@@ -128,14 +128,43 @@
 
         socket.on('rowData', function (data) {
             if (data && !arraysEqual(rowData, data)) {
-                console.log(new Date().toISOString() + " - " + "rowData updated");
-                console.log("rowData -----");
-                console.log(rowData);
-                console.log("data ------");
-                console.log(data);
-                rowData = data;
-                createChart(data);
-                table = createDataTable(data);
+                try {
+                    console.log(new Date().toISOString() + " - " + "rowData updated");
+                    console.log("rowData -----");
+                    console.log(rowData);
+                    console.log("data ------");
+                    console.log(data);
+                    
+                    createChart(data);
+
+                    if (table) {
+                        console.log("ROWDATA HANDLER ---- TABLE EXISTS, ADD ROW");
+                        console.log(data[0]);
+
+                        console.log("NEWEST DAY: " + data[0][0] + " - CLIENT DAY: " + rowData[0][0]);
+
+                        if (rowData[0][0] < data[0][0]){
+
+                            var daysMissing = (data[0][0] - rowData[0][0]);
+                            console.log("daysMissing: " + daysMissing);
+
+                            for (var x = daysMissing; x > 0; x--){
+                                console.log("x: " + x);
+                                console.log(data[(x - 1)]);
+                                table.row.add(data[(x - 1)]);
+                            }
+                            console.log("DRAW ");
+                            table.draw(); 
+                        }
+                    } else {
+                        console.log("ROWDATA HANDLER ---- CREATE TABLE");
+                        table = createDataTable(data); 
+                    }
+                } catch (error) {
+                    console.log("SOCKET ON rowData - ERROR - " + error.toString());
+                } finally {
+                    rowData = data;
+                }
             }
         });
 

@@ -206,8 +206,7 @@ io.on('connection', (socket) => {
   socket.emit("liveData", liveData);
   socket.emit("currencyRates", currencyRates);
 
-  /*
-  socket.on("sendLatestData", (arg) => {
+  socket.on("sendLatestData", (arg) => { // delete later
     if (rowData && arg && Number.isInteger(arg)) {
       log("sendLatestData TRY - User: " + arg + " - Server: " + rowData[0][0]);
       if (rowData[0][0] > arg) {
@@ -216,7 +215,6 @@ io.on('connection', (socket) => {
       }
     }
   });
-  */
 
   //createAllRows();
   //update_shiftRowsDown();

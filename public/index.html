@@ -148,10 +148,15 @@
                             var daysMissing = (data[0][0] - rowData[0][0]);
                             console.log("daysMissing: " + daysMissing);
 
+                            var orderIndexes = table.colReorder.order();
+                            console.log("colOrder: " + table.colReorder.order());
+
                             for (var x = daysMissing; x > 0; x--){
+                                var row = data[(x - 1)];
+                                var rowOrdered = orderIndexes.map(i => row[i]);
                                 console.log("x: " + x);
-                                console.log(data[(x - 1)]);
-                                table.row.add(data[(x - 1)]);
+                                console.log(rowOrdered);
+                                table.row.add(rowOrdered);
                             }
                             console.log("DRAW ");
                             table.draw(); 
@@ -159,6 +164,7 @@
                     } else {
                         console.log("ROWDATA HANDLER ---- CREATE TABLE");
                         table = createDataTable(data); 
+                        console.log("STARTING ORDER: " + table.colReorder.order());
                     }
                 } catch (error) {
                     console.log("SOCKET ON rowData - ERROR - " + error.toString());

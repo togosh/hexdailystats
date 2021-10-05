@@ -476,6 +476,7 @@ async function getLiveData() {
     (priceUV3 * (liquidityUV3_USDC / liquidityUV2UV3_USDC))).toFixed(8));
     
     var tshareRateHEX = await get_shareRateChange(); await sleep(500);
+    tshareRateHEX = parseFloat(tshareRateHEX);
     var tshareRateUSD = parseFloat((tshareRateHEX * priceUV2).toFixed(4));
 
     if (liquidityUV2_HEXUSDC == 0 || liquidityUV2_USDC == 0 || liquidityUV2_HEXETH == 0 || liquidityUV2_ETH == 0) {

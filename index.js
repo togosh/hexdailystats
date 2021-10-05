@@ -182,6 +182,10 @@ app.get('/fulldata', cors(), function (req, res) {
   res.send(JSON.parse(JSON.stringify(rowDataObjects)))
 });
 
+app.get('/livedata', cors(), function (req, res) {
+  if (liveData) { res.send(JSON.parse(JSON.stringify(liveData))); } else {res.status(404).send({ error: "liveData not populated yet" });};
+});
+
 async function grabData() {
   if (!getRowDataRunning){ getRowData(); }
   if (!getLiveDataRUNNING){ await runLiveData(); }

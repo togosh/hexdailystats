@@ -93,8 +93,7 @@ tail -f /root/.forever/AAAA.log
 
 Mongo Compass - Filter Examples  
 ```
-{isTestData: {$eq: true}}
-{channelId: {$eq: "AAAAAAAAAAAAAA"}}
+{currentDay: {$eq: 650}}
 ```
 
 =

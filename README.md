@@ -2,6 +2,7 @@
 
 Website --- https://HEXDailyStats.com   
 Telegram -- https://t.me/HEXDailyStats  
+
 Twitter ----- https://twitter.com/HEXDailyStats  
 Twitter ----- https://twitter.com/HEXDailyBot  
 
@@ -59,6 +60,21 @@ E. Start Server:
 ```
 node index.js
 ```
+E.1. Stop Server
+`CTRL + C` or `sudo killall nodejs`
+
+F. Stop Server, Update it, and then Start it in a Forever Loop
+`chmod +x update.sh`
+`./update.sh`
+
+G. Setup Reboot  
+`chmod +x start.sh`
+`sudo crontab -e`   
+`@reboot /home/hexdailystats/start.sh`  
+
+H. Watch Log
+`forever logs`
+`tail -f /root/.forever/AAAA.log`
 
 =  
 

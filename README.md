@@ -58,9 +58,9 @@ npm install
 - Replace Etherescan API Key
 - NOTE: urls.grabdata is url that manually runs daily data grabbing   
 
-5. Create MongoDB Atlas Database and Install Compass 
-https://www.mongodb.com/cloud/atlas   
-https://www.mongodb.com/products/compass   
+5. Create MongoDB Atlas Database and Install Compass   
+https://www.mongodb.com/cloud/atlas      
+https://www.mongodb.com/products/compass      
 
 6. Start Server:  
 ```

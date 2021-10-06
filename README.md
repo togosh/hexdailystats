@@ -40,46 +40,50 @@ Core Data:
 
 How to Run:
 
-A. Install Node  
+1. Install Node  
 https://nodejs.org/en/download/  
 
-B. Request Etherscan API Key    
+2. Request Etherscan API Key    
 https://etherscan.io/apis 
 
-C. Clone Code & Install Packages     
+3. Clone Code & Install Packages     
 ```
 git clone https://github.com/togosh/hexdailystats.git
 cd hexdailystats
 npm install
 ```
 
-D. Setup Config   
+4. Setup Config   
 - Rename "config-default.json" to "config.json"
 - Replace Etherescan API Key
 - NOTE: urls.grabdata is url that manually runs daily data grabbing   
 
-E. Start Server:  
+5. Create MongoDB Atlas Database and Install Compass 
+https://www.mongodb.com/cloud/atlas   
+https://www.mongodb.com/products/compass   
+
+6. Start Server:  
 ```
 node index.js
 ```
 
-E.1. Stop Server   
+7. Stop Server   
 `CTRL + C` or `sudo killall nodejs`   
 
-F. Stop Server, Update it, and then Start it in a Forever Loop   
+8. Stop Server, Update it, and then Start it in a Forever Loop   
 ```
 chmod +x update.sh
 ./update.sh
 ```
 
-G. Setup Reboot  
+9. Setup Reboot  
 ```
 chmod +x start.sh
 sudo crontab -e
 @reboot /home/hexdailystats/start.sh
 ```
 
-H. Watch Log   
+10. Watch Log   
 ```
 forever logs
 tail -f /root/.forever/AAAA.log

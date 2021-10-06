@@ -445,7 +445,6 @@
                 destroy: true,
                 data: data,
                 scrollX: true,
-                //scrollY: "380px",
                 scrollCollapse: true,
                 order: [[ 0, "desc" ]],
                 dom: 'Brtip',
@@ -485,10 +484,6 @@
                     });
                 },
                 buttons: [
-                    //{
-                    //    extend: "copy",
-                    //    exportOptions: { orthogonal: "exportcopy" }
-                    //},
                     { extend: 'colvis', text: 'Columns', }, //columns: ":not(':first')"
                     {
                         extend: 'colvisGroup',
@@ -968,11 +963,6 @@
             var tsharesYear10 = calculatorTshares(365 * 10);
             var tsharesYear15 = calculatorTshares(365 * 10);
 
-            //console.log("calculatorOutputValue " + calculatorOutputValue);
-            //console.log("tsharesYear1 " + tsharesYear1);
-            //console.log("payoutPerTshare " + payoutPerTshare);
-            //console.log("liveData.price" + liveData.price);
-
             var html = `<center>
                     <table style="text-align: right; margin-top: 10px;">
                     <tr>
@@ -1040,81 +1030,6 @@
                 console.log(error);
             }
         }
-
-        /*
-        // Set the name of the "hidden" property and the change event for visibility
-        var hidden, visibilityChange; 
-        if (typeof document.hidden !== "undefined") {
-          hidden = "hidden";
-          visibilityChange = "visibilitychange";
-        } else if (typeof document.mozHidden !== "undefined") { // Firefox up to v17
-          hidden = "mozHidden";
-          visibilityChange = "mozvisibilitychange";
-        } else if (typeof document.webkitHidden !== "undefined") { // Chrome up to v32, Android up to v4.4, Blackberry up to v10
-          hidden = "webkitHidden";
-          visibilityChange = "webkitvisibilitychange";
-        }
-
-        function throttle(callback, delay) {
-            let isThrottled = false, args, context;
-
-            function wrapper() {
-                if (isThrottled) {
-                args = arguments;
-                context = this;
-                return;
-                }
-
-                isThrottled = true;
-                callback.apply(this, arguments);
-                
-                setTimeout(() => {
-                isThrottled = false;
-                if (args) {
-                    wrapper.apply(context, args);
-                    args = context = null;
-                }
-                }, delay);
-            }
-
-            return wrapper;
-        }
-
-        function emitSendLatestData() {
-            if (rowData){
-                console.log("emit sendLatestData THROTTLED " + rowData[0][0]);
-                socket.emit("sendLatestData", rowData[0][0]);
-            }
-        }
-
-        const emitSendLatestData_Throttled = throttle(emitSendLatestData, 30000);
-
-        function handleVisibilityChange() {
-          if (document[hidden]) {
-            //console.log("HIDDEN");
-          } else {
-            //console.log("FOCUS");
-            if (rowData){
-                var start = new Date();
-                start.setUTCHours(0, 0, 0, 0);
-                var unixTimestamp = (start.valueOf() / 1000);
-                var day = (unixTimestamp - 1575417600 + (1 * 86400)) / 86400;
-                console.log("CurrentDay: " + day + " - LatestRowDay: " + rowData[0][0]);
-                if (day > rowData[0][0]) {
-                    console.log("emit sendLatestData TRY");
-                    emitSendLatestData_Throttled();
-                }
-            }
-          }
-        }
-
-        // Warn if the browser doesn't support addEventListener or the Page Visibility API
-        if (typeof document.addEventListener === "undefined" || typeof document[hidden] === "undefined") {
-          console.log("This browser does not support the Page Visibility API.");
-        } else {
-          // Handle page visibility change   
-          document.addEventListener(visibilityChange, handleVisibilityChange, false);
-        }*/
 
     </script>
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
@@ -1485,16 +1400,14 @@
         </ul>
     </center>
     
-    <div id="nomicsSection" style="padding-top: 10px;">
+    <div id="nomicsSection" style="padding-top: 10px; padding-bottom: 20px;">
         <div><center><a href="https://codeakk.medium.com/hex-development-data-a1b1822446fa" target="_blank">Codeak</a> | 
             <a href="https://gist.github.com/togosh/5ff8a9a51740f30c96b3ee013e44b798" target="_blank">API</a> | 
             <a href="https://etherscan.io/address/0x2b591e99afe9f32eaa6214f7b7629768c40eeb39#readContract" target="_blank">Etherscan</a> | 
             <a href="https://thegraph.com/legacy-explorer/subgraph/uniswap/uniswap-v2" target="_blank">Uniswap</a> | 
             <a href="https://nomics.com" target="_blank">Nomics</a></center></div>
     </div>
-    <div id="footer" style="width: 100%; text-align: center; padding-top: 10px; padding-bottom: 20px;">
-        <a href="https://etherscan.io/address/0xdee0A5da68ea787C5C441EB7482F61157fE8DEC5" target="_blank"><span>0xdee0A5da68ea787C5C441EB7482F61157fE8DEC5</span></a>
-    </div>
-    <center><a href="https://www.freedomtv.info/#wix-events-widget" target="_blank"><img src="kryptosparbuch.webp" style="width:300px; padding-bottom:10px;"></a></center>
-    <center><a href="https://t.me/USroadtripCHAT" style="width:300px; padding-bottom:30px;" target="_blank">t.me/USroadtripCHAT</a></center>
+    <center><a href="https://stakedwealth.com/" target="_blank"><img src="stakedwealth.webp" style="width:300px; padding-bottom:10px;"></a></center>
+    <center><a href="https://www.freedomtv.info/" target="_blank"><img src="kryptosparbuch.webp" style="width:300px; padding-bottom:10px;"></a></center>
+    <center><a href="https://www.freedomtv.info/" style="width:300px; padding-bottom:30px;" target="_blank">freedomtv.info</a></center>
 </div>

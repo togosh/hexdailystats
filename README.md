@@ -23,6 +23,9 @@ Documentation:
 https://codeakk.medium.com/hex-development-data-a1b1822446fa  
 https://togosh.medium.com/hex-developer-guide-3b018a943a55  
 
+Dev Chat:   
+https://t.me/HEXcryptoDEV  
+
 =
 
 Core Data:
@@ -95,11 +98,6 @@ Mongo Compass - Filter Examples
 ```
 {currentDay: {$eq: 650}}
 ```
-
-=
-
-Join Dev Chat  
-https://t.me/HEXcryptoDEV  
 
 =
 
@@ -176,3 +174,8 @@ https://www.reddit.com/r/HEXcrypto/comments/plhx3b/locked_usd_grew_by_978_during
 - amount USD to 2x, 10x price
 
 - percent down from All Time High
+
+===
+
+Join Dev Chat!  
+https://t.me/HEXcryptoDEV  

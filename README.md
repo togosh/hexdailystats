@@ -34,6 +34,7 @@ Core Data:
 - Daily Payout
 - Daily Penalties
 - Uniswap V2 & V3, USDC & WETH pair liquidity
+- Stakes and Holders
 
 =  
 
@@ -55,6 +56,7 @@ npm install
 D. Setup Config   
 - Rename "config-default.json" to "config.json"
 - Replace Etherescan API Key
+- NOTE: urls.grabdata is url that manually runs daily data grabbing   
 
 E. Start Server:  
 ```

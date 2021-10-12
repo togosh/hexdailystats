@@ -59,16 +59,25 @@ npm install
 4. Setup Config   
 - Rename "config-default.json" to "config.json"
 - Replace Etherescan API Key
-- NOTE: urls.grabdata is url that manually runs daily data grabbing   
+- NOTE: urls.grabdata is url to grab multiple sets of data
+--- all current row data from database
+--- live data
+--- currency rates
+--- new daily data row
 
 5. Create MongoDB Atlas Database and Install Compass   
 https://www.mongodb.com/cloud/atlas      
 https://www.mongodb.com/products/compass      
 
-6. Start Server:  
+6. Start Server  
 ```
 node index.js
 ```
+
+6.a. Grab Data   
+Replace url below with what is set in config.json for urls.grabdata   
+`localhost:3000/url`   
+Use this command to initilize the servers data after every start   
 
 7. Stop Server   
 `CTRL + C` or `sudo killall nodejs`   
@@ -105,7 +114,7 @@ CRITICAL
 
 - scaling issue (can only get 1,000 data objects from TheGraph at a time, if community 10x's may take 1.5 hours to get all stake and holder data)
 
-- drifted data (Day 595+ data is drifted 5+ minutes past 00:00:00 UTC, historical functions exist need to switch and fix historical)
+- drifted data (some Day 595+ data is drifted 5+ minutes past 00:00:00 UTC, historical functions exist need to switch and fix historical rows)
 
 NEXT
 
@@ -115,12 +124,36 @@ https://t.me/PulseDev
 - BTC and ETH prices   
 https://min-api.cryptocompare.com/documentation?key=Historical&cat=dataHistoday
 
+POTENTIAL
 
-INTERESTING
+- payout per tshare USD
+
+- bshare columns (bshare price, bshare rate, increase in bshare rate, payout per bshare)
+
+- percent change in payout per tshare
+
+- average payout per tshare
+
+- new stakes   
+https://www.reddit.com/r/HEXcrypto/comments/plhx3b/locked_usd_grew_by_978_during_first_9_days_of/
+
+- staked % of coins minus origin address
+
+- bleeding stakes (Count, Avg days late, Avg percent, Total HEX, USD Value)
+
+- staker leagues share and usd requirements
+
+- amount USD to 2x, 10x price
+
+- percent down from All Time High
+
+===
+
+INTERESTING IDEA
 
 - reverse penalties wall of shame
 
-1. check for one 5555 day stake, easy
+1. check for one 5555 day stake
 
 2. check for > 90% HEX staked, (sum staked / (balance + sum staked)) > 0.90
 
@@ -150,30 +183,6 @@ https://etherscan.io/apis#pricingSection
 4. restaking principal, does 2 and 3 pretty much cover this? as time goes on to continue satisfying 2 and 3 you have no choice but to restake? :)
 
 Would have to find a same size or greater than principal stake started within some threshold (week/month) of endstake. 
-
-
-POTENTIAL
-
-- payout per tshare USD
-
-- bshare columns (bshare price, bshare rate, increase in bshare rate, payout per bshare)
-
-- percent change in payout per tshare
-
-- average payout per tshare
-
-- new stakes   
-https://www.reddit.com/r/HEXcrypto/comments/plhx3b/locked_usd_grew_by_978_during_first_9_days_of/
-
-- staked % of coins minus origin address
-
-- bleeding stakes (Count, Avg days late, Avg percent, Total HEX, USD Value)
-
-- staker leagues share and usd requirements
-
-- amount USD to 2x, 10x price
-
-- percent down from All Time High
 
 ===
 

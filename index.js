@@ -200,7 +200,11 @@ async function grabData() {
 }
 
 httpServer.listen(httpPort, hostname, () => { log(`Server running at http://${hostname}:${httpPort}/`);});
-if(!DEBUG){ httpsServer.listen(httpsPort, hostname, () => { log('listening on *:' + httpsPort); }); grabData(); }
+if(!DEBUG){ httpsServer.listen(httpsPort, hostname, () => { 
+    log('listening on *:' + httpsPort); 
+    grabData(); 
+  });
+}
 
 var io = undefined;
 if(DEBUG){ io = require('socket.io')(httpServer);

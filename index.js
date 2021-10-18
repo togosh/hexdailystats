@@ -178,8 +178,14 @@ app.get("/" + CONFIG.urls.grabdata, function (req, res) {
   res.send(new Date().toISOString() + ' - Grab Data!');
 });
 
+app.get('/crash', cors(), function (req, res) {
+  setTimeout(function () {
+    throw new Error("Forced Crash");
+  }, 10);
+});
+
 app.get('/fulldata', cors(), function (req, res) {
-  res.send(JSON.parse(JSON.stringify(rowDataObjects)))
+  if (rowDataObjects) { res.send(JSON.parse(JSON.stringify(rowDataObjects))); } else {res.status(404).send({ error: "fullData not populated yet" });};
 });
 
 app.get('/livedata', cors(), function (req, res) {
@@ -194,7 +200,7 @@ async function grabData() {
 }
 
 httpServer.listen(httpPort, hostname, () => { log(`Server running at http://${hostname}:${httpPort}/`);});
-if(!DEBUG){ httpsServer.listen(httpsPort, hostname, () => { log('listening on *:' + httpsPort); }); }
+if(!DEBUG){ httpsServer.listen(httpsPort, hostname, () => { log('listening on *:' + httpsPort); }); grabData(); }
 
 var io = undefined;
 if(DEBUG){ io = require('socket.io')(httpServer);

@@ -178,12 +178,6 @@ app.get("/" + CONFIG.urls.grabdata, function (req, res) {
   res.send(new Date().toISOString() + ' - Grab Data!');
 });
 
-app.get('/crash', cors(), function (req, res) {
-  setTimeout(function () {
-    throw new Error("Forced Crash");
-  }, 10);
-});
-
 app.get('/fulldata', cors(), function (req, res) {
   if (rowDataObjects) { res.send(JSON.parse(JSON.stringify(rowDataObjects))); } else {res.status(404).send({ error: "fullData not populated yet" });};
 });

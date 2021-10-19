@@ -1,5 +1,5 @@
-var DEBUG = false;
 var CONFIG = require('./config.json');
+var DEBUG = CONFIG.debug;
 const http = require('http');
 require('es6-promise').polyfill();
 

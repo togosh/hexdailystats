@@ -1,4 +1,5 @@
 {
+	"debug": true,
 	"hostname": "AAA",
 	"urls": {
 		"grabdata": "AAA"

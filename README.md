@@ -45,6 +45,7 @@ How to Run:
 
 1. Install Node  
 https://nodejs.org/en/download/  
+https://github.com/nodesource/distributions#debinstall  
 
 2. Request Etherscan API Key    
 https://etherscan.io/apis 
@@ -56,14 +57,19 @@ cd hexdailystats
 npm install
 ```
 
+3.a. Install Forever
+```
+sudo npm install forever -g
+```
+
 4. Setup Config   
 - Rename "config-default.json" to "config.json"
 - Replace Etherescan API Key
-- NOTE: urls.grabdata is url to grab multiple sets of data
---- all current row data from database
---- live data
---- currency rates
---- new daily data row
+- NOTE: urls.grabdata is url to grab multiple sets of data   
+--- all current row data from database   
+--- live data   
+--- currency rates   
+--- new daily data row   
 
 5. Create MongoDB Atlas Database and Install Compass   
 https://www.mongodb.com/cloud/atlas      
@@ -75,9 +81,9 @@ node index.js
 ```
 
 6.a. Grab Data   
-Replace url below with what is set in config.json for urls.grabdata   
-`localhost:3000/url`   
-Use this command to initilize the servers data after every start   
+Replace URL below with what is set in config.json for urls.grabdata   
+`localhost:3000/URL`   
+Use this command to initialize the servers data after every start in debug mode   
 
 7. Stop Server   
 `CTRL + C` or `sudo killall nodejs`   
@@ -92,8 +98,9 @@ chmod +x update.sh
 ```
 chmod +x start.sh
 sudo crontab -e
-@reboot /home/hexdailystats/start.sh
+@reboot sleep 10 && cd /home/hexdailystats/ && ./start.sh
 ```
+NOTE: Add >> /home/testing.txt 2>&1 to end of command to pipe output to file
 
 10. Watch Log   
 ```

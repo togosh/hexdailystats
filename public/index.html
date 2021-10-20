@@ -508,9 +508,16 @@
                         filename: function() { var d = new Date();
                             return "HEXDailyStats_" + d.toISOString().slice(0,10).replace(/-/g,"") + "_" + d.toISOString().slice(11,18).replace(/-/g,""); }
                     },
+                    {
+                        text: 'API',
+                        action: function ( e, dt, node, config ) {
+                            window.open('https://gist.github.com/togosh/5ff8a9a51740f30c96b3ee013e44b798', '_blank');
+                            //window.location.href = 'https://gist.github.com/togosh/5ff8a9a51740f30c96b3ee013e44b798';
+                        }
+                    },
                     'pageLength',
                     {
-                        text: 'Reset Order',
+                        text: 'Reset',
                         action: function ( e, dt, node, config ) {
                             if (table) { 
                                 table.colReorder.reset();

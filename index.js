@@ -186,6 +186,36 @@ app.get('/livedata', cors(), function (req, res) {
   if (liveData) { res.send(JSON.parse(JSON.stringify(liveData))); } else {res.status(404).send({ error: "liveData not populated yet" });};
 });
 
+app.get('/hexsite', cors(), function (req, res) {
+  if (rowDataObjects) { 
+
+    try {
+      var highestTshareRateUSD = Math.max.apply(Math, rowDataObjects.map(function(o) { return o.tshareRateUSD; }))
+
+      var prices = rowDataObjects.map(a => a.priceUV2UV3).reverse();;
+
+      var json = {
+        averageStakeLength: rowDataObjects[0].averageStakeLength,
+        numberOfHolders: rowDataObjects[0].numberOfHolders,
+        numberOfHoldersChange: rowDataObjects[0].numberOfHoldersChange,
+        currentStakerCount: rowDataObjects[0].currentStakerCount,
+        currentStakerCountChange: rowDataObjects[0].currentStakerCountChange,
+        totalValueLocked: rowDataObjects[0].totalValueLocked,
+
+        tshareRateUSD_Highest: highestTshareRateUSD,
+
+        priceUV2UV3_Array: prices,
+      }
+
+      res.send(JSON.parse(JSON.stringify(json))); 
+    } catch (error) {
+      log("/hexsite");
+      log(error);
+    }
+  } 
+  else {res.status(404).send({ error: "hexsite not populated yet" });};
+});
+
 async function grabData() {
   if (!getRowDataRunning){ getRowData(); }
   if (!getLiveDataRUNNING){ await runLiveData(); }

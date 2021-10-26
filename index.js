@@ -82,6 +82,7 @@ var liveData = undefined;
 var currencyRates = undefined;
 var getCurrencyDataRunning = false;
 var getAndSet_currentGlobalDay_Running = false;
+var hexSiteData = undefined;
 
 var hostname = CONFIG.hostname;
 if (DEBUG){ hostname = '127.0.0.1'; }
@@ -187,12 +188,23 @@ app.get('/livedata', cors(), function (req, res) {
 });
 
 app.get('/hexsite', cors(), function (req, res) {
-  if (rowDataObjects) { 
-
+  if (hexSiteData) {
     try {
-      var highestTshareRateUSD = Math.max.apply(Math, rowDataObjects.map(function(o) { return o.tshareRateUSD; }))
+      res.send(JSON.parse(JSON.stringify(hexSiteData)));
+    } catch (error) {
+      log("/hexsite");
+      log(error);
+    }
+  } 
+  else {res.status(404).send({ error: "hexsite not populated yet" });};
+});
 
-      var prices = rowDataObjects.map(a => a.priceUV2UV3).reverse();;
+async function buildHexSiteData(rowDataObjects){
+  if (rowDataObjects) { 
+    try {
+      var highestTshareRateUSD = Math.max.apply(Math, rowDataObjects.map(function(a) { return a.tshareRateUSD; }))
+
+      var prices = rowDataObjects.map(a => a.priceUV2UV3).reverse();
 
       var json = {
         averageStakeLength: rowDataObjects[0].averageStakeLength,
@@ -207,14 +219,15 @@ app.get('/hexsite', cors(), function (req, res) {
         priceUV2UV3_Array: prices,
       }
 
-      res.send(JSON.parse(JSON.stringify(json))); 
+      return json;
     } catch (error) {
-      log("/hexsite");
+      log("buildHexSiteData()");
       log(error);
     }
-  } 
-  else {res.status(404).send({ error: "hexsite not populated yet" });};
-});
+  } else {
+    log("buildHexSiteData() - rowDataObjects not ready");
+  }
+}
 
 async function grabData() {
   if (!getRowDataRunning){ getRowData(); }
@@ -573,6 +586,7 @@ async function getRowData() {
     if (rowData === undefined || !(JSON.stringify(rowData) === JSON.stringify(rowDataNew))){ //!arraysEqual(rowData, rowDataNew)) {
       rowData = rowDataNew;
       rowDataObjects = dailyStats;
+      hexSiteData = await buildHexSiteData(rowDataObjects);
       log('SOCKET -- ****EMIT: rowData');
       io.emit("rowData", rowData);
     }

@@ -639,7 +639,7 @@ async function getDailyData() {
 
   var priceUV2 = await getUniswapV2HEXDailyPrice(); await sleep(1000);
   log("*** 007 - priceUV2: " + priceUV2);
-  var priceUV3 = await getUniswapV3HEXDailyPrice(); await sleep(1000);
+  var priceUV3 = priceUV2; //await getUniswapV3HEXDailyPrice(); await sleep(1000);
   log("*** 008 - priceUV3: " + priceUV3);
 
   var { liquidityUV2_HEXUSDC, liquidityUV2_USDC } = await getUniswapV2HEXUSDC_Polling(); await sleep(1000);

@@ -257,8 +257,8 @@
             var payoutPerTshares = arrayColumn(data, 5).reverse().slice(2); //, 600);
             var tshareRates = arrayColumn(data, 7).reverse().slice(2); //, 600);
             var currentStakers = arrayColumn(data, 32).reverse().slice(2); //, 600);
-            var totalStakersChange = arrayColumn(data, 35).reverse().slice(4); //, 600);
-            var averageStakeLength = arrayColumn(data, 9).reverse().slice(4); //, 600);
+            var totalStakersChange = arrayColumn(data, 35).reverse().slice(3); //, 600);
+            var averageStakeLength = arrayColumn(data, 9).reverse().slice(2); //, 600);
             
             const result_HEXPrice = dates.map((item,index) => {return {x: Date.parse(item), y: prices[index]}});
             const result_TsharePrice = dates.map((item,index) => {return {x: Date.parse(item), y: tsharePrices[index]}});

@@ -256,11 +256,17 @@
             var tsharePrices = arrayColumn(data, 6).reverse().slice(2); //, 600);
             var payoutPerTshares = arrayColumn(data, 5).reverse().slice(2); //, 600);
             var tshareRates = arrayColumn(data, 7).reverse().slice(2); //, 600);
+            var currentStakers = arrayColumn(data, 32).reverse().slice(2); //, 600);
+            var totalStakersChange = arrayColumn(data, 35).reverse().slice(4); //, 600);
+            var averageStakeLength = arrayColumn(data, 9).reverse().slice(4); //, 600);
             
             const result_HEXPrice = dates.map((item,index) => {return {x: Date.parse(item), y: prices[index]}});
             const result_TsharePrice = dates.map((item,index) => {return {x: Date.parse(item), y: tsharePrices[index]}});
             const result_PayoutPerTshare = dates.map((item,index) => {return {x: Date.parse(item), y: payoutPerTshares[index]}});
             const result_TshareRate = dates.map((item,index) => {return {x: Date.parse(item), y: tshareRates[index]}});
+            const result_CurrentStakers = dates.map((item,index) => {return {x: Date.parse(item), y: currentStakers[index]}});
+            const result_TotalStakersChange = dates.map((item,index) => {return {x: Date.parse(item), y: totalStakersChange[index]}});
+            const result_AverageStakeLength = dates.map((item,index) => {return {x: Date.parse(item), y: averageStakeLength[index]}});
             
             var options_TsharePrice = {
                 chart: {
@@ -323,6 +329,141 @@
             }
             var chart_TsharePrice = new ApexCharts(document.querySelector("#chart_TsharePrice"), options_TsharePrice);
             chart_TsharePrice.render();
+
+            var options_CurrentStakers = {
+                chart: {
+                    type: 'area',
+                    height: 400,
+                    toolbar: {
+                        show: true,
+                        offsetY: 0,
+                    },
+                },
+                title: {
+                    text: 'Current Stakers',
+                    style: {
+                        color:  'white'
+                    },
+                },
+                series: [{
+                    name: 'Current Stakers',
+                    data: result_CurrentStakers
+                }],
+                xaxis: {
+                    type: 'datetime',
+                    labels: { style: { colors: 'white', }, },
+                },
+                yaxis: [{
+                    labels: { style: { colors: 'white', }, formatter: function (value) { return value.toFixed(1); }, },
+                    logarithmic: false,
+                    opposite: true,
+                }],
+                markers: {
+                    size: 0
+                },
+                tooltip: {
+                    theme: 'dark'
+                },
+                stroke: {
+                    show: true,
+                    width: 3,
+                },
+                dataLabels: {
+                    enabled: false,
+                }
+            }
+            var chart_CurrentStakers = new ApexCharts(document.querySelector("#chart_CurrentStakers"), options_CurrentStakers);
+            chart_CurrentStakers.render();
+
+            var options_TotalStakersChange = {
+                chart: {
+                    type: 'area',
+                    height: 400,
+                    toolbar: {
+                        show: true,
+                        offsetY: 0,
+                    },
+                },
+                title: {
+                    text: 'New Stakers',
+                    style: {
+                        color:  'white'
+                    },
+                },
+                series: [{
+                    name: 'New Stakers',
+                    data: result_TotalStakersChange
+                }],
+                xaxis: {
+                    type: 'datetime',
+                    labels: { style: { colors: 'white', }, },
+                },
+                yaxis: [{
+                    labels: { style: { colors: 'white', }, formatter: function (value) { return value.toFixed(1); }, },
+                    logarithmic: false,
+                    opposite: true,
+                }],
+                markers: {
+                    size: 0
+                },
+                tooltip: {
+                    theme: 'dark'
+                },
+                stroke: {
+                    show: true,
+                    width: 3,
+                },
+                dataLabels: {
+                    enabled: false,
+                }
+            }
+            var chart_TotalStakersChange = new ApexCharts(document.querySelector("#chart_TotalStakersChange"), options_TotalStakersChange);
+            chart_TotalStakersChange.render();
+
+            var options_AverageStakeLength = {
+                chart: {
+                    type: 'area',
+                    height: 400,
+                    toolbar: {
+                        show: true,
+                        offsetY: 0,
+                    },
+                },
+                title: {
+                    text: 'Average Stake Length (YEARS)',
+                    style: {
+                        color:  'white'
+                    },
+                },
+                series: [{
+                    name: 'Average Stake Length',
+                    data: result_AverageStakeLength
+                }],
+                xaxis: {
+                    type: 'datetime',
+                    labels: { style: { colors: 'white', }, },
+                },
+                yaxis: [{
+                    labels: { style: { colors: 'white', }, formatter: function (value) { return value.toFixed(1); }, },
+                    logarithmic: false,
+                    opposite: true,
+                }],
+                markers: {
+                    size: 0
+                },
+                tooltip: {
+                    theme: 'dark'
+                },
+                stroke: {
+                    show: true,
+                    width: 3,
+                },
+                dataLabels: {
+                    enabled: false,
+                }
+            }
+            var chart_AverageStakeLength = new ApexCharts(document.querySelector("#chart_AverageStakeLength"), options_AverageStakeLength);
+            chart_AverageStakeLength.render();
 
             var options_TshareRate = {
                 chart: {
@@ -1364,6 +1505,9 @@
 
         <div id="divCharts" style="display: none; margin-left: 10px; margin-right: 10px;">
             <div id="chart_TsharePrice" style="margin-right: 0px;"></div>
+            <div id="chart_CurrentStakers" style="margin-right: 0px;"></div>
+            <div id="chart_TotalStakersChange" style="margin-right: 0px;"></div>
+            <div id="chart_AverageStakeLength" style="margin-right: 0px;"></div>
             <div id="chart_TshareRate" style="margin-right: 0px;"></div>
             <div id="chart_PayoutPerTshare" style="margin-right: 0px;"></div>
             <div id="chart_StakedVsCirculating" style="margin-right: 0px;"></div>

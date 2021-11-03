@@ -75,6 +75,7 @@
 
         var rowData = "";
         var liveData = "";
+        var ethereumData = "";
         var currencyRates = undefined;
         var currencyCode = "USD";
         var calculatorOutputValue = 0;
@@ -231,6 +232,36 @@
             var { amount, symbol } = nFormatter(data, 2);
             return Number(amount).toLocaleString(undefined,{minimumFractionDigits:decimals, maximumFractionDigits:decimals}) + symbol;
         }
+
+        socket.on('ethereumData', function (data) {
+            if (data) {
+                //console.log(new Date().toISOString() + " - " + "ethereumData updated");
+                console.log(data);
+                ethereumData = data;
+
+                var htmlNew = "<div style='padding: 0px 40px;'>" +
+                "<div style='height: 24px'>" +
+                    "<div style='float: left;'><b>ETH Price</b>&nbsp;</div>" +
+                    "<div style='float: right;'>" + Number(data.price).toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2}) + " USD</div>" +
+                "</div>" +
+                "<div style='height: 24px'>" +
+                    "<div style='float: left;'><b>ERC20 Transfer</b>&nbsp;</div>" +
+                    "<div style='float: right;'>" + Number(data.erc20transfer).toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2}) + " USD</div>" +
+                "</div>" +
+                "<div style='height: 24px'>" +
+                    "<div style='float: left;'><b>Uniswap Swap</b>&nbsp;</div>" +
+                    "<div style='float: right;'>" + Number(data.uniswapSwap).toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2}) + " USD</div>" +
+                "</div>" +
+                "<div style='height: 24px'>" +
+                    "<div style='float: left;'><b>Add Liquidity</b>&nbsp;</div>" +
+                    "<div style='float: right;'>" + Number(data.addLiquidity).toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2}) + " USD</div>" +
+                "</div>" + "</div>";
+
+                //console.log(htmlNew);
+
+                $("#divEthereumSection").html(htmlNew);
+            }
+        });
 
         /*ds.currentDay, ds.date, 
         ds.priceUV2UV3, ds.priceChangeUV2UV3, ds.roiMultiplierFromATL,
@@ -1303,7 +1334,18 @@
         </div></center>
         <center><button id="buttonCharts" onclick="openCharts()" style="width: 150px; padding: 6px 40px; margin-bottom: 10px; outline: none;">Charts</button><button id="buttonCalculator" onclick="openCalculator()" style="width: 150px; padding: 6px 40px; margin-bottom: 10px; outline: none;">Calculator</button></center>
 
-        <center><div style="margin-bottom: 10px;"><div id="divLiveSectionHeader" style="padding-top: 8px; text-align:center; font-size: 16px;  max-width: 340px; cursor: pointer;" onclick="divLiveSectionToggle();"><b>LIVE DATA</b></div><div id="divLiveSection" class="divLive" style="text-align:center; font-size: 16px; max-width: 340px; border-radius: 0px;"></div></div></center> <!--max-width: 484px; style="display: none;"-->
+        <center>
+            <div style="margin-bottom: 10px;">
+                <div id="divLiveSectionHeader" style="padding-top: 8px; text-align:center; font-size: 16px;  max-width: 340px; cursor: pointer;" onclick="divLiveSectionToggle();"><b>LIVE DATA</b></div>
+                <div id="divLiveSection" class="divLive" style="text-align:center; font-size: 16px; max-width: 340px; border-radius: 0px;"></div>
+            </div>
+        </center>
+        <center>
+            <div style="margin-bottom: 10px;">
+                <div id="divEthereumSectionHeader" style="padding-top: 8px; text-align:center; font-size: 16px;  max-width: 340px; cursor: pointer;"><b>ETHEREUM</b></div>
+                <div id="divEthereumSection" class="divLive" style="text-align:center; font-size: 16px; max-width: 340px; border-radius: 0px;"></div>
+            </div>
+        </center>
         <div id="divAbout" style="display: none;">
             <div id="aboutSection">
                 <center><div><div class="text" style="max-width: 620px"><b>About:</b> Created to keep historical records of the HEX ecosystem, for research, education and analysis</div>

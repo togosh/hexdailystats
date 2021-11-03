@@ -83,6 +83,8 @@ var currencyRates = undefined;
 var getCurrencyDataRunning = false;
 var getAndSet_currentGlobalDay_Running = false;
 var hexSiteData = undefined;
+var getEthereumDataRUNNING = false;
+var ethereumData = undefined;
 
 var hostname = CONFIG.hostname;
 if (DEBUG){ hostname = '127.0.0.1'; }
@@ -233,7 +235,8 @@ async function grabData() {
   if (!getRowDataRunning){ getRowData(); }
   if (!getLiveDataRUNNING){ await runLiveData(); }
   if (!getCurrencyDataRunning){ getCurrencyData(); };
-  if (!getDataRunning){ getDailyData(); }
+  if (!getDataRunning){ await getDailyData(); }
+  if (!getEthereumDataRUNNING){ runEthereumData(); }
 }
 
 httpServer.listen(httpPort, hostname, () => { log(`Server running at http://${hostname}:${httpPort}/`);});
@@ -256,6 +259,7 @@ io.on('connection', (socket) => {
   socket.emit("currentDay", currentDayGlobal);
   socket.emit("liveData", liveData);
   socket.emit("currencyRates", currencyRates);
+  socket.emit("ethereumData", ethereumData);
 
   socket.on("sendLatestData", (arg) => { // delete later
     if (rowData && arg && Number.isInteger(arg)) {
@@ -369,8 +373,13 @@ const job40 = schedule.scheduleJob(rule40, function(){
 //	}, priceTimer); }
 
 var jobLive = schedule.scheduleJob("*/1 * * * *", function() { 
-  runLiveData();
+  getAllLiveData();
 });
+
+async function getAllLiveData(){
+  await runLiveData();
+  await runEthereumData();
+}
 
 const ruleCurrentDay = new schedule.RecurrenceRule();
 ruleCurrentDay.hour = 0;
@@ -479,6 +488,76 @@ var DailyStatSchema = new Schema({
 });
 
 const DailyStat = mongoose.model('DailyStat', DailyStatSchema);
+
+async function runEthereumData() {
+  try {
+  await sleep(300);
+  if (!getDataRunning && !getEthereumDataRUNNING){
+    var ethereumDataNew = await getEthereumData();
+    //console.log(ethereumDataNew);
+    if (ethereumDataNew && (JSON.stringify(ethereumDataNew) !== JSON.stringify(ethereumData))){
+      ethereumData = ethereumDataNew;
+      io.emit("ethereumData", ethereumData);
+    }
+  }
+  } catch (error){
+    log("runEthereumData() --- ERROR --- " + error.toString());
+  } finally {
+    getEthereumDataRUNNING = false;
+  }
+}
+
+async function getEthereumData() {
+  getEthereumDataRUNNING = true;
+  log("getEthereumData()");
+  try {
+  if (!getDataRunning){
+    var price = await getEthereumPrice(); await sleep(2000);
+    var {low, average, high} = await getGas(); await sleep(1000);
+    
+    return {
+      price: price,
+      erc20transfer: (average * 65000 / 1000000000 * price),
+      uniswapSwap: (average * 200000 / 1000000000 * price),
+      addLiquidity: (average * 175000 / 1000000000 * price),
+    };
+  }
+  } catch (error){
+    log("getEthereumData() --- ERROR --- " + error.toString());
+  } finally {
+    getEthereumDataRUNNING = false;
+  }
+}
+
+async function getEthereumPrice(){
+  var url = "https://api.etherscan.io/api?module=stats&action=ethprice&apikey=" + CONFIG.etherscan.apiKey;
+  return await fetchRetry(url, {
+    method: 'GET',
+    highWaterMark: FETCH_SIZE,
+    headers: { 'Content-Type': 'application/json' }
+  })
+    .then(res => res.json())
+    .then(res => {
+		  return Number(res.result.ethusd);
+  });
+}
+
+async function getGas(){
+  var url = "https://api.etherscan.io/api?module=gastracker&action=gasoracle&apikey=" + CONFIG.etherscan.apiKey;
+  return await fetchRetry(url, {
+    method: 'GET',
+    highWaterMark: FETCH_SIZE,
+    headers: { 'Content-Type': 'application/json' }
+  })
+    .then(res => res.json())
+    .then(res => {
+    return {
+    	low: res.result.SafeGasPrice,
+      average: res.result.ProposeGasPrice,
+      high: res.result.FastGasPrice
+    };
+  });
+}
 
 async function runLiveData() {
   try {

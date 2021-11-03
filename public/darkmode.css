@@ -87,12 +87,12 @@ thead .grey {
   background-color: #000 !important;
 }
 
-#divLiveSectionHeader {
+#divLiveSectionHeader, #divEthereumSectionHeader {
   color:white;
   background-color: #10172d;
 }
 
-#divLiveSection {
+#divLiveSection, #divEthereumSection {
   color:white;
   background-color: #10172d;
 }

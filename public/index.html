@@ -325,10 +325,10 @@
                     name: 'T-Share Price',
                     data: result_TsharePrice
                 },
-                {
-                    name: 'HEX Price',
-                    data: result_HEXPrice
-                },
+                //{
+                //    name: 'HEX Price',
+                //    data: result_HEXPrice
+                //},
                 ],
                 xaxis: {
                     type: 'datetime',
@@ -339,11 +339,12 @@
                     logarithmic: true,
                     opposite: false,
                 }, 
-                {
-                    labels: { style: { colors: 'white', }, formatter: function (value) { return "$" + value.toFixed(5); }, },
-                    logarithmic: false,
-                    opposite: true,
-                }],
+                //{
+                //    labels: { style: { colors: 'white', }, formatter: function (value) { return "$" + value.toFixed(5); }, },
+                //    logarithmic: true,
+                    //opposite: true,
+                //}
+                ],
                 markers: {
                     size: 0
                 },

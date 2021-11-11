@@ -220,7 +220,7 @@ async function buildHexSiteData(rowDataObjects){
 
         priceUV2UV3_Array: prices,
 
-        stakedHEX: liveData ? liveData.stakedHEX : rowDataObjects[0].stakedHEX,
+        stakedHEX: rowDataObjects[0].stakedHEX, //liveData ? liveData.stakedHEX : 
       }
 
       return json;

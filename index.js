@@ -219,6 +219,8 @@ async function buildHexSiteData(rowDataObjects){
         tshareRateUSD_Highest: highestTshareRateUSD,
 
         priceUV2UV3_Array: prices,
+
+        stakedHEX: liveData ? liveData.stakedHEX : rowDataObjects[0].stakedHEX,
       }
 
       return json;
@@ -625,6 +627,7 @@ async function getLiveData() {
       liquidityETH: liquidityUV2UV3_ETH,
       penaltiesHEX: penaltiesHEX,
       payoutPerTshare: payoutPerTshare,
+      stakedHEX: stakedHEX,
     };
   }
   } catch (error){

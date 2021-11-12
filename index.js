@@ -208,6 +208,18 @@ async function buildHexSiteData(rowDataObjects){
 
       var prices = rowDataObjects.map(a => a.priceUV2UV3).reverse();
 
+      var pricesBitcoin = await getPriceHistory_Bitcoin(); await sleep(500);
+      var pricesEthereum = await getPriceHistory_Ethereum(); await sleep(500);
+      var pricesGold = await getPriceHistory_Gold(); await sleep(500);
+
+      var priceHistory = {
+        btc: pricesBitcoin,
+        eth: pricesEthereum,
+        gold: pricesGold
+      }
+
+      var priceATH = await getPriceAllTimeHigh(); //await sleep(300);
+
       var json = {
         averageStakeLength: rowDataObjects[0].averageStakeLength,
         numberOfHolders: rowDataObjects[0].numberOfHolders,
@@ -216,11 +228,15 @@ async function buildHexSiteData(rowDataObjects){
         currentStakerCountChange: rowDataObjects[0].currentStakerCountChange,
         totalValueLocked: rowDataObjects[0].totalValueLocked,
 
+        stakedHEX: liveData ? liveData.stakedHEX : rowDataObjects[0].stakedHEX,
+        circulatingHEX: liveData ? liveData.circulatingHEX : rowDataObjects[0].circulatingHEX,
+
         tshareRateUSD_Highest: highestTshareRateUSD,
 
-        priceUV2UV3_Array: prices,
+        priceATH: priceATH,
 
-        stakedHEX: rowDataObjects[0].stakedHEX, //liveData ? liveData.stakedHEX : 
+        priceUV2UV3_Array: prices,
+        priceHistory: priceHistory,
       }
 
       return json;
@@ -234,9 +250,9 @@ async function buildHexSiteData(rowDataObjects){
 }
 
 async function grabData() {
-  if (!getRowDataRunning){ getRowData(); }
   if (!getLiveDataRUNNING){ await runLiveData(); }
   if (!getCurrencyDataRunning){ getCurrencyData(); };
+  if (!getRowDataRunning){ getRowData(); }
   if (!getDataRunning){ await getDailyData(); }
   if (!getEthereumDataRUNNING){ runEthereumData(); }
 }
@@ -382,6 +398,15 @@ async function getAllLiveData(){
   await runLiveData();
   await runEthereumData();
 }
+
+var jobLive15 = schedule.scheduleJob("*/15 * * * *", function() { 
+  getHexSiteData();
+});
+
+async function getHexSiteData(){
+  if (rowDataObjects) { hexSiteData = await buildHexSiteData(rowDataObjects); }
+}
+
 
 const ruleCurrentDay = new schedule.RecurrenceRule();
 ruleCurrentDay.hour = 0;
@@ -628,6 +653,7 @@ async function getLiveData() {
       penaltiesHEX: penaltiesHEX,
       payoutPerTshare: payoutPerTshare,
       stakedHEX: stakedHEX,
+      circulatingHEX: circulatingHEX
     };
   }
   } catch (error){
@@ -3959,6 +3985,66 @@ async function getCurrencyRates(){
     return undefined;
   });
 }
+
+///////////////////////////////////////////////////
+// COINGECKO PRICES
+
+async function getPriceAllTimeHigh(){
+  var url = "https://api.coingecko.com/api/v3/coins/hex";
+  return await fetchRetry(url, {
+    method: 'GET',
+    highWaterMark: FETCH_SIZE,
+    headers: { 'Content-Type': 'application/json' }
+  })
+    .then(res => res.json())
+    .then(res => {
+      var priceATH = res.market_data.ath.usd;
+      return priceATH;
+  });
+}
+
+async function getPriceHistory_Bitcoin(){
+  var url = "https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=" + currentDayGlobal + "&interval=daily";
+  return await fetchRetry(url, {
+    method: 'GET',
+    highWaterMark: FETCH_SIZE,
+    headers: { 'Content-Type': 'application/json' }
+  })
+    .then(res => res.json())
+    .then(res => {
+      var prices = res.prices.map(e => e[1]);
+      return prices;
+  });
+}
+
+async function getPriceHistory_Ethereum(){
+  var url = "https://api.coingecko.com/api/v3/coins/ethereum/market_chart?vs_currency=usd&days=" + currentDayGlobal + "&interval=daily";
+  return await fetchRetry(url, {
+    method: 'GET',
+    highWaterMark: FETCH_SIZE,
+    headers: { 'Content-Type': 'application/json' }
+  })
+    .then(res => res.json())
+    .then(res => {
+      var prices = res.prices.map(e => e[1]);
+      return prices;
+  });
+}
+
+async function getPriceHistory_Gold(){
+  var url = "https://api.coingecko.com/api/v3/coins/pax-gold/market_chart?vs_currency=usd&days=" + currentDayGlobal + "&interval=daily";
+  return await fetchRetry(url, {
+    method: 'GET',
+    highWaterMark: FETCH_SIZE,
+    headers: { 'Content-Type': 'application/json' }
+  })
+    .then(res => res.json())
+    .then(res => {
+      var prices = res.prices.map(e => e[1]);
+      return prices;
+  });
+}
+
 
 ///////////////////////////////////////////////////
 // TWITTER

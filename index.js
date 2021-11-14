@@ -4114,11 +4114,11 @@ async function tweet(dailyStat){
   //tweetStatus += "APY Rate - " + Number(dailyStat.actualAPYRate).toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2}) + "%\r\n";
   tweetStatus += "\r\n";
 
-  var {amount, symbol} = nFormatter(dailyStat.liquidityUV2UV3_HEX, 1);
-  tweetStatus += "HEX Liquidity - " + Number(amount).toLocaleString(undefined) + symbol + "\r\n";
-  var liquidityUSDCFormatted = nFormatter(dailyStat.liquidityUV2UV3_USDC, 1);
-  tweetStatus += "USDC Liquidity - " + Number(liquidityUSDCFormatted.amount).toLocaleString(undefined) + liquidityUSDCFormatted.symbol + "\r\n";
-  tweetStatus += "\r\n";
+  //var {amount, symbol} = nFormatter(dailyStat.liquidityUV2UV3_HEX, 1);
+  //tweetStatus += "HEX Liquidity - " + Number(amount).toLocaleString(undefined) + symbol + "\r\n";
+  //var liquidityUSDCFormatted = nFormatter(dailyStat.liquidityUV2UV3_USDC, 1);
+  //tweetStatus += "USDC Liquidity - " + Number(liquidityUSDCFormatted.amount).toLocaleString(undefined) + liquidityUSDCFormatted.symbol + "\r\n";
+  //tweetStatus += "\r\n";
 
   tweetStatus += "Current Holders - " + Number(dailyStat.currentHolders).toLocaleString(undefined) + " (+" + Number(dailyStat.currentHoldersChange).toLocaleString(undefined) + ")" + "\r\n";
   tweetStatus += "Current Stakers - " + Number(dailyStat.currentStakerCount).toLocaleString(undefined) + " (+" + Number(dailyStat.currentStakerCountChange).toLocaleString(undefined) + ")" + "\r\n";

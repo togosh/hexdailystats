@@ -210,21 +210,19 @@
                 "<div style='height: 24px'>" +
                     "<div style='float: left;'><b>Penalties</b>&nbsp;</div>" +
                     "<div style='float: right;'>" + getLiqiudityString(data.penaltiesHEX, 1) + " HEX</div>" +
+                "</div>" +
+                "<div style='height: 24px'>" +
+                    "<div style='float: left;'><b>Liquidity HEX</b>&nbsp;</div>" +
+                    "<div style='float: right;'>" + getLiqiudityString(data.liquidityHEX, 1) + " HEX</div>" +
+                "</div>" +
+                "<div style='height: 24px'>" +
+                    "<div style='float: left;'><b>Liquidity USDC</b>&nbsp;</div>" +
+                    "<div style='float: right;'>" + getLiqiudityString(data.liquidityUSDC, 1) + " USD</div>" +
+                "</div>" +
+                "<div style='height: 24px'>" +
+                    "<div style='float: left;'><b>Liquidity ETH</b>&nbsp;</div>" +
+                    "<div style='float: right;'>" + getLiqiudityString(data.liquidityETH, 1) + " ETH</div>" +
                 "</div>";
-                
-                //+
-                //"<div style='height: 24px'>" +
-                //    "<div style='float: left;'><b>Liquidity HEX</b>&nbsp;</div>" +
-                //    "<div style='float: right;'>" + getLiqiudityString(data.liquidityHEX, 1) + " HEX</div>" +
-                //"</div>" +
-                //"<div style='height: 24px'>" +
-                //    "<div style='float: left;'><b>Liquidity USDC</b>&nbsp;</div>" +
-                //    "<div style='float: right;'>" + getLiqiudityString(data.liquidityUSDC, 1) + " USD</div>" +
-                //"</div>" +
-                //"<div style='height: 24px'>" +
-                //    "<div style='float: left;'><b>Liquidity ETH</b>&nbsp;</div>" +
-                //    "<div style='float: right;'>" + getLiqiudityString(data.liquidityETH, 1) + " ETH</div>" +
-                //"</div>";
 
                 $("#divLiveSection").html(htmlNew);
             }

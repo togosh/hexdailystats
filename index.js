@@ -756,10 +756,6 @@ async function getDailyData() {
   log("*** 010 - liquidityUV2_HEXETH: " + liquidityUV2_HEXETH + " - liquidityUV2_ETH: " + liquidityUV2_ETH);
   var { liquidityUV3_HEX, liquidityUV3_USDC, liquidityUV3_ETH } = await getUniswapV3(); await sleep(500);
   log("*** 011 - liquidityUV3_HEX: " + liquidityUV3_HEX + " - liquidityUV3_USDC: " + liquidityUV3_USDC + " - liquidityUV3_ETH: " + liquidityUV3_ETH);
-  liquidityUV2_HEXUSDC = 0;
-  liquidityUV2_USDC = 0;
-  liquidityUV2_HEXETH = 0;
-  liquidityUV2_ETH = 0
   liquidityUV3_HEX = 0;
   liquidityUV3_USDC = 0;
   liquidityUV3_ETH = 0;
@@ -810,7 +806,7 @@ async function getDailyData() {
   var priceChangeUV2          = parseFloat((priceUV2 - previousDailyStat.priceUV2).toFixed(4));
   var priceChangeUV3          = parseFloat((priceUV3 - previousDailyStat.priceUV3).toFixed(4));
 
-  var priceUV2UV3             = parseFloat(((priceUV2 * (liquidityUV2_USDC / liquidityUV2UV3_USDC)) + (priceUV3 * (liquidityUV3_USDC / liquidityUV2UV3_USDC))).toFixed(8));
+  var priceUV2UV3             = priceUV2; //parseFloat(((priceUV2 * (liquidityUV2_USDC / liquidityUV2UV3_USDC)) + (priceUV3 * (liquidityUV3_USDC / liquidityUV2UV3_USDC))).toFixed(8));
   var priceChangeUV2UV3       = parseFloat((((priceUV2UV3 / previousDailyStat.priceUV2UV3) - 1) * 100).toFixed(8));
 
   var tshareRateIncrease      = (tshareRateHEX - previousDailyStat.tshareRateHEX);

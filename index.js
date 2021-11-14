@@ -756,6 +756,13 @@ async function getDailyData() {
   log("*** 010 - liquidityUV2_HEXETH: " + liquidityUV2_HEXETH + " - liquidityUV2_ETH: " + liquidityUV2_ETH);
   var { liquidityUV3_HEX, liquidityUV3_USDC, liquidityUV3_ETH } = await getUniswapV3(); await sleep(500);
   log("*** 011 - liquidityUV3_HEX: " + liquidityUV3_HEX + " - liquidityUV3_USDC: " + liquidityUV3_USDC + " - liquidityUV3_ETH: " + liquidityUV3_ETH);
+  liquidityUV2_HEXUSDC = 0;
+  liquidityUV2_USDC = 0;
+  liquidityUV2_HEXETH = 0;
+  liquidityUV2_ETH = 0
+  liquidityUV3_HEX = 0;
+  liquidityUV3_USDC = 0;
+  liquidityUV3_ETH = 0;
 
   var numberOfHolders = await get_numberOfHolders();
   var numberOfHoldersChange = (numberOfHolders - previousDailyStat.numberOfHolders);
@@ -1901,27 +1908,36 @@ async function getUniswapV3() {
     var liquidityUV3_USDC = 0;
     var liquidityUV3_ETH = 0;
     var liquidityUV3_HEX = 0;
-    for(var i = 0; i < res.data.pools.length; i++) {
-      var token0Name = res.data.pools[i].token0.name;
-      var token1Name = res.data.pools[i].token1.name;
-      var token0TVL = res.data.pools[i].totalValueLockedToken0;
-      var token1TVL = res.data.pools[i].totalValueLockedToken1;
 
-      if (token0Name == "HEX" && token1Name == "USD Coin") {
-        liquidityUV3_HEX += token0TVL;
-        liquidityUV3_USDC = token1TVL;
-      } 
-      
-      if (token0Name == "HEX" && token1Name == "Wrapped Ether") {
-        liquidityUV3_HEX += token0TVL;
-        liquidityUV3_ETH = token1TVL;
+    if (res && res.data && res.data.pools) {
+      for(var i = 0; i < res.data.pools.length; i++) {
+        var token0Name = res.data.pools[i].token0.name;
+        var token1Name = res.data.pools[i].token1.name;
+        var token0TVL = res.data.pools[i].totalValueLockedToken0;
+        var token1TVL = res.data.pools[i].totalValueLockedToken1;
+  
+        if (token0Name == "HEX" && token1Name == "USD Coin") {
+          liquidityUV3_HEX += token0TVL;
+          liquidityUV3_USDC = token1TVL;
+        } 
+        
+        if (token0Name == "HEX" && token1Name == "Wrapped Ether") {
+          liquidityUV3_HEX += token0TVL;
+          liquidityUV3_ETH = token1TVL;
+        }
       }
-    }
-
-    return {
-      liquidityUV3_HEX: parseInt(liquidityUV3_HEX), //parseFloat(parseFloat(liquidityUV3_HEX).toFixed(4)),
-      liquidityUV3_USDC: parseInt(liquidityUV3_USDC), //parseFloat(parseFloat(liquidityUV3_USDC).toFixed(4)),
-      liquidityUV3_ETH: parseInt(liquidityUV3_ETH), //parseFloat(parseFloat(liquidityUV3_ETH).toFixed(4))
+  
+      return {
+        liquidityUV3_HEX: parseInt(liquidityUV3_HEX), //parseFloat(parseFloat(liquidityUV3_HEX).toFixed(4)),
+        liquidityUV3_USDC: parseInt(liquidityUV3_USDC), //parseFloat(parseFloat(liquidityUV3_USDC).toFixed(4)),
+        liquidityUV3_ETH: parseInt(liquidityUV3_ETH), //parseFloat(parseFloat(liquidityUV3_ETH).toFixed(4))
+      }
+    } else {
+      return {
+        liquidityUV3_HEX: 0,
+        liquidityUV3_USDC: 0,
+        liquidityUV3_ETH: 0,
+      }
     }
   });
 }

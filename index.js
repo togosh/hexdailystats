@@ -53,6 +53,13 @@ var fetchRetry = require('fetch-retry')(fetch, {
       }
     }
   });
+
+  
+  var getRowData = async () => {
+    await MongoDb.getRowData(); 
+    hexSiteData = await buildHexSiteData(rowDataObjects); 
+    io.emit("rowData", rowData);
+  }
 const HEX_CONTRACT_ADDRESS = "0x2b591e99afe9f32eaa6214f7b7629768c40eeb39";
 const HEX_CONTRACT_CURRENTDAY = "0x5c9302c9";
 const HEX_CONTRACT_GLOBALINFO = "0xf04b5fa0";
@@ -190,9 +197,9 @@ async function buildHexSiteData(rowDataObjects){
 
       var prices = rowDataObjects.map(a => a.priceUV2UV3).reverse();
 
-      var pricesBitcoin = await Coingecko.getPriceHistory_Bitcoin(); await sleep(500);
-      var pricesEthereum = await Coingecko.getPriceHistory_Ethereum(); await sleep(500);
-      var pricesGold = await Coingecko.getPriceHistory_Gold(); await sleep(500);
+      var pricesBitcoin = await Coingecko.getPriceHistory_Bitcoin(currentDayGlobal); await sleep(500);
+      var pricesEthereum = await Coingecko.getPriceHistory_Ethereum(currentDayGlobal); await sleep(500);
+      var pricesGold = await Coingecko.getPriceHistory_Gold(currentDayGlobal); await sleep(500);
 
       var priceHistory = {
         btc: pricesBitcoin,
@@ -271,11 +278,6 @@ io.on('connection', (socket) => {
     }
   });
 
-  var getRowData = async () => {
-    await MongoDb.getRowData(); 
-    hexSiteData = await buildHexSiteData(rowDataObjects); 
-    io.emit("rowData", rowData);
-  }
 
   //createAllRows();
   //update_shiftRowsDown();

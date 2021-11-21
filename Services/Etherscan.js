@@ -96,10 +96,15 @@ async function getCurrentDay(){
       var totalTshares = parseInt(chunks[5], 16).toString();
       totalTshares = totalTshares.substring(0, totalTshares.length - 12) + "." + totalTshares.substring(totalTshares.length - 12);
   
+      var penalties = parseInt(chunks[3], 16).toString(); 
+      penalties = penalties.substring(0, penalties.length - 8) + "." + penalties.substring(penalties.length - 8);
+      penalties = parseFloat(penalties) * 2.0;
+
       return {
         circulatingHEX: parseInt(circulatingSupply),
         stakedHEX: parseInt(lockedHEX),
         totalTshares: parseFloat(totalTshares),
+        penaltiesHEX: penalties,
       };
     });
   }

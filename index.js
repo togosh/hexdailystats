@@ -504,8 +504,7 @@ async function getLiveData() {
       return undefined;
     }
 
-    var penaltiesHEX = await get_dailyPenalties(false); await sleep(500);
-    var { circulatingHEX, stakedHEX, totalTshares } = await Etherscan.getGlobalInfo(); await sleep(500);
+    var { circulatingHEX, stakedHEX, totalTshares, penaltiesHEX } = await Etherscan.getGlobalInfo(); await sleep(500);
 
     var payout = ((circulatingHEX + stakedHEX) * 10000 / 100448995) + (penaltiesHEX / 2.0);
     var payoutPerTshare = (payout / totalTshares);
@@ -565,8 +564,8 @@ async function getDailyData() {
   var tshareRateHEX = await TheGraph.get_shareRateChange(); await sleep(250);
   log("*** 005 - tshareRateHEX: " + tshareRateHEX);
 
-  var { circulatingHEX, stakedHEX } = await Etherscan.getGlobalInfo(); await sleep(250);
-  log("*** 006 - circulatingHEX: " + circulatingHEX + " - stakedHEX: " + stakedHEX);
+  var { circulatingHEX, stakedHEX, penaltiesHEX } = await Etherscan.getGlobalInfo(); await sleep(250);
+  log("*** 006 - circulatingHEX: " + circulatingHEX + " - stakedHEX: " + stakedHEX + " - penaltiesHEX: " + penaltiesHEX);
 
   var priceUV2 = await TheGraph.getUniswapV2HEXDailyPrice(); await sleep(1000);
   log("*** 007 - priceUV2: " + priceUV2);
@@ -589,8 +588,8 @@ async function getDailyData() {
   log("*** 013 - averageStakeLength: " + averageStakeLength + " - currentStakerCount: " + currentStakerCount);
 
   // Core Historical
-  var penaltiesHEX = await get_dailyPenalties(); await sleep(500);
-  log("*** 014 - penaltiesHEX: " + penaltiesHEX);
+  //var penaltiesHEX = await get_dailyPenalties(); await sleep(500);
+  //log("*** 014 - penaltiesHEX: " + penaltiesHEX);
 
   var { dailyPayoutHEX, totalTshares } = await get_dailyDataUpdatePolling(currentDay); await sleep(500);
   log("*** 015 - dailyPayoutHEX: " + dailyPayoutHEX + " - totalTshares: " + totalTshares);

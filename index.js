@@ -82,6 +82,7 @@ var hexSiteData = undefined;
 var getEthereumDataRUNNING = false;
 var ethereumData = undefined;
 var DailyStat = MongoDb.DailyStat;
+var Connection = MongoDb.Connection;
 
 let getMongoData = async () => { 
   getRowDataPackage = await MongoDb.getRowData();

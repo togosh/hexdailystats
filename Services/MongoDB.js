@@ -1401,7 +1401,8 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 module.exports = {
-    DailyStat: DailyStat 
+    DailyStat: DailyStat
+    ,Connection: Connection 
     ,getRowData: async () => {
        return await getRowData();
     }

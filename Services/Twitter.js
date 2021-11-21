@@ -150,6 +150,10 @@ async function tweetBshare(dailyStat){
 	return '';
 }
 
+function log(message){
+  console.log(new Date().toISOString() + ", " + message);
+}
+
 module.exports = { 
     tweet: async (dailyStat) => {
        return await tweet(dailyStat);

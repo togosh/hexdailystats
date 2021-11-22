@@ -56,7 +56,11 @@ var fetchRetry = require('fetch-retry')(fetch, {
 
   
   var getRowData = async () => {
-    await MongoDb.getRowData(); 
+    returnPackage = await MongoDb.getRowData(); 
+    
+    rowData = returnPackage.rowData;
+    rowDataObjects = returnPackage.rowDataObjects;
+
     hexSiteData = await buildHexSiteData(rowDataObjects); 
     io.emit("rowData", rowData);
   }

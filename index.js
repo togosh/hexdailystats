@@ -547,10 +547,10 @@ async function getDailyData() {
 
   // Check if Current Row of Data already exists
   var currentDailyStat = await DailyStat.findOne({currentDay: { $eq: currentDay }});
-  //if (!isEmpty(currentDailyStat)) {
-  //  log('getDailyData() --- WARNING - Current Daily Stat already set - Day#: ' + currentDay);
+  if (!isEmpty(currentDailyStat)) {
+    log('getDailyData() --- WARNING - Current Daily Stat already set - Day#: ' + currentDay);
     return;
-  //}
+  }
   log("*** 002 - currentDay row doesnt exist!");
 
   var blockNumber = await TheGraph.getEthereumBlock(currentDay);  await sleep(250);
@@ -567,6 +567,7 @@ async function getDailyData() {
 
   var { circulatingHEX, stakedHEX, penaltiesHEX } = await Etherscan.getGlobalInfo(); await sleep(250);
   log("*** 006 - circulatingHEX: " + circulatingHEX + " - stakedHEX: " + stakedHEX + " - penaltiesHEX: " + penaltiesHEX);
+  if (currentDay == 721){ penaltiesHEX = 403605199; }
 
   var priceUV2 = await TheGraph.getUniswapV2HEXDailyPrice(); await sleep(1000);
   log("*** 007 - priceUV2: " + priceUV2);

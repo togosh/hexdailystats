@@ -569,9 +569,8 @@ async function getDailyData() {
   var tshareRateHEX = await TheGraph.get_shareRateChange(); await sleep(250);
   log("*** 005 - tshareRateHEX: " + tshareRateHEX);
 
-  var { circulatingHEX, stakedHEX, penaltiesHEX } = await Etherscan.getGlobalInfo(); await sleep(250);
-  log("*** 006 - circulatingHEX: " + circulatingHEX + " - stakedHEX: " + stakedHEX + " - penaltiesHEX: " + penaltiesHEX);
-  if (currentDay == 721){ penaltiesHEX = 403605199; }
+  var { circulatingHEX, stakedHEX } = await Etherscan.getGlobalInfo(); await sleep(250);
+  log("*** 006 - circulatingHEX: " + circulatingHEX + " - stakedHEX: " + stakedHEX);
 
   var priceUV2 = await TheGraph.getUniswapV2HEXDailyPrice(); await sleep(1000);
   log("*** 007 - priceUV2: " + priceUV2);
@@ -613,6 +612,9 @@ async function getDailyData() {
 
 
   // Calculated Values
+  var penaltiesHEX = (dailyPayoutHEX - ((circulatingHEX + stakedHEX) * 10000 / 100448995)) * 2;
+  log("*** 019 - penaltiesHEX: " + penaltiesHEX);
+
   var totalTsharesChange      = (totalTshares - previousDailyStat.totalTshares);
   var payoutPerTshareHEX      = (dailyPayoutHEX / totalTshares);
   var actualAPYRate           = parseFloat(((dailyPayoutHEX / stakedHEX) * 365.25 * 100).toFixed(2));

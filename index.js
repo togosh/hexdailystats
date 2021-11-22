@@ -547,10 +547,10 @@ async function getDailyData() {
 
   // Check if Current Row of Data already exists
   var currentDailyStat = await DailyStat.findOne({currentDay: { $eq: currentDay }});
-  if (!isEmpty(currentDailyStat)) {
-    log('getDailyData() --- WARNING - Current Daily Stat already set - Day#: ' + currentDay);
+  //if (!isEmpty(currentDailyStat)) {
+  //  log('getDailyData() --- WARNING - Current Daily Stat already set - Day#: ' + currentDay);
     return;
-  }
+  //}
   log("*** 002 - currentDay row doesnt exist!");
 
   var blockNumber = await TheGraph.getEthereumBlock(currentDay);  await sleep(250);

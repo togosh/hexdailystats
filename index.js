@@ -596,9 +596,6 @@ async function getDailyData() {
   //var penaltiesHEX = await get_dailyPenalties(); await sleep(500);
   //log("*** 014 - penaltiesHEX: " + penaltiesHEX);
 
-  var { dailyPayoutHEX, totalTshares } = await get_dailyDataUpdatePolling(currentDay); await sleep(500);
-  log("*** 015 - dailyPayoutHEX: " + dailyPayoutHEX + " - totalTshares: " + totalTshares);
-
   var { stakedHEXGA } = await get_stakeStartGADataHistorical(blockNumber);
   log("*** 016 - stakedHEXGA: " + stakedHEXGA);
 
@@ -610,10 +607,13 @@ async function getDailyData() {
   var totalStakerCountChange = (getNum(totalStakerCount) - getNum(previousDailyStat.totalStakerCount))
   log("*** 018 - totalStakerCount: " + totalStakerCount + " - totalStakerCountChange: " + totalStakerCountChange);
 
+  var { dailyPayoutHEX, totalTshares } = await get_dailyDataUpdatePolling(currentDay); await sleep(500);
+  log("*** 019 - dailyPayoutHEX: " + dailyPayoutHEX + " - totalTshares: " + totalTshares);
+
 
   // Calculated Values
   var penaltiesHEX = (dailyPayoutHEX - ((circulatingHEX + stakedHEX) * 10000 / 100448995)) * 2;
-  log("*** 019 - penaltiesHEX: " + penaltiesHEX);
+  log("*** 020 - penaltiesHEX: " + penaltiesHEX);
 
   var totalTsharesChange      = (totalTshares - previousDailyStat.totalTshares);
   var payoutPerTshareHEX      = (dailyPayoutHEX / totalTshares);
@@ -874,7 +874,7 @@ async function get_dailyDataUpdatePolling(currentDay) {
     }
     await sleep(30000);
     count += 1;
-    if (count > 50) {
+    if (count > 240) {
       return {
         dailyPayoutHEX: -1,
         totalTshares: -1

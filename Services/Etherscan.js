@@ -1,9 +1,11 @@
-var CONFIG = require('../config.json');
-var DEBUG = CONFIG.debug;
-const HEX_CONTRACT_ADDRESS = "0x2b591e99afe9f32eaa6214f7b7629768c40eeb39";
-const HEX_CONTRACT_CURRENTDAY = "0x5c9302c9";
-const HEX_CONTRACT_GLOBALINFO = "0xf04b5fa0";
-const FETCH_SIZE = 1048576;
+const h = require('../Helpers/helpers'); 
+const CONFIG = h.CONFIG;
+const HEX_CONTRACT_ADDRESS = h.HEX_CONTRACT_ADDRESS;
+const HEX_CONTRACT_CURRENTDAY = h.HEX_CONTRACT_CURRENTDAY;
+const HEX_CONTRACT_GLOBALINFO = h.HEX_CONTRACT_GLOBALINFO;
+const FETCH_SIZE = h.FETCH_SIZE;
+const fetchRetry = h.fetchRetry;
+
 function chunkSubstr(str, size) {
   const numChunks = Math.ceil(str.length / size);
   const chunks = new Array(numChunks);
@@ -13,40 +15,8 @@ function chunkSubstr(str, size) {
   }
 
   return chunks;
-}
-const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
-var fetchRetry = require('fetch-retry')(fetch, { 
-    retryOn: async function(attempt, error, response) {
-      if (attempt > 3) { return false; }
-  
-      if (error !== null) {
-        log(`FETCH --- RETRY ${attempt + 1} --- ERROR --- ` + error.toString()); await sleep(500);
-        return true;
-    } 
-  
-      if (response.status >= 400) {
-        log(`FETCH --- RETRY ${attempt + 1} --- STATUS --- ` + response.status); await sleep(500);
-        return true;
-      }
-  
-      try {
-        var response2 = await response.clone().buffer();
-        const json = JSON.parse(response2);
-  
-        if (json.errors && Object.keys(json.errors).length > 0) {
-            if (json.errors[0].message) {
-              log(`FETCH --- INTERNAL JSON ERROR --- ${attempt + 1} --- ` + json.errors[0].message); await sleep(500);
-              return true;
-            }
-        }
-        
-        return false;
-      } catch (error) {
-        log(`FETCH --- RETRY ${attempt + 1} --- JSON ---` + error.toString()); await sleep(500);
-        return true;
-      }
-    }
-  });
+} 
+
 //////////////////////////////////////
 //// ETHERSCAN
 
@@ -137,15 +107,7 @@ async function getCurrentDay(){
       };
     });
   }
-
-  function log(message){
-    console.log(new Date().toISOString() + ", " + message);
-  }
-
-  function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
-
+  
   module.exports = { 
     getCurrentDay: async () => {
        return await getCurrentDay();

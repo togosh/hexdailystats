@@ -1,5 +1,7 @@
-var CONFIG = require('../config.json');
-var DEBUG = CONFIG.debug;
+const h = require('../Helpers/helpers');
+const CONFIG = h.CONFIG;
+const DEBUG = CONFIG.debug;
+const log = h.log;
 
 ///////////////////////////////////////////////////
 // TWITTER
@@ -148,10 +150,6 @@ async function tweetBshare(dailyStat){
 	}
 
 	return '';
-}
-
-function log(message){
-  console.log(new Date().toISOString() + ", " + message);
 }
 
 function nFormatter(num, digits) {

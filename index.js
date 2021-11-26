@@ -1,11 +1,17 @@
-var MongoDb = require('./Services/MongoDB'); 
-var TheGraph = require('./Services/TheGraph'); 
-var Coingecko = require('./Services/Coingecko'); 
-var Twitter = require('./Services/Twitter'); 
-var Etherscan = require('./Services/Etherscan'); 
+const MongoDb = require('./Services/MongoDB'); 
+const TheGraph = require('./Services/TheGraph'); 
+const Coingecko = require('./Services/Coingecko'); 
+const Twitter = require('./Services/Twitter'); 
+const Etherscan = require('./Services/Etherscan'); 
+const h = require('./Helpers/helpers'); 
 
-var CONFIG = require('./config.json');
+const fetchRetry = h.fetchRetry;
+const FETCH_SIZE = h.FETCH_SIZE;
+const sleep = h.sleep;
+const log = h.log;
+const CONFIG = h.CONFIG; 
 var DEBUG = CONFIG.debug;
+
 const http = require('http');
 require('es6-promise').polyfill();
  
@@ -19,55 +25,17 @@ var cors = require('cors');
 const { JSDOM } = require( "jsdom" );
 const { window } = new JSDOM( "" );
 const $ = require( "jquery" )( window );
-const FETCH_SIZE = 1048576;
-const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
-var fetchRetry = require('fetch-retry')(fetch, { 
-    retryOn: async function(attempt, error, response) {
-      if (attempt > 3) { return false; }
-  
-      if (error !== null) {
-        log(`FETCH --- RETRY ${attempt + 1} --- ERROR --- ` + error.toString()); await sleep(500);
-        return true;
-      }
-  
-      if (response.status >= 400) {
-        log(`FETCH --- RETRY ${attempt + 1} --- STATUS --- ` + response.status); await sleep(500);
-        return true;
-      }
-  
-      try {
-        var response2 = await response.clone().buffer();
-        const json = JSON.parse(response2);
-  
-        if (json.errors && Object.keys(json.errors).length > 0) {
-            if (json.errors[0].message) {
-              log(`FETCH --- INTERNAL JSON ERROR --- ${attempt + 1} --- ` + json.errors[0].message); await sleep(500);
-              return true;
-            }
-        }
-        
-        return false;
-      } catch (error) {
-        log(`FETCH --- RETRY ${attempt + 1} --- JSON ---` + error.toString()); await sleep(500);
-        return true;
-      }
-    }
-  });
 
+var getRowData = async () => {
+  returnPackage = await MongoDb.getRowData(); 
   
-  var getRowData = async () => {
-    returnPackage = await MongoDb.getRowData(); 
-    
-    rowData = returnPackage.rowData;
-    rowDataObjects = returnPackage.rowDataObjects;
+  rowData = returnPackage.rowData;
+  rowDataObjects = returnPackage.rowDataObjects;
 
-    hexSiteData = await buildHexSiteData(rowDataObjects); 
-    io.emit("rowData", rowData);
-  }
-const HEX_CONTRACT_ADDRESS = "0x2b591e99afe9f32eaa6214f7b7629768c40eeb39";
-const HEX_CONTRACT_CURRENTDAY = "0x5c9302c9";
-const HEX_CONTRACT_GLOBALINFO = "0xf04b5fa0";
-
+  hexSiteData = await buildHexSiteData(rowDataObjects); 
+  io.emit("rowData", rowData);
+}
+  
 const HEX_PRICE_ALLTIMELOW = 0.00005645;
 
 var rowData = undefined;
@@ -760,29 +728,8 @@ async function getDailyData() {
   }
 }
 
-
-
 //////////////////////////////////////
 //// HELPER 
-
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-function chunkSubstr(str, size) {
-  const numChunks = Math.ceil(str.length / size);
-  const chunks = new Array(numChunks);
-
-  for (let i = 0, o = 0; i < numChunks; ++i, o += size) {
-    chunks[i] = str.substr(o, size);
-  }
-
-  return chunks;
-}
-
-function log(message){
-	console.log(new Date().toISOString() + ", " + message);
-}
 
 function isEmpty(obj) {
 	for(var prop in obj) {
@@ -792,11 +739,7 @@ function isEmpty(obj) {
 
 	return true;
 }
-
-function onlyUnique(value, index, self) {
-  return self.indexOf(value) === index;
-}
-
+  
 function getNum(val) {
   if (isNaN(val)) {
     return 0;
@@ -810,32 +753,6 @@ const objectsEqual = (o1, o2) =>
 
 const arraysEqual = (a1, a2) => 
    a1.length === a2.length && a1.every((o, idx) => objectsEqual(o, a2[idx]));
-
-function nFormatter(num, digits) {
-  try {
-      const lookup = [
-          { value: 1, symbol: "" },
-          { value: 1e3, symbol: "k" },
-          { value: 1e6, symbol: "M" },
-          { value: 1e9, symbol: "B" },
-          { value: 1e12, symbol: "T" }
-      ];
-      const rx = /\.0+$|(\.[0-9]*[1-9])0+$/;
-      var item = lookup.slice().reverse().find(function(item) {
-          return num >= item.value;
-      });
-
-      return { 
-          amount: (num / item.value).toFixed(digits).replace(rx, "$1"),
-          symbol: item.symbol
-      }
-  } catch {
-      return {
-          amount: 0,
-          symbol: ''
-      };
-  }
-}
 
 function throttle (callback, limit) {
   var wait = false;                  // Initially, we're not waiting
@@ -1198,7 +1115,6 @@ async function get_stakeStartGADataHistorical(blockNumber){
   }
 }
 
-
 async function get_stakeStartsCountHistorical(day){
   console.log("get_stakeStartsCountHistorical");
       try {
@@ -1234,8 +1150,6 @@ async function getAll_stakeStartsCountHistorical(blockNumber){
     uniqueStakerCount: uniqueAddressCount,
   }
 }
-
-
 
 ///////////////////////////////////////////////////
 // CURRENCY RATES

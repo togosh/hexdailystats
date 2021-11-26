@@ -1,13 +1,14 @@
-var Etherscan = require('./Etherscan'); 
-var CONFIG = require('../config.json');
-var DEBUG = CONFIG.debug;
-var mongoCollectionName = CONFIG.mongoCollectionName;
+const Etherscan = require('./Etherscan'); 
+const h = require('../Helpers/helpers'); 
+const CONFIG = h.CONFIG; 
+const log = h.log;
+const sleep = h.sleep;
+const mongoCollectionName = CONFIG.mongoCollectionName;
 require('es6-promise').polyfill();
 
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
-var rowData = undefined;
-var rowDataObjects = undefined; 
+var rowData = undefined; 
 
 var ConnectionSchema = new Schema({
 	created: {
@@ -1363,10 +1364,7 @@ async function create_totalStakerCountChanges(){
         
         await sleep(100);
       } } catch (error) { log("ERROR"); log(error); }
-  }
-  
-  
-  
+  } 
   
   ////////////////////////////////////////////
   // Copy Columns
@@ -1392,14 +1390,7 @@ async function create_totalStakerCountChanges(){
         await sleep(100);
       } } catch (error) { log("ERROR"); log(error); }
   }
-  
-  function log(message){
-	console.log(new Date().toISOString() + ", " + message);
-}
-
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
+   
 module.exports = {
     DailyStat: DailyStat
     ,Connection: Connection 

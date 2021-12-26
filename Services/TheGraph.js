@@ -9,9 +9,25 @@ const UNISWAP_V2_HEXUSDC = h.UNISWAP_V2_HEXUSDC;
 const UNISWAP_V2_HEXETH = h.UNISWAP_V2_HEXETH;
 const UNISWAP_V3_HEXUSDC = h.UNISWAP_V3_HEXUSDC;
 const UNISWAP_V3_HEXETH = h.UNISWAP_V3_HEXETH;
+const HEX_SUBGRAPH_API_ETHEREUM = h.HEX_SUBGRAPH_API_ETHEREUM;
 
+let get_latestStakeStartId = async (blockNumber) =>{
+  let query = `
+  query {
+    stakeStarts(
+      first: 1, 
+      orderBy: stakeId, 
+      orderDirection: desc,
+      block: {number: ` + blockNumber + `},
+    ) {
+      stakeId
+    }
+  }`; 
+  let data = await get_GraphData(query); 
+  return data['stakeStarts'];
+};
 async function get_stakeStartsCountHistoricalBlock($lastStakeId, blockNumber){
-    return await fetchRetry('https://api.thegraph.com/subgraphs/name/codeakk/hex', {
+    return await fetchRetry(HEX_SUBGRAPH_API_ETHEREUM, {
       method: 'POST',
       highWaterMark: FETCH_SIZE,
       headers: { 'Content-Type': 'application/json' },
@@ -62,7 +78,7 @@ async function get_stakeStartsCountHistoricalBlock($lastStakeId, blockNumber){
     });
   }
   async function get_stakeStartGAsHistorical($lastStakeId, blockNumber){
-    return await fetchRetry('https://api.thegraph.com/subgraphs/name/codeakk/hex', {
+    return await fetchRetry(HEX_SUBGRAPH_API_ETHEREUM, {
       method: 'POST',
       highWaterMark: FETCH_SIZE,
       headers: { 'Content-Type': 'application/json' },
@@ -126,7 +142,7 @@ async function get_stakeStartsCountHistoricalBlock($lastStakeId, blockNumber){
     );
   }
   async function get_tokenHolders_Historical(blockNumber, $lastNumeralIndex){
-    return await fetchRetry('https://api.thegraph.com/subgraphs/name/codeakk/hex', {
+    return await fetchRetry(HEX_SUBGRAPH_API_ETHEREUM, {
       method: 'POST',
       highWaterMark: FETCH_SIZE,
       headers: { 'Content-Type': 'application/json' },
@@ -180,7 +196,7 @@ async function get_stakeStartsCountHistoricalBlock($lastStakeId, blockNumber){
 
   
 async function get_numberOfHolders_Historical(blockNumber){
-    return await fetchRetry('https://api.thegraph.com/subgraphs/name/codeakk/hex', {
+    return await fetchRetry(HEX_SUBGRAPH_API_ETHEREUM, {
       method: 'POST',
       highWaterMark: FETCH_SIZE,
       headers: { 'Content-Type': 'application/json' },
@@ -210,7 +226,7 @@ async function get_numberOfHolders_Historical(blockNumber){
 
   
 async function get_stakeGoodAccountings_Historical(blockNumber, $lastStakeId, unixTimestamp, unixTimestampEnd){
-    return await fetchRetry('https://api.thegraph.com/subgraphs/name/codeakk/hex', {
+    return await fetchRetry(HEX_SUBGRAPH_API_ETHEREUM, {
       method: 'POST',
       highWaterMark: FETCH_SIZE,
       headers: { 'Content-Type': 'application/json' },
@@ -260,7 +276,7 @@ async function get_stakeGoodAccountings_Historical(blockNumber, $lastStakeId, un
   }
   
 async function get_stakeEnds_Historical(blockNumber, $lastStakeId, unixTimestamp, unixTimestampEnd){
-    return await fetchRetry('https://api.thegraph.com/subgraphs/name/codeakk/hex', {
+    return await fetchRetry(HEX_SUBGRAPH_API_ETHEREUM, {
       method: 'POST',
       highWaterMark: FETCH_SIZE,
       headers: { 'Content-Type': 'application/json' },
@@ -311,7 +327,7 @@ async function get_stakeEnds_Historical(blockNumber, $lastStakeId, unixTimestamp
 
   
 async function get_stakeStartsHistorical($lastStakeId, blockNumber){
-    return await fetchRetry('https://api.thegraph.com/subgraphs/name/codeakk/hex', {
+    return await fetchRetry(HEX_SUBGRAPH_API_ETHEREUM, {
       method: 'POST',
       highWaterMark: FETCH_SIZE,
       headers: { 'Content-Type': 'application/json' },
@@ -406,12 +422,11 @@ async function getEthereumBlock(day){
   
   const day2Epoch = 1575417600 + 86400;
   
-  async function get_shareRateChangeByDay(day){
-    var startTime = day2Epoch + ((day - 2) * 86400);
-    var endTime = startTime + 86400;
-    log("get_shareRateChangeByDay() --- startTime " + startTime + " endTime " + endTime + " day --- " + day);
+  async function get_shareRateChangeByTimestamp(timestamp){
+    
+    log("get_shareRateChangeByTimestamp() --- timestamp " + timestamp);
   
-    return await fetchRetry('https://api.thegraph.com/subgraphs/name/codeakk/hex', {
+    return await fetchRetry(HEX_SUBGRAPH_API_ETHEREUM, {
       method: 'POST',
       highWaterMark: FETCH_SIZE,
       headers: { 'Content-Type': 'application/json' },
@@ -422,8 +437,7 @@ async function getEthereumBlock(day){
             orderDirection: desc, 
             orderBy: timestamp,
             where: { 
-              timestamp_gte: ` + startTime + `,
-              timestamp_lt: ` + endTime + `,
+              timestamp_lt: ` + timestamp + `,
             } 
           ) {
             shareRate
@@ -597,7 +611,19 @@ async function getUniswapV2() {
     .then(res => console.log(res.data));
   }
   
-  async function getUniswapV2HEXETH(){
+  async function getUniswapV2HEXETH(day){
+
+    var startTime = day2Epoch + ((day - 2) * 86400);
+    var endTime = startTime - 86400;
+    let where = "";
+    
+    if (day != undefined ){
+      where = `
+          date_lt: ` + startTime + `,
+          date_gte: ` + endTime + `,
+        `
+    }
+
     return await fetchRetry('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2', {
       method: 'POST',
       highWaterMark: FETCH_SIZE,
@@ -606,7 +632,9 @@ async function getUniswapV2() {
         query {
           pairDayDatas (
             orderBy: id, orderDirection: desc, first: 1,
-            where: {pairAddress: "` + UNISWAP_V2_HEXETH + `"}){
+            where: {pairAddress: "` + UNISWAP_V2_HEXETH + `",
+            ` + where + `  
+          }){
            token0 {
              symbol
            }
@@ -683,10 +711,10 @@ async function getUniswapV2() {
     });
   }
   
-  async function getUniswapV2HEXUSDC_Polling(){
+  async function getUniswapV2HEXUSDC_Polling(day){
     var count = 0;
     while (true){
-      var { liquidityUV2_HEXUSDC, liquidityUV2_USDC } = await getUniswapV2HEXUSDC(); await sleep(1000);
+      var { liquidityUV2_HEXUSDC, liquidityUV2_USDC } = await getUniswapV2HEXUSDC(day); await sleep(1000);
       if ( liquidityUV2_HEXUSDC != 0 && liquidityUV2_USDC != 0){
         break;
       }
@@ -700,7 +728,19 @@ async function getUniswapV2() {
     return { liquidityUV2_HEXUSDC, liquidityUV2_USDC };
   }
   
-  async function getUniswapV2HEXUSDC(){
+  async function getUniswapV2HEXUSDC(day){
+
+    var startTime = day2Epoch + ((day - 2) * 86400);
+    var endTime = startTime - 86400;
+    let where = "";
+    
+    if (day != undefined ){
+      where = `
+          date_lt: ` + startTime + `,
+          date_gte: ` + endTime + `,
+        `
+    }
+
     return await fetchRetry('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2', {
       method: 'POST',
       highWaterMark: FETCH_SIZE,
@@ -709,7 +749,9 @@ async function getUniswapV2() {
         query {
           pairDayDatas (
             orderBy: id, orderDirection: desc, first: 1,
-            where: {pairAddress: "` + UNISWAP_V2_HEXUSDC + `"}){
+            where: {pairAddress: "` + UNISWAP_V2_HEXUSDC + `",
+            ` + where + ` 
+          }){
            token0 {
              symbol
            }
@@ -789,7 +831,19 @@ async function getUniswapV2() {
     });
   }
   
-  async function getUniswapV2HEXDailyPrice(){
+  async function getUniswapV2HEXDailyPrice(day){
+  
+    var startTime = day2Epoch + ((day - 2) * 86400);
+    var endTime = startTime - 86400;
+    let where = "";
+    
+    if (day != undefined ){
+      where = `
+          date_lt: ` + (startTime)+ `,
+          date_gte: ` + endTime + `,
+        `
+    }
+
     return await fetchRetry('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2', {
       method: 'POST',
       highWaterMark: FETCH_SIZE,
@@ -801,7 +855,8 @@ async function getUniswapV2() {
             orderBy: date, 
             orderDirection: desc, 
             where: { 
-              token: "` + HEX_CONTRACT_ADDRESS + `"
+              token: "` + HEX_CONTRACT_ADDRESS + `",
+              ` + where + `
             }) 
               { 
                 date
@@ -950,6 +1005,7 @@ async function getUniswapV2() {
   async function getUniswapV3() {
     //var pools = await getUniswapV3Pools();
     //await sleep(200);
+
     var pools = [ 
       UNISWAP_V3_HEXUSDC,
       UNISWAP_V3_HEXETH
@@ -965,7 +1021,8 @@ async function getUniswapV2() {
         query {
           pools (
             orderBy: volumeUSD, orderDirection: desc,
-            where: {id_in: ` + JSON.stringify(pools) + `}
+            where: {id_in: ` + JSON.stringify(pools) + `
+            }
           ){
             id
             token0 { name }
@@ -1018,7 +1075,7 @@ async function getUniswapV2() {
   }
 
   async function get_stakeEnds($lastStakeId, unixTimestamp, unixTimestampEnd){
-    return await fetchRetry('https://api.thegraph.com/subgraphs/name/codeakk/hex', {
+    return await fetchRetry(HEX_SUBGRAPH_API_ETHEREUM, {
       method: 'POST',
       highWaterMark: FETCH_SIZE,
       headers: { 'Content-Type': 'application/json' },
@@ -1067,7 +1124,7 @@ async function getUniswapV2() {
   }
   
   async function get_stakeGoodAccountings($lastStakeId, unixTimestamp, unixTimestampEnd){
-    return await fetchRetry('https://api.thegraph.com/subgraphs/name/codeakk/hex', {
+    return await fetchRetry(HEX_SUBGRAPH_API_ETHEREUM, {
       method: 'POST',
       highWaterMark: FETCH_SIZE,
       headers: { 'Content-Type': 'application/json' },
@@ -1116,14 +1173,15 @@ async function getUniswapV2() {
   }  
 
   
-async function get_stakeStarts($lastStakeId){
-    return await fetchRetry('https://api.thegraph.com/subgraphs/name/codeakk/hex', {
+async function get_stakeStarts($lastStakeId, blockNumber){
+    return await fetchRetry(HEX_SUBGRAPH_API_ETHEREUM, {
       method: 'POST',
       highWaterMark: FETCH_SIZE,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ query: `
         query {
-          stakeStarts(first: 1000, orderBy: stakeId, 
+          stakeStarts(first: 1000, orderBy: stakeId,  
+            block: {number: ` + blockNumber + `},
             where: { 
               stakeId_gt: "` + $lastStakeId + `",
               stakeEnd: null, 
@@ -1187,7 +1245,7 @@ async function get_stakeStarts($lastStakeId){
 
   async function get_dailyDataUpdate(currentDay){
     log("get_dailyDataUpdate");
-    return await fetchRetry('https://api.thegraph.com/subgraphs/name/codeakk/hex', {
+    return await fetchRetry(HEX_SUBGRAPH_API_ETHEREUM, {
       method: 'POST',
       highWaterMark: FETCH_SIZE,
       headers: { 'Content-Type': 'application/json' },
@@ -1239,7 +1297,7 @@ async function get_stakeStarts($lastStakeId){
   }
   
 async function get_shareRateChange(){
-  return await fetchRetry('https://api.thegraph.com/subgraphs/name/codeakk/hex', {
+  return await fetchRetry(HEX_SUBGRAPH_API_ETHEREUM, {
     method: 'POST',
     highWaterMark: FETCH_SIZE,
     headers: { 'Content-Type': 'application/json' },
@@ -1266,44 +1324,92 @@ async function get_shareRateChange(){
   });
 }
 
-async function get_numberOfHolders(){
-    return await fetchRetry('https://api.thegraph.com/subgraphs/name/codeakk/hex', {
-      method: 'POST',
-      highWaterMark: FETCH_SIZE,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ query: `
-        query {
-          tokenHolders(
-            first: 1, 
-            orderDirection: desc, 
-            orderBy: numeralIndex
-          ) {
-            numeralIndex
-          }
-        }` 
-      }),
+async function get_numberOfHolders(blockNumber){
+   let query = `
+      query {
+        tokenHolders( 
+          first: 1, 
+          block: {number: ` + blockNumber + `},
+          orderDirection: desc, 
+          orderBy: numeralIndex
+        ) {
+          numeralIndex
+        }
+      }`; 
+    let data = await get_GraphData(query);
+    var numberOfHolders = parseInt(data.tokenHolders[0].numeralIndex);
+    return numberOfHolders;
+}
+
+async function get_latestDay(){
+  let query = `
+     query {
+      dailyDataUpdates(
+        first: 1,
+        orderBy: endDay,
+        orderDirection: desc
+        ) {
+          endDay 
+        }
+     }`; 
+   let data = await get_GraphData(query);
+   var latestDay = parseInt(data.dailyDataUpdates[0].endDay);
+   return latestDay;
+}
+
+let get_globalInfoByDay = async (day) => {
+  let query = `
+      query {
+        globalInfos(
+        first: 1,
+        orderBy: timestamp,
+        orderDirection: asc,
+        where: { 
+          hexDay: ` + day + `,
+        } 
+        ) {
+          totalHeartsinCirculation
+          ,lockedHeartsTotal
+          ,blocknumber
+          ,timestamp
+        }
+      }`; 
+  let data = await get_GraphData(query); 
+  return data['globalInfos'];
+}
+
+async function get_GraphData(query){
+  let call = await fetchRetry(HEX_SUBGRAPH_API_ETHEREUM, {
+    method: 'POST',
+    highWaterMark: FETCH_SIZE,
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify
+    ({ 
+      query: query
     })
-    .then(res => res.json())
-    .then(res => {
-  
-      var numberOfHolders = parseInt(res.data.tokenHolders[0].numeralIndex);
-  
-      return numberOfHolders;
-    });
-  }
-  
+  });
+
+  let response = await call.json();
+  return response.data;
+   
+}
+
+
 module.exports = { 
-    getUniswapV2HEXDailyPrice: async () => { 
-        return await getUniswapV2HEXDailyPrice();
+    getUniswapV2HEXDailyPrice: async (day) => { 
+        return await getUniswapV2HEXDailyPrice(day);
     }
-    ,getUniswapV2HEXUSDC_Polling: async () => {
-        return await getUniswapV2HEXUSDC_Polling();
+    ,getUniswapV2HEXUSDC_Polling: async (day) => {
+        return await getUniswapV2HEXUSDC_Polling(day);
     }
-    ,getUniswapV2HEXETH: async () => {
-        return await getUniswapV2HEXETH();
+    ,getUniswapV2HEXETH: async (day) => {
+        return await getUniswapV2HEXETH(day);
     }
     ,getUniswapV3: async () => {
         return await getUniswapV3();
+    }
+    ,getUniswapV3Historical: async (blockNumber) => {
+        return await getUniswapV3Historical(blockNumber);
     }
     ,getEthereumBlock: async (day) => {
         return await getEthereumBlock(day);
@@ -1311,8 +1417,8 @@ module.exports = {
     ,get_shareRateChange: async () => {
         return await get_shareRateChange();
     } 
-    ,get_stakeStarts: async ($lastStakeId) => {
-        return await get_stakeStarts($lastStakeId);
+    ,get_stakeStarts: async ($lastStakeId, blockNumber) => {
+        return await get_stakeStarts($lastStakeId, blockNumber);
     }
     ,get_stakeEnds: async ($lastStakeId, unixTimestamp, unixTimestampEnd) => {
         return await get_stakeEnds($lastStakeId, unixTimestamp, unixTimestampEnd);
@@ -1320,8 +1426,8 @@ module.exports = {
     ,get_stakeGoodAccountings: async ($lastStakeId, unixTimestamp, unixTimestampEnd) => {
         return await get_stakeGoodAccountings($lastStakeId, unixTimestamp, unixTimestampEnd);
     }
-    ,get_numberOfHolders: async () => {
-        return await get_numberOfHolders();
+    ,get_numberOfHolders: async (blockNumber) => {
+        return await get_numberOfHolders(blockNumber);
     }
     ,get_dailyDataUpdate: async (currentDay) => {
         return await get_dailyDataUpdate(currentDay);
@@ -1343,6 +1449,18 @@ module.exports = {
     }
     ,get_stakeGoodAccountings_Historical: async (blockNumber, $lastStakeId, unixTimestamp, unixTimestampEnd) => {
         return await get_stakeGoodAccountings_Historical(blockNumber, $lastStakeId, unixTimestamp, unixTimestampEnd);
+    }
+    ,get_latestDay: async () => {
+      return await get_latestDay();
+    }
+    ,get_shareRateChangeByTimestamp: async (timestamp) =>{
+      return await get_shareRateChangeByTimestamp(timestamp);
+    }
+    ,get_globalInfoByDay: async (day) =>{
+      return await get_globalInfoByDay(day);
+    }
+    ,get_latestStakeStartId: async (blockNumber) => {
+      return await get_latestStakeStartId(blockNumber);
     }
  }
  

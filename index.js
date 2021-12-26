@@ -314,39 +314,6 @@ async function getCurrencyData() {
   }
 }
 
-if(!DEBUG){
-const rule5 = new schedule.RecurrenceRule();
-rule5.hour = 0;
-rule5.minute = 5;
-rule5.tz = 'Etc/UTC';
-
-const job5 = schedule.scheduleJob(rule5, function(){
-  log('**** DAILY DATA TIMER 5!');
-  if (!getDataRunning){ getDailyData(); }
-});
-
-const rule20 = new schedule.RecurrenceRule();
-rule20.hour = 0;
-rule20.minute = 20;
-rule20.tz = 'Etc/UTC';
-
-const job20 = schedule.scheduleJob(rule20, function(){
-  log('**** DAILY DATA TIMER 20!');
-  if (!getDataRunning){ getDailyData(); }
-});
-
-const rule40 = new schedule.RecurrenceRule();
-rule40.hour = 0;
-rule40.minute = 40;
-rule40.tz = 'Etc/UTC';
-
-const job40 = schedule.scheduleJob(rule40, function(){
-  log('**** DAILY DATA TIMER 40!');
-  if (!getDataRunning){ getDailyData(); }
-});
-}
-
-
 //if (CONFIG.price.enabled) {
 //	var priceTimer = CONFIG.price.timer * 60 * 1000;
 //	setInterval(function() {
@@ -501,231 +468,278 @@ async function getLiveData() {
     getLiveDataRUNNING = false;
   }
 }
+var cron = require('node-cron');
+var DailyStatMaintenance = false;
 
-async function getDailyData() {
+cron.schedule('30 * * * * *', async () => {
+  log('**** DAILY DATA TIMER 30!');
   
-  getDataRunning = true;
-  log("getDailyData() --- START ****************");
-  try {
-  await sleep(5000);
-  var currentDay = await Etherscan.getCurrentDay();
-  var newDay = currentDay + 1;
-  log("*** 001 *** - currentDay: " + currentDay);
+  if (!getDataRunning && !DailyStatMaintenance){ 
+    DailyStatMaintenance = true;
+    try{
+      let latestDay = await TheGraph.get_latestDay(); 
+      let latestDailyData = await DailyStat.find().sort({currentDay:-1});
+      let latestDailyDataCurrentDay = latestDailyData[0].currentDay; 
 
-  if (newDay != currentDayGlobal && newDay > currentDayGlobal) {
-    currentDayGlobal = newDay;
-    io.emit("currentDay", currentDayGlobal);
-  }
-
-  // Check if Current Row of Data already exists
-  var currentDailyStat = await DailyStat.findOne({currentDay: { $eq: currentDay }});
-  if (!isEmpty(currentDailyStat)) {
-    log('getDailyData() --- WARNING - Current Daily Stat already set - Day#: ' + currentDay);
-    return;
-  }
-  log("*** 002 - currentDay row doesnt exist!");
-
-  var blockNumber = await TheGraph.getEthereumBlock(currentDay);  await sleep(250);
-  log("*** 003 - blockNumber: " + blockNumber);
-
-  // Get Previous Row of Data
-  var previousDay = (currentDay - 1);
-  var previousDailyStat = await DailyStat.findOne({currentDay: { $eq: previousDay }});
-  log("*** 004 - previousDay: " + previousDay);
-
-  // Core Live
-  var tshareRateHEX = await TheGraph.get_shareRateChange(); await sleep(250);
-  log("*** 005 - tshareRateHEX: " + tshareRateHEX);
-
-  var { circulatingHEX, stakedHEX } = await Etherscan.getGlobalInfo(); await sleep(250);
-  log("*** 006 - circulatingHEX: " + circulatingHEX + " - stakedHEX: " + stakedHEX);
-
-  var priceUV2 = await TheGraph.getUniswapV2HEXDailyPrice(); await sleep(1000);
-  log("*** 007 - priceUV2: " + priceUV2);
-  var priceUV3 = priceUV2; //await getUniswapV3HEXDailyPrice(); await sleep(1000);
-  log("*** 008 - priceUV3: " + priceUV3);
-
-  var { liquidityUV2_HEXUSDC, liquidityUV2_USDC } = await TheGraph.getUniswapV2HEXUSDC_Polling(); await sleep(1000);
-  log("*** 009 - liquidityUV2_HEXUSDC: " + liquidityUV2_HEXUSDC + " - liquidityUV2_USDC: " + liquidityUV2_USDC);
-  var { liquidityUV2_HEXETH, liquidityUV2_ETH } = await TheGraph.getUniswapV2HEXETH(); await sleep(1000);
-  log("*** 010 - liquidityUV2_HEXETH: " + liquidityUV2_HEXETH + " - liquidityUV2_ETH: " + liquidityUV2_ETH);
-  var { liquidityUV3_HEX, liquidityUV3_USDC, liquidityUV3_ETH } = await TheGraph.getUniswapV3(); await sleep(500);
-  log("*** 011 - liquidityUV3_HEX: " + liquidityUV3_HEX + " - liquidityUV3_USDC: " + liquidityUV3_USDC + " - liquidityUV3_ETH: " + liquidityUV3_ETH);
-
-  var numberOfHolders = await TheGraph.get_numberOfHolders();
-  var numberOfHoldersChange = (numberOfHolders - previousDailyStat.numberOfHolders);
-  log("*** 012 - numberOfHolders: " + numberOfHolders + " - numberOfHoldersChange: " + numberOfHoldersChange);
-
-  var { averageStakeLength, currentStakerCount } = await get_stakeStartData();
-  var currentStakerCountChange = (currentStakerCount - getNum(previousDailyStat.currentStakerCount));
-  log("*** 013 - averageStakeLength: " + averageStakeLength + " - currentStakerCount: " + currentStakerCount);
-
-  // Core Historical
-  //var penaltiesHEX = await get_dailyPenalties(); await sleep(500);
-  //log("*** 014 - penaltiesHEX: " + penaltiesHEX);
-
-  var { stakedHEXGA } = await get_stakeStartGADataHistorical(blockNumber);
-  log("*** 016 - stakedHEXGA: " + stakedHEXGA);
-
-  var currentHolders = await get_currentHolders(blockNumber);
-  var currentHoldersChange = (currentHolders - previousDailyStat.currentHolders);
-  log("*** 017 - currentHolders: " + currentHolders);
-
-  var totalStakerCount = await get_stakeStartsCountHistorical(currentDay);
-  var totalStakerCountChange = (getNum(totalStakerCount) - getNum(previousDailyStat.totalStakerCount))
-  log("*** 018 - totalStakerCount: " + totalStakerCount + " - totalStakerCountChange: " + totalStakerCountChange);
-
-  var { dailyPayoutHEX, totalTshares } = await get_dailyDataUpdatePolling(currentDay); await sleep(500);
-  log("*** 019 - dailyPayoutHEX: " + dailyPayoutHEX + " - totalTshares: " + totalTshares);
-
-
-  // Calculated Values
-  var penaltiesHEX = (dailyPayoutHEX - ((circulatingHEX + stakedHEX) * 10000 / 100448995)) * 2;
-  log("*** 020 - penaltiesHEX: " + penaltiesHEX);
-
-  var totalTsharesChange      = (totalTshares - previousDailyStat.totalTshares);
-  var payoutPerTshareHEX      = (dailyPayoutHEX / totalTshares);
-  var actualAPYRate           = parseFloat(((dailyPayoutHEX / stakedHEX) * 365.25 * 100).toFixed(2));
-
-  var stakedSupplyChange      = (stakedHEX - previousDailyStat.stakedHEX);
-  var stakedHEXGAChange       = (stakedHEXGA - previousDailyStat.stakedHEXGA)
-  var circulatingSupplyChange = (circulatingHEX - previousDailyStat.circulatingHEX);
-
-  var stakedHEXPercent        = parseFloat(((stakedHEX / (stakedHEX + circulatingHEX)) * 100).toFixed(2));
-  var stakedHEXPercentChange  = parseFloat((stakedHEXPercent - previousDailyStat.stakedHEXPercent).toFixed(2));
-
-  var liquidityUV2UV3_HEX     = parseInt(liquidityUV2_HEXUSDC + liquidityUV2_HEXETH + liquidityUV3_HEX); //parseFloat((liquidityUV2_HEXUSDC + liquidityUV2_HEXETH + liquidityUV3_HEX).toFixed(4));
-  var liquidityUV2UV3_USDC    = parseInt(liquidityUV2_USDC + liquidityUV3_USDC); //parseFloat((liquidityUV2_USDC + liquidityUV3_USDC).toFixed(4));
-  var liquidityUV2UV3_ETH     = parseInt(liquidityUV2_ETH + liquidityUV3_ETH); //parseFloat((liquidityUV2_ETH + liquidityUV3_ETH).toFixed(4));
-
-  var priceChangeUV2          = parseFloat((priceUV2 - previousDailyStat.priceUV2).toFixed(4));
-  var priceChangeUV3          = parseFloat((priceUV3 - previousDailyStat.priceUV3).toFixed(4));
-
-  var priceUV2UV3             = parseFloat(((priceUV2 * (liquidityUV2_USDC / liquidityUV2UV3_USDC)) + (priceUV3 * (liquidityUV3_USDC / liquidityUV2UV3_USDC))).toFixed(8));
-  var priceChangeUV2UV3       = parseFloat((((priceUV2UV3 / previousDailyStat.priceUV2UV3) - 1) * 100).toFixed(8));
-
-  var tshareRateIncrease      = (tshareRateHEX - previousDailyStat.tshareRateHEX);
-  var tshareRateUSD           = parseFloat((tshareRateHEX * priceUV2UV3).toFixed(4));
-
-  var date                    = new Date();
-
-  var dailyMintedInflationTotal = (circulatingHEX + stakedHEX) - (previousDailyStat.circulatingHEX + previousDailyStat.stakedHEX);
-
-  var totalHEX = (circulatingHEX + stakedHEX);
-
-  var marketCap = (priceUV2UV3 * circulatingHEX);
-  var tshareMarketCap = (tshareRateUSD * totalTshares);
-  var tshareMarketCapToMarketCapRatio = parseFloat((tshareMarketCap / marketCap).toFixed(4));
-
-  var roiMultiplierFromATL = (priceUV2UV3 / HEX_PRICE_ALLTIMELOW);
-
-  var totalValueLocked = (priceUV2UV3 * stakedHEX);
-
-  // Create Full Object, Set Calculated Values
-  try {
-    const dailyStat = new DailyStat({ 
-
-      // CORE DATA
-      date:               date,
-      currentDay:         currentDay,
-      circulatingHEX:     circulatingHEX,
-      stakedHEX:          stakedHEX,
-      stakedHEXGA:        stakedHEXGA,
-
-      tshareRateHEX:      tshareRateHEX,
-      dailyPayoutHEX:     dailyPayoutHEX,
-      totalTshares:       totalTshares,
-      averageStakeLength: averageStakeLength,
-      penaltiesHEX:       penaltiesHEX,
-
-      priceUV2:           priceUV2,
-      priceUV3:           priceUV3,
-
-      liquidityUV2_USDC:  liquidityUV2_USDC,
-      liquidityUV2_ETH:   liquidityUV2_ETH,
-
-      liquidityUV2_HEXUSDC: liquidityUV2_HEXUSDC,
-      liquidityUV2_HEXETH:  liquidityUV2_HEXETH,
-
-      liquidityUV3_HEX:     liquidityUV3_HEX,
-      liquidityUV3_USDC:    liquidityUV3_USDC,
-      liquidityUV3_ETH:     liquidityUV3_ETH,
-
-
-      // CALCULATED DATA
-      tshareRateIncrease:       tshareRateIncrease,
-      tshareRateUSD:            tshareRateUSD,
-
-      totalTsharesChange:       totalTsharesChange,
-      payoutPerTshareHEX:       payoutPerTshareHEX,
-      actualAPYRate:            actualAPYRate,
-
-      stakedSupplyChange:       stakedSupplyChange,
-      circulatingSupplyChange:  circulatingSupplyChange,
-      stakedHEXGAChange:        stakedHEXGAChange,
-
-      stakedHEXPercent:         stakedHEXPercent,
-      stakedHEXPercentChange:   stakedHEXPercentChange,
-
-      priceUV2UV3:              priceUV2UV3,
-      priceChangeUV2:           priceChangeUV2,
-      priceChangeUV3:           priceChangeUV3,
-      priceChangeUV2UV3:        priceChangeUV2UV3,
-
-      liquidityUV2UV3_USDC:     liquidityUV2UV3_USDC,
-      liquidityUV2UV3_ETH:      liquidityUV2UV3_ETH,
-      liquidityUV2UV3_HEX:      liquidityUV2UV3_HEX,
-
-      numberOfHolders:          numberOfHolders,
-      numberOfHoldersChange:    numberOfHoldersChange,
-      currentHolders:           currentHolders,
-      currentHoldersChange:     currentHoldersChange,
-
-      dailyMintedInflationTotal: dailyMintedInflationTotal,
-      totalHEX: totalHEX,
-
-      marketCap:                        marketCap,
-      tshareMarketCap:                  tshareMarketCap,
-      tshareMarketCapToMarketCapRatio:  tshareMarketCapToMarketCapRatio,
-      roiMultiplierFromATL:             roiMultiplierFromATL,
-
-      currentStakerCount:        currentStakerCount,
-      currentStakerCountChange:  currentStakerCountChange,
-      totalStakerCount:         totalStakerCount,
-      totalStakerCountChange:   totalStakerCountChange,
-
-      totalValueLocked:         totalValueLocked,
-    });
-
-    log("*** 100 - PRINT ************");
-    log(dailyStat);
-
-    // Check if Current Row of Data already exists Again
-    var currentDailyStat2 = await DailyStat.findOne({currentDay: { $eq: currentDay }});
-    if (!isEmpty(currentDailyStat2)) {
-      log('getDailyData() --- WARNING - Current Daily Stat already set Again - Day#: ' + currentDay);
-      return;
+      if(latestDay != latestDailyDataCurrentDay) {
+        for (let i = latestDailyDataCurrentDay; i <= latestDay; i++) { 
+          await getDailyData(i);  
+        }
+      }
+      
     }
-
-    dailyStat.save(function (err) {
-      if (err) return log(err);
-    });
-
-    if (!getRowDataRunning){ getRowData(); }
-
-    if (CONFIG.twitter.enabled) {
-      Twitter.tweet(dailyStat); await sleep(30000);
-      Twitter.tweetBshare(dailyStat);
+    catch (err) {
+      log('DAILY DATA TIMER() ----- ERROR ---' + err.toString() + " - " + err.stack);
+    } finally { 
+      DailyStatMaintenance = false;
     }
-  } catch (err) {
-    log('getDailyData() ----- SAVE --- ' + err.toString() + " - " + err.stack);
   }
+});
 
-  } catch (err) {
-    log('getDailyData() ----- ERROR ---' + err.toString() + " - " + err.stack);
-  } finally {
-    getDataRunning = false;
+cron.schedule('* * 3 * * *', async () => {
+  let latestDay = await TheGraph.get_latestDay();
+  for(let i = 1; i <= latestDay; i++){
+    let present = await DailyStat.find({currentDay: i}).limit(1);
+    if(isEmpty(present)){
+      await getDailyData(i);  
+    }
   }
+});
+
+async function getDailyData(day) {
+  return new Promise(async (resolve) => {
+    getDataRunning = true;
+    log("getDailyData() --- START ****************");
+    try {
+      await sleep(5000);
+      var currentDay = day;
+      var newDay = currentDay + 1;
+      log("*** 001 *** - currentDay: " + currentDay);
+
+      if (newDay != currentDayGlobal && newDay > currentDayGlobal) {
+        currentDayGlobal = newDay;
+        io.emit("currentDay", currentDayGlobal);
+      }
+      //currentDay = currentDay + 1;
+      // Check if Current Row of Data already exists
+      var currentDailyStat = await DailyStat.findOne({currentDay: { $eq: currentDay }});
+      if (!isEmpty(currentDailyStat)) {
+        log('getDailyData() --- WARNING - Current Daily Stat already set - Day#: ' + currentDay);
+        return;
+      }
+      log("*** 002 - currentDay row doesnt exist!");
+
+      //var blockNumber = await TheGraph.getEthereumBlock(currentDay);  await sleep(250);
+      //log("*** 003 - blockNumber: " + blockNumber);
+
+      // Get Previous Row of Data
+      var previousDay = (currentDay - 1);
+      var previousDailyStat = await DailyStat.findOne({currentDay: { $eq: previousDay }});
+      log("*** 004 - previousDay: " + previousDay);
+
+      var globalInfo = await TheGraph.get_globalInfoByDay(currentDay + 1); await sleep(250);
+
+      let circulatingHEX = parseInt(globalInfo[0].totalHeartsinCirculation) / 100000000;
+      let stakedHEX = parseInt(globalInfo[0].lockedHeartsTotal) / 100000000;
+      let blocknumber = parseInt(globalInfo[0].blocknumber);
+      let timestamp = parseInt(globalInfo[0].timestamp);
+
+      // Core Live
+      var tshareRateHEX = await TheGraph.get_shareRateChangeByTimestamp(timestamp); await sleep(250);
+      tshareRateHEX = tshareRateHEX.tShareRateHEX;
+      log("*** 005 - tshareRateHEX: " + tshareRateHEX);
+      
+      // var { circulatingHEX, stakedHEX } = await Etherscan.getGlobalInfo(); await sleep(250);
+      log("*** 006 - circulatingHEX: " + circulatingHEX + " - stakedHEX: " + stakedHEX);
+
+      var priceUV2 = await TheGraph.getUniswapV2HEXDailyPrice(currentDay); await sleep(1000);
+      log("*** 007 - priceUV2: " + priceUV2);
+      var priceUV3 = priceUV2; //await getUniswapV3HEXDailyPrice(); await sleep(1000);
+      log("*** 008 - priceUV3: " + priceUV3);
+
+      var { liquidityUV2_HEXUSDC, liquidityUV2_USDC } = await TheGraph.getUniswapV2HEXUSDC_Polling(currentDay); await sleep(1000);
+      log("*** 009 - liquidityUV2_HEXUSDC: " + liquidityUV2_HEXUSDC + " - liquidityUV2_USDC: " + liquidityUV2_USDC);
+      var { liquidityUV2_HEXETH, liquidityUV2_ETH } = await TheGraph.getUniswapV2HEXETH(currentDay); await sleep(1000);
+      log("*** 010 - liquidityUV2_HEXETH: " + liquidityUV2_HEXETH + " - liquidityUV2_ETH: " + liquidityUV2_ETH);
+      var { liquidityUV3_HEX, liquidityUV3_USDC, liquidityUV3_ETH } = await TheGraph.getUniswapV3Historical(blocknumber); await sleep(500);
+      log("*** 011 - liquidityUV3_HEX: " + liquidityUV3_HEX + " - liquidityUV3_USDC: " + liquidityUV3_USDC + " - liquidityUV3_ETH: " + liquidityUV3_ETH);
+
+      var numberOfHolders = await TheGraph.get_numberOfHolders(blocknumber);
+      var numberOfHoldersChange = (numberOfHolders - previousDailyStat.numberOfHolders);
+      log("*** 012 - numberOfHolders: " + numberOfHolders + " - numberOfHoldersChange: " + numberOfHoldersChange);
+
+      var { averageStakeLength, currentStakerCount } = await get_stakeStartData(blocknumber);
+      var currentStakerCountChange = (currentStakerCount - getNum(previousDailyStat.currentStakerCount));
+      log("*** 013 - averageStakeLength: " + averageStakeLength + " - currentStakerCount: " + currentStakerCount);
+
+      // Core Historical
+      //var penaltiesHEX = await get_dailyPenalties(); await sleep(500);
+      //log("*** 014 - penaltiesHEX: " + penaltiesHEX);
+
+      var { stakedHEXGA } = await get_stakeStartGADataHistorical(blocknumber);
+      log("*** 016 - stakedHEXGA: " + stakedHEXGA);
+
+      var currentHolders = await get_currentHolders(blocknumber);
+      var currentHoldersChange = (currentHolders - previousDailyStat.currentHolders);
+      log("*** 017 - currentHolders: " + currentHolders);
+
+      var totalStakerCount = await get_stakeStartsCountHistorical(blocknumber);
+      var totalStakerCountChange = (getNum(totalStakerCount) - getNum(previousDailyStat.totalStakerCount))
+      log("*** 018 - totalStakerCount: " + totalStakerCount + " - totalStakerCountChange: " + totalStakerCountChange);
+
+      var { dailyPayoutHEX, totalTshares } = await get_dailyDataUpdatePolling(currentDay); await sleep(500);
+      log("*** 019 - dailyPayoutHEX: " + dailyPayoutHEX + " - totalTshares: " + totalTshares);
+
+
+      // Calculated Values
+      var penaltiesHEX = (dailyPayoutHEX - ((circulatingHEX + stakedHEX) * 10000 / 100448995)) * 2;
+      log("*** 020 - penaltiesHEX: " + penaltiesHEX);
+
+      var totalTsharesChange      = (totalTshares - previousDailyStat.totalTshares);
+      var payoutPerTshareHEX      = (dailyPayoutHEX / totalTshares);
+      var actualAPYRate           = parseFloat(((dailyPayoutHEX / stakedHEX) * 365.25 * 100).toFixed(2));
+
+      var stakedSupplyChange      = (stakedHEX - previousDailyStat.stakedHEX);
+      var stakedHEXGAChange       = (stakedHEXGA - previousDailyStat.stakedHEXGA)
+      var circulatingSupplyChange = (circulatingHEX - previousDailyStat.circulatingHEX);
+
+      var stakedHEXPercent        = parseFloat(((stakedHEX / (stakedHEX + circulatingHEX)) * 100).toFixed(2));
+      var stakedHEXPercentChange  = parseFloat((stakedHEXPercent - previousDailyStat.stakedHEXPercent).toFixed(2));
+
+      var liquidityUV2UV3_HEX     = parseInt(liquidityUV2_HEXUSDC + liquidityUV2_HEXETH + liquidityUV3_HEX); //parseFloat((liquidityUV2_HEXUSDC + liquidityUV2_HEXETH + liquidityUV3_HEX).toFixed(4));
+      var liquidityUV2UV3_USDC    = parseInt(liquidityUV2_USDC + liquidityUV3_USDC); //parseFloat((liquidityUV2_USDC + liquidityUV3_USDC).toFixed(4));
+      var liquidityUV2UV3_ETH     = parseInt(liquidityUV2_ETH + liquidityUV3_ETH); //parseFloat((liquidityUV2_ETH + liquidityUV3_ETH).toFixed(4));
+
+      var priceChangeUV2          = parseFloat((priceUV2 - previousDailyStat.priceUV2).toFixed(4));
+      var priceChangeUV3          = parseFloat((priceUV3 - previousDailyStat.priceUV3).toFixed(4));
+
+      var priceUV2UV3             = parseFloat(((priceUV2 * (liquidityUV2_USDC / liquidityUV2UV3_USDC)) + (priceUV3 * (liquidityUV3_USDC / liquidityUV2UV3_USDC))).toFixed(8));
+      var priceChangeUV2UV3       = parseFloat((((priceUV2UV3 / previousDailyStat.priceUV2UV3) - 1) * 100).toFixed(8));
+
+      var tshareRateIncrease      = (parseFloat(tshareRateHEX) - previousDailyStat.tshareRateHEX);
+      var tshareRateUSD           = parseFloat((parseFloat(tshareRateHEX) * priceUV2UV3).toFixed(4));
+
+      var date                    = new Date(timestamp * 1000);
+
+      var dailyMintedInflationTotal = (circulatingHEX + stakedHEX) - (previousDailyStat.circulatingHEX + previousDailyStat.stakedHEX);
+
+      var totalHEX = (circulatingHEX + stakedHEX);
+
+      var marketCap = (priceUV2UV3 * circulatingHEX);
+      var tshareMarketCap = (tshareRateUSD * totalTshares);
+      var tshareMarketCapToMarketCapRatio = parseFloat((tshareMarketCap / marketCap).toFixed(4));
+
+      var roiMultiplierFromATL = (priceUV2UV3 / HEX_PRICE_ALLTIMELOW);
+
+      var totalValueLocked = (priceUV2UV3 * stakedHEX);
+
+      // Create Full Object, Set Calculated Values
+      try {
+        const dailyStat = new DailyStat({ 
+
+          // CORE DATA
+          date:               date,
+          currentDay:         currentDay,
+          circulatingHEX:     circulatingHEX,
+          stakedHEX:          stakedHEX,
+          stakedHEXGA:        stakedHEXGA,
+
+          tshareRateHEX:      tshareRateHEX,
+          dailyPayoutHEX:     dailyPayoutHEX,
+          totalTshares:       totalTshares,
+          averageStakeLength: averageStakeLength,
+          penaltiesHEX:       penaltiesHEX,
+
+          priceUV2:           priceUV2,
+          priceUV3:           priceUV3,
+
+          liquidityUV2_USDC:  liquidityUV2_USDC,
+          liquidityUV2_ETH:   liquidityUV2_ETH,
+
+          liquidityUV2_HEXUSDC: liquidityUV2_HEXUSDC,
+          liquidityUV2_HEXETH:  liquidityUV2_HEXETH,
+
+          liquidityUV3_HEX:     liquidityUV3_HEX,
+          liquidityUV3_USDC:    liquidityUV3_USDC,
+          liquidityUV3_ETH:     liquidityUV3_ETH,
+
+
+          // CALCULATED DATA
+          tshareRateIncrease:       tshareRateIncrease,
+          tshareRateUSD:            tshareRateUSD,
+
+          totalTsharesChange:       totalTsharesChange,
+          payoutPerTshareHEX:       payoutPerTshareHEX,
+          actualAPYRate:            actualAPYRate,
+
+          stakedSupplyChange:       stakedSupplyChange,
+          circulatingSupplyChange:  circulatingSupplyChange,
+          stakedHEXGAChange:        stakedHEXGAChange,
+
+          stakedHEXPercent:         stakedHEXPercent,
+          stakedHEXPercentChange:   stakedHEXPercentChange,
+
+          priceUV2UV3:              priceUV2UV3,
+          priceChangeUV2:           priceChangeUV2,
+          priceChangeUV3:           priceChangeUV3,
+          priceChangeUV2UV3:        priceChangeUV2UV3,
+
+          liquidityUV2UV3_USDC:     liquidityUV2UV3_USDC,
+          liquidityUV2UV3_ETH:      liquidityUV2UV3_ETH,
+          liquidityUV2UV3_HEX:      liquidityUV2UV3_HEX,
+
+          numberOfHolders:          numberOfHolders,
+          numberOfHoldersChange:    numberOfHoldersChange,
+          currentHolders:           currentHolders,
+          currentHoldersChange:     currentHoldersChange,
+
+          dailyMintedInflationTotal: dailyMintedInflationTotal,
+          totalHEX: totalHEX,
+
+          marketCap:                        marketCap,
+          tshareMarketCap:                  tshareMarketCap,
+          tshareMarketCapToMarketCapRatio:  tshareMarketCapToMarketCapRatio,
+          roiMultiplierFromATL:             roiMultiplierFromATL,
+
+          currentStakerCount:        currentStakerCount,
+          currentStakerCountChange:  currentStakerCountChange,
+          totalStakerCount:         totalStakerCount,
+          totalStakerCountChange:   totalStakerCountChange,
+
+          totalValueLocked:         totalValueLocked,
+        });
+
+        log("*** 100 - PRINT ************");
+        log(dailyStat);
+
+        // Check if Current Row of Data already exists Again
+        var currentDailyStat2 = await DailyStat.findOne({currentDay: { $eq: currentDay }});
+        if (!isEmpty(currentDailyStat2)) {
+          log('getDailyData() --- WARNING - Current Daily Stat already set Again - Day#: ' + currentDay);
+          return;
+        }
+
+        dailyStat.save(function (err) {
+          if (err) return log(err);
+        });
+
+        if (!getRowDataRunning){ getRowData(); }
+
+        if (CONFIG.twitter.enabled) {
+          Twitter.tweet(dailyStat); await sleep(30000);
+          Twitter.tweetBshare(dailyStat);
+        }
+      } catch (err) {
+        log('getDailyData() ----- SAVE --- ' + err.toString() + " - " + err.stack);
+      }
+
+    } catch (err) {
+      log('getDailyData() ----- ERROR ---' + err.toString() + " - " + err.stack);
+    } finally { 
+      getDataRunning = false;
+    }
+    resolve(true);
+  });
 }
 
 //////////////////////////////////////
@@ -800,7 +814,7 @@ async function get_dailyDataUpdatePolling(currentDay) {
   }
 }
 
-async function get_stakeStartData(){
+async function get_stakeStartData(blockNumber){
 
   var $lastStakeId = 0;
   var stakedDaysSum = 0;
@@ -813,7 +827,7 @@ async function get_stakeStartData(){
   var uniqueAddressList = [];
 
   while (true) {
-    var data = await TheGraph.get_stakeStarts($lastStakeId);
+    var data = await TheGraph.get_stakeStarts($lastStakeId, blockNumber);
     if (data.count <= 0) { break; }
     stakedCount += data.count;
     stakedDaysSum += data.stakedDaysSum;
@@ -1115,13 +1129,11 @@ async function get_stakeStartGADataHistorical(blockNumber){
   }
 }
 
-async function get_stakeStartsCountHistorical(day){
+async function get_stakeStartsCountHistorical(blocknumber){
   console.log("get_stakeStartsCountHistorical");
-      try {
-      		console.log("Day: " + day);
-          var blockNumber = await TheGraph.getEthereumBlock(day);
-          console.log("BlockNumber: " + blockNumber);
-          var { uniqueStakerCount } = await getAll_stakeStartsCountHistorical(blockNumber);
+      try {  
+          console.log("BlockNumber: " + blocknumber);
+          var { uniqueStakerCount } = await getAll_stakeStartsCountHistorical(blocknumber);
           console.log("Staker Count: " + uniqueStakerCount);
           return uniqueStakerCount;
       } catch (error) {

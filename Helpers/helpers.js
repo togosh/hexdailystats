@@ -10,6 +10,8 @@ const UNISWAP_V2_HEXETH = "0x55d5c232d921b9eaa6b37b5845e439acd04b4dba";
 const UNISWAP_V3_HEXUSDC = "0x69d91b94f0aaf8e8a2586909fa77a5c2c89818d5";
 const UNISWAP_V3_HEXETH = "0x9e0905249ceefffb9605e034b534544684a58be6";
 
+const HEX_SUBGRAPH_API_ETHEREUM = "https://api.thegraph.com/subgraphs/name/codeakk/hex";
+
 const log = (message) => {
     console.log(new Date().toISOString() + ", " + message);
 }
@@ -68,4 +70,5 @@ module.exports = {
     ,UNISWAP_V2_HEXETH: UNISWAP_V2_HEXETH
     ,UNISWAP_V3_HEXUSDC: UNISWAP_V3_HEXUSDC
     ,UNISWAP_V3_HEXETH: UNISWAP_V3_HEXETH
+    ,HEX_SUBGRAPH_API_ETHEREUM: HEX_SUBGRAPH_API_ETHEREUM
  }

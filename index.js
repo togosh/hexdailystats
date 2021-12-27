@@ -481,18 +481,19 @@ cron.schedule('30 * * * * *', async () => {
       let latestDailyData = await DailyStat.find().sort({currentDay:-1});
       let latestDailyDataCurrentDay = latestDailyData[0].currentDay; 
 
-      if(latestDay != latestDailyDataCurrentDay) {
-        for (let i = latestDailyDataCurrentDay; i <= latestDay; i++) { 
+      if(latestDay > latestDailyDataCurrentDay) {
+        for (let i = latestDailyDataCurrentDay + 1; i <= latestDay; i++) { 
           await getDailyData(i);  
         }
       }
-      
+      DailyStatMaintenance = false;
     }
     catch (err) {
       log('DAILY DATA TIMER() ----- ERROR ---' + err.toString() + " - " + err.stack);
     } finally { 
       DailyStatMaintenance = false;
     }
+    DailyStatMaintenance = false;
   }
 });
 

@@ -108,18 +108,18 @@ async function getCurrentDay(){
     });
   }
   
-  module.exports = { 
-    getCurrentDay: async () => {
-       return await getCurrentDay();
-    }
-    ,getGlobalInfo: async () => {
-        return await getGlobalInfo();
-     }
-     ,getEthereumPrice: async () => {
-        return await getEthereumPrice();
-     }
-     ,getGas: async () => {
-         return await getGas();
-      }
- }
+module.exports = { 
+  getCurrentDay: async () => {
+      return await getCurrentDay();
+  }
+  ,getGlobalInfo: async () => {
+    return await getGlobalInfo();
+  }
+  ,getEthereumPrice: async () => {
+    return await getEthereumPrice();
+  }
+  ,getGas: async () => {
+      return await getGas();
+  }
+}
  

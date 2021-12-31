@@ -475,17 +475,52 @@ let test = async () => {
   //var test2 = test;
 }; test();
 
-cron.schedule('30 * * * * *', async () => {
-  log('**** DAILY DATA TIMER 30!');
+cron.schedule('1 * * * * *', async () => {
+  log('**** DAILY DATA TIMER 1!');
+   
+  if (!DailyStatMaintenance){ 
+    try{ 
+        let latestDailyData = await DailyStat.find().sort({currentDay:-1}); 
+        let dailyDataCurrentDayEnd = latestDailyData[0].currentDay;
+        let dailyDataCurrentDayStart = latestDailyData[4].currentDay; 
+        
+        for (let i = dailyDataCurrentDayStart; i <= dailyDataCurrentDayEnd; i++) { 
+          
+          let ds = await DailyStat.find({currentDay:i}); 
+
+          for(var key in ds[0]){
+          if(key != '$op' && ds[0][key] === null){
+              DailyStatMaintenance = true;
+              await DailyStatHandler.getDailyData(i);  
+              if (!getRowDataRunning){ getRowData(); }
+              io.emit("currentDay", currentDayGlobal);
+            }
+          }
+
+        }
+        DailyStatMaintenance = false;
+    
+    }
+    catch (err) {
+      log('DAILY DATA TIMER 1() ----- ERROR ---' + err.toString() + " - " + err.stack);
+    } finally { 
+      DailyStatMaintenance = false; 
+    }
+    DailyStatMaintenance = false;  
+  }
+});
+
+cron.schedule('2 * * * * *', async () => {
+  log('**** DAILY DATA TIMER 2!');
   
   if (!getDataRunning && !DailyStatMaintenance){ 
-    DailyStatMaintenance = true;
     try{
       let latestDay = await TheGraph.get_latestDay(); 
       let latestDailyData = await DailyStat.find().sort({currentDay:-1});
       let latestDailyDataCurrentDay = latestDailyData[0].currentDay; 
 
       if(latestDay > latestDailyDataCurrentDay) {
+        DailyStatMaintenance = true;
         for (let i = latestDailyDataCurrentDay + 1; i <= latestDay; i++) { 
           await DailyStatHandler.getDailyData(i);  
           if (!getRowDataRunning){ getRowData(); }
@@ -495,7 +530,7 @@ cron.schedule('30 * * * * *', async () => {
       DailyStatMaintenance = false;
     }
     catch (err) {
-      log('DAILY DATA TIMER() ----- ERROR ---' + err.toString() + " - " + err.stack);
+      log('DAILY DATA TIMER 2() ----- ERROR ---' + err.toString() + " - " + err.stack);
     } finally { 
       DailyStatMaintenance = false;
     }

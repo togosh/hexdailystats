@@ -11,6 +11,7 @@ const HEX_PRICE_ALLTIMELOW = 0.00005645;
 let getDataRunning = false;
 let currentDayGlobal = 0;
 let DailyStat = MongoDb.DailyStat;
+let currentDailyStat = undefined;
 
 function isEmpty(obj) {
 	for(var prop in obj) {
@@ -27,150 +28,183 @@ function getNum(val) {
   return val;
 }
 
-let get_tShareRateHEX = async (timestamp) => {
-  try { 
-    let tshareRateHEX = await TheGraph.get_shareRateChangeByTimestamp(timestamp); await sleep(250); 
-    tshareRateHEX = tshareRateHEX.tShareRateHEX;
-    log("*** 005 - tshareRateHEX: " + tshareRateHEX);
-    return tshareRateHEX;
+let get_tShareRateHEX = async (timestamp) => { 
+  if(!currentDailyStat || !currentDailyStat.tshareRateHEX) {
+    try { 
+      let tshareRateHEX = await TheGraph.get_shareRateChangeByTimestamp(timestamp); await sleep(250); 
+      tshareRateHEX = tshareRateHEX.tShareRateHEX;
+      log("*** 005 - tshareRateHEX: " + tshareRateHEX);
+      return tshareRateHEX;
+    }
+    catch (err) {
+      log('getDailyData() ----- tshareRateHEX --- ' + err.toString() + " - " + err.stack );
+      //Alert(); 
+      return undefined;
+    }
   }
-  catch (err) {
-    log('getDailyData() ----- tshareRateHEX --- ' + err.toString() + " - " + err.stack );
-    //Alert(); 
-    return undefined;
-  }
+  else return currentDailyStat.tshareRateHEX;
 }
 
 let get_priceUV2 = async (currentDay) => {
-  try {
-    let priceUV2 = await TheGraph.getUniswapV2HEXDailyPrice(currentDay); await sleep(1000);
-    log("*** 007 - priceUV2: " + priceUV2);
-    return priceUV2;
+  if(!currentDailyStat || !currentDailyStat.priceUV2) {
+    try {
+      let priceUV2 = await TheGraph.getUniswapV2HEXDailyPrice(currentDay); await sleep(1000);
+      log("*** 007 - priceUV2: " + priceUV2);
+      return priceUV2;
+    }
+    catch (err) {
+      log('getDailyData() ----- priceUV2 --- ' + err.toString() + " - " + err.stack );
+      //Alert(); 
+      return undefined;
+    }
   }
-  catch (err) {
-    log('getDailyData() ----- priceUV2 --- ' + err.toString() + " - " + err.stack );
-    //Alert(); 
-    return undefined;
-  }
+  else return currentDailyStat.priceUV2;
 }
 
 let get_liquidityUV2USDC = async (currentDay) => {
-  try { 
-    let V2HEXUSDC_Polling = await TheGraph.getUniswapV2HEXUSDC_Polling(currentDay); await sleep(1000); 
-    log("*** 009 - liquidityUV2_HEXUSDC: " + V2HEXUSDC_Polling.liquidityUV2_HEXUSDC + " - liquidityUV2_USDC: " + V2HEXUSDC_Polling.liquidityUV2_USDC);
-    return V2HEXUSDC_Polling;
+  if(!currentDailyStat || (!currentDailyStat.liquidityUV2_HEXUSDC && !currentDailyStat.liquidityUV2_USDC)) {
+    try { 
+      let V2HEXUSDC_Polling = await TheGraph.getUniswapV2HEXUSDC_Polling(currentDay); await sleep(1000); 
+      log("*** 009 - liquidityUV2_HEXUSDC: " + V2HEXUSDC_Polling.liquidityUV2_HEXUSDC + " - liquidityUV2_USDC: " + V2HEXUSDC_Polling.liquidityUV2_USDC);
+      return V2HEXUSDC_Polling;
+    }
+    catch (err) {
+      log('getDailyData() ----- liquidityUV2_HEXUSDC, liquidityUV2_USDC --- ' + err.toString() + " - " + err.stack );
+      //Alert(); 
+      return undefined;
+    }
   }
-  catch (err) {
-    log('getDailyData() ----- liquidityUV2_HEXUSDC, liquidityUV2_USDC --- ' + err.toString() + " - " + err.stack );
-    //Alert(); 
-    return undefined;
-  }
+  else return {liquidityUV2_HEXUSDC: currentDailyStat.liquidityUV2_HEXUSDC, liquidityUV2_USDC: currentDailyStat.liquidityUV2_USDC};
 }
 
 let get_liquidityUV2ETH = async (currentDay) => {
-  try {
-    let V2HEXETH = await TheGraph.getUniswapV2HEXETH(currentDay); await sleep(1000);
-    log("*** 010 - liquidityUV2_HEXETH: " + V2HEXETH.liquidityUV2_HEXETH + " - liquidityUV2_ETH: " + V2HEXETH.liquidityUV2_ETH);
-    return V2HEXETH;
+  if(!currentDailyStat || (!currentDailyStat.liquidityUV2_HEXETH && !currentDailyStat.liquidityUV2_ETH)) {
+    try {
+      let V2HEXETH = await TheGraph.getUniswapV2HEXETH(currentDay); await sleep(1000);
+      log("*** 010 - liquidityUV2_HEXETH: " + V2HEXETH.liquidityUV2_HEXETH + " - liquidityUV2_ETH: " + V2HEXETH.liquidityUV2_ETH);
+      return V2HEXETH;
+    }
+    catch (err) {
+      log('getDailyData() ----- liquidityUV2_HEXETH, liquidityUV2_ETH --- ' + err.toString() + " - " + err.stack );
+      //Alert(); 
+      return undefined;
+    }
   }
-  catch (err) {
-    log('getDailyData() ----- liquidityUV2_HEXETH, liquidityUV2_ETH --- ' + err.toString() + " - " + err.stack );
-    //Alert(); 
-    return undefined;
-  }
+  else return {liquidityUV2_HEXETH: currentDailyStat.liquidityUV2_HEXETH, liquidityUV2_ETH: currentDailyStat.liquidityUV2_ETH};
 }
 
 let get_liquidityUV3 = async (blockNumber) => {
-  try {
-    let V3Historical = await TheGraph.getUniswapV3Historical(blockNumber); await sleep(500);
-    log("*** 011 - liquidityUV3_HEX: " + V3Historical.liquidityUV3_HEX + " - liquidityUV3_USDC: " + V3Historical.liquidityUV3_USDC + " - liquidityUV3_ETH: " + V3Historical.liquidityUV3_ETH);
-    return V3Historical;
+  if(!currentDailyStat || (!currentDailyStat.liquidityUV3_HEX && !currentDailyStat.liquidityUV3_USDC && !currentDailyStat.liquidityUV3_ETH)) {
+    try {
+      let V3Historical = await TheGraph.getUniswapV3Historical(blockNumber); await sleep(500);
+      log("*** 011 - liquidityUV3_HEX: " + V3Historical.liquidityUV3_HEX + " - liquidityUV3_USDC: " + V3Historical.liquidityUV3_USDC + " - liquidityUV3_ETH: " + V3Historical.liquidityUV3_ETH);
+      return V3Historical;
+    }
+    catch (err) {
+      log('getDailyData() ----- liquidityUV3_HEX, liquidityUV3_USDC, liquidityUV3_ETH --- ' + err.toString() + " - " + err.stack );
+      //Alert(); 
+      return undefined;
+    }
   }
-  catch (err) {
-    log('getDailyData() ----- liquidityUV3_HEX, liquidityUV3_USDC, liquidityUV3_ETH --- ' + err.toString() + " - " + err.stack );
-    //Alert(); 
-    return undefined;
-  }
+  else return {liquidityUV3_HEX: currentDailyStat.liquidityUV3_HEX, liquidityUV3_USDC: currentDailyStat.liquidityUV3_USDC, liquidityUV3_ETH: currentDailyStat.liquidityUV3_ETH};
 }
 
 let get_numberOfHolders = async (blockNumber) => {
-  try {
-    numberOfHolders = await TheGraph.get_numberOfHolders(blockNumber); 
-    log("*** 012 - numberOfHolders: " + numberOfHolders); 
-    return numberOfHolders;
+  if(!currentDailyStat || !currentDailyStat.numberOfHolders) { 
+    try {
+      numberOfHolders = await TheGraph.get_numberOfHolders(blockNumber); 
+      log("*** 012 - numberOfHolders: " + numberOfHolders); 
+      return numberOfHolders;
+    }
+    catch (err) {
+      log('getDailyData() ----- numberOfHolders --- ' + err.toString() + " - " + err.stack );
+      //Alert(); 
+      return undefined;
+    }
   }
-  catch (err) {
-    log('getDailyData() ----- numberOfHolders --- ' + err.toString() + " - " + err.stack );
-    //Alert(); 
-    return undefined;
-  }
+  else return currentDailyStat.numberOfHolders;
 }
 
 let get_averageStakeLengthCurrentStakerCount = async (blockNumber) => {
-  try {
-    let ssd = await get_stakeStartData(blockNumber);
-    log("*** 013 - averageStakeLength: " + ssd.averageStakeLength + " - currentStakerCount: " + ssd.currentStakerCount);
-    return ssd;
-  } 
-  catch (err) {
-    log('getDailyData() ----- averageStakeLength, currentStakerCount --- ' + err.toString() + " - " + err.stack );
-    //Alert(); 
-    return undefined;
+  if(!currentDailyStat || (!currentDailyStat.averageStakeLength && !currentDailyStat.currentStakerCount)) { 
+    try {
+      let ssd = await get_stakeStartData(blockNumber);
+      log("*** 013 - averageStakeLength: " + ssd.averageStakeLength + " - currentStakerCount: " + ssd.currentStakerCount);
+      return ssd;
+    } 
+    catch (err) {
+      log('getDailyData() ----- averageStakeLength, currentStakerCount --- ' + err.toString() + " - " + err.stack );
+      //Alert(); 
+      return undefined;
+    }
   }
+  else return {averageStakeLength: currentDailyStat.averageStakeLength, currentStakerCount: currentDailyStat.currentStakerCount};
 }
 
 let get_stakedHEXGA = async (blockNumber) => {
-  try {
-    stakedHEXGA = await get_stakeStartGADataHistorical(blockNumber); 
-    log("*** 016 - stakedHEXGA: " + stakedHEXGA.stakedHEXGA);
-    return stakedHEXGA.stakedHEXGA;
+  if(!currentDailyStat || !currentDailyStat.stakedHEXGA) {  
+    try {
+      stakedHEXGA = await get_stakeStartGADataHistorical(blockNumber); 
+      log("*** 016 - stakedHEXGA: " + stakedHEXGA.stakedHEXGA);
+      return stakedHEXGA.stakedHEXGA;
+    }
+    catch (err){
+      log('getDailyData() ----- stakedHEXGA --- ' + err.toString() + " - " + err.stack );
+      //Alert(); 
+      return undefined;
+    }
   }
-  catch (err){
-    log('getDailyData() ----- stakedHEXGA --- ' + err.toString() + " - " + err.stack );
-    //Alert(); 
-    return undefined;
-  }
+  else return currentDailyStat.stakedHEXGA;
 }
 
 
 let get_currentHolders = async (blockNumber) => {
-  try {
-    currentHolders = await get_tokenHoldersData_Historical(blockNumber);
-    currentHolders = currentHolders.currentHolders;
-    log("*** 017 - currentHolders: " + currentHolders);
-    return currentHolders;
+  if(!currentDailyStat || !currentDailyStat.currentHolders) {   
+    try {
+      currentHolders = await get_tokenHoldersData_Historical(blockNumber);
+      currentHolders = currentHolders.currentHolders;
+      log("*** 017 - currentHolders: " + currentHolders);
+      return currentHolders;
+    }
+    catch (err){
+      log('getDailyData() ----- currentHolders --- ' + err.toString() + " - " + err.stack );
+      //Alert(); 
+      return undefined;
+    }
   }
-  catch (err){
-    log('getDailyData() ----- currentHolders --- ' + err.toString() + " - " + err.stack );
-    //Alert(); 
-    return undefined;
-  }
+  else return currentDailyStat.currentHolders;
 }
  
 let get_totalStakerCount = async (blockNumber) => {
-  try {
-    totalStakerCount = await get_stakeStartsCountHistorical(blockNumber);
-    log("*** 018 - totalStakerCount: " + totalStakerCount);
-    return totalStakerCount;
+  if(!currentDailyStat || !currentDailyStat.totalStakerCount) {    
+    try {
+      totalStakerCount = await get_stakeStartsCountHistorical(blockNumber);
+      log("*** 018 - totalStakerCount: " + totalStakerCount);
+      return totalStakerCount;
+    }
+    catch (err){
+      log('getDailyData() ----- totalStakerCount --- ' + err.toString() + " - " + err.stack );
+      //Alert(); 
+      return undefined;
+    }
   }
-  catch (err){
-    log('getDailyData() ----- totalStakerCount --- ' + err.toString() + " - " + err.stack );
-    //Alert(); 
-    return undefined;
-  }
+  else return currentDailyStat.totalStakerCount;
 }
 
 let get_dailyPayoutHexTotalTshares = async (currentDay) => {
-  try {
-    let ddup = await get_dailyDataUpdatePolling(currentDay); await sleep(500); 
-    log("*** 019 - dailyPayoutHEX: " + ddup.dailyPayoutHEX + " - totalTshares: " + ddup.totalTshares);
-    return ddup;
+  if(!currentDailyStat || (!currentDailyStat.dailyPayoutHEX && !currentDailyStat.totalTshares)) {     
+    try {
+      let ddup = await get_dailyDataUpdatePolling(currentDay); await sleep(500); 
+      log("*** 019 - dailyPayoutHEX: " + ddup.dailyPayoutHEX + " - totalTshares: " + ddup.totalTshares);
+      return ddup;
+    }
+    catch (err){
+      log('getDailyData() ----- dailyPayoutHEX, totalTshares --- ' + err.toString() + " - " + err.stack );
+      //Alert(); 
+      return undefined;
+    }
   }
-  catch (err){
-    log('getDailyData() ----- dailyPayoutHEX, totalTshares --- ' + err.toString() + " - " + err.stack );
-    //Alert(); 
-    return undefined;
-  }
+  else return {dailyPayoutHEX: currentDailyStat.dailyPayoutHEX, totalTshares: currentDailyStat.totalTshares};
 }
 
 async function getDailyData(day) {
@@ -187,13 +221,7 @@ async function getDailyData(day) {
         currentDayGlobal = newDay;
       }
       
-      // Check if Current Row of Data already exists
-      var currentDailyStat = await DailyStat.findOne({currentDay: { $eq: currentDay }});
-      if (!isEmpty(currentDailyStat)) {
-        log('getDailyData() --- WARNING - Current Daily Stat already set - Day#: ' + currentDay);
-        return;
-      }
-      log("*** 002 - currentDay row doesnt exist!");
+      currentDailyStat = await DailyStat.findOne({currentDay: { $eq: currentDay }});
 
       // Get Previous Row of Data
       var previousDay = (currentDay - 1);
@@ -439,21 +467,19 @@ async function getDailyData(day) {
         log("*** 100 - PRINT ************");
         log(dailyStat);
 
-        // Check if Current Row of Data already exists Again
-        var currentDailyStat2 = await DailyStat.findOne({currentDay: { $eq: currentDay }});
-        if (!isEmpty(currentDailyStat2)) {
-          log('getDailyData() --- WARNING - Current Daily Stat already set Again - Day#: ' + currentDay);
-          return;
-        }
 
-        dailyStat.save(function (err) {
-          if (err) return log(err);
-        });
- 
-        if (CONFIG.twitter.enabled) {
-          Twitter.tweet(dailyStat); await sleep(30000);
-          Twitter.tweetBshare(dailyStat);
-        }
+        if(currentDailyStat) await DailyStat.deleteOne({currentDay: { $eq: currentDay }});
+
+        dailyStat.save(async function (err) {
+          if (err) log(err); 
+          else{
+            if (CONFIG.twitter.enabled) {
+              Twitter.tweet(dailyStat); await sleep(30000);
+              Twitter.tweetBshare(dailyStat);
+            }
+          }
+          resolve(true);
+        }); 
       } catch (err) {
         log('getDailyData() ----- SAVE --- ' + err.toString() + " - " + err.stack);
       }
@@ -462,8 +488,8 @@ async function getDailyData(day) {
       log('getDailyData() ----- ERROR ---' + err.toString() + " - " + err.stack);
     } finally { 
       getDataRunning = false;
+      currentDailyStat = undefined;
     }
-    resolve(true);
   });
 }
   

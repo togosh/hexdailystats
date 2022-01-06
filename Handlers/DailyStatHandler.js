@@ -473,7 +473,7 @@ async function getDailyData(day) {
         dailyStat.save(async function (err) {
           if (err) log(err); 
           else{
-            if (CONFIG.twitter.enabled) {
+            if (CONFIG.twitter.enabled && currentDayGlobal == newDay) {
               Twitter.tweet(dailyStat); await sleep(30000);
               Twitter.tweetBshare(dailyStat);
             }

@@ -494,6 +494,7 @@ cron.schedule('1 * * * * *', async () => {
               await DailyStatHandler.getDailyData(i);  
               if (!getRowDataRunning){ getRowData(); }
               io.emit("currentDay", currentDayGlobal);
+              break;
             }
           }
 

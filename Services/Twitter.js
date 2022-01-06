@@ -37,14 +37,14 @@ twitterClient = new twitterAPI.TwitterClient({
 
 async function tweet(dailyStat){
   console.log("tweet()");
-	if (CONFIG.twitter.enabled && !DEBUG && dailyStat){
+	if (CONFIG.twitter.enabled && !DEBUG && dailyStat && !objectHasNullProperties(dailyStat)){
 	try {
     console.log("tweet() ---- ENABLED");
 	var mediaId = ''; 
   var tweetStatus = "";
 
-  //tweetStatus += "Day " + dailyStat.currentDay + "\r\n";
-	//tweetStatus += "\r\n";
+  tweetStatus += "Day " + dailyStat.currentDay + "\r\n";
+	tweetStatus += "\r\n";
 
   tweetStatus += "HEX Price - $" + Number(dailyStat.priceUV2UV3).toLocaleString(undefined,{minimumFractionDigits:3, maximumFractionDigits:3}) + "\r\n";
   //tweetStatus += "ROI - " + Number(dailyStat.roiMultiplierFromATL).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + "x\r\n";
@@ -94,14 +94,14 @@ async function tweet(dailyStat){
 
 async function tweetBshare(dailyStat){
   console.log("tweetBshare()");
-	if (CONFIG.twitter.enabled && !DEBUG && dailyStat){
+	if (CONFIG.twitter.enabled && !DEBUG && dailyStat && !objectHasNullProperties(dailyStat)){
 	try {
     console.log("tweetBshare() ---- ENABLED");
 	var mediaId = ''; 
   var tweetStatus = "";
 
-  //tweetStatus += "Day " + dailyStat.currentDay + "\r\n";
-	//tweetStatus += "\r\n";
+  tweetStatus += "Day " + dailyStat.currentDay + "\r\n";
+	tweetStatus += "\r\n";
 
   tweetStatus += "HEX Price - $" + Number(dailyStat.priceUV2UV3).toLocaleString(undefined,{minimumFractionDigits:3, maximumFractionDigits:3}) + "\r\n";
   //tweetStatus += "ROI - " + Number(dailyStat.roiMultiplierFromATL).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + "x\r\n";
@@ -176,6 +176,14 @@ function nFormatter(num, digits) {
           symbol: ''
       };
   }
+}
+
+function objectHasNullProperties(obj) {
+  for (var key in obj) {
+      if (obj[key] === null || obj[key] === undefined || obj[key] == "")
+          return true;
+  }
+  return false;
 }
 
 module.exports = { 

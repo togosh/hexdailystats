@@ -37,7 +37,7 @@ twitterClient = new twitterAPI.TwitterClient({
 
 async function tweet(dailyStat){
   console.log("tweet()");
-	if (CONFIG.twitter.enabled && !DEBUG && dailyStat && !objectHasNullProperties(dailyStat)){
+	if (CONFIG.twitter.enabled && !DEBUG && dailyStat){ //&& !objectHasNullProperties(dailyStat)){
 	try {
     console.log("tweet() ---- ENABLED");
 	var mediaId = ''; 
@@ -94,7 +94,7 @@ async function tweet(dailyStat){
 
 async function tweetBshare(dailyStat){
   console.log("tweetBshare()");
-	if (CONFIG.twitter.enabled && !DEBUG && dailyStat && !objectHasNullProperties(dailyStat)){
+	if (CONFIG.twitter.enabled && !DEBUG && dailyStat){ //&& !objectHasNullProperties(dailyStat)){
 	try {
     console.log("tweetBshare() ---- ENABLED");
 	var mediaId = ''; 

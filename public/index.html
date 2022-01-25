@@ -288,8 +288,26 @@
 
         const arrayColumn = (arr, n) => arr.map(x => x[n]);
 
-        let createChartOptions = (title, data, fn, log) => {
-            return {
+        function createChart(data) {
+
+            var dates = arrayColumn(data, 1).reverse().slice(2); //, 600);
+            var prices = arrayColumn(data, 2).reverse().slice(2); //, 600);
+            var tsharePrices = arrayColumn(data, 6).reverse().slice(2); //, 600);
+            var payoutPerTshares = arrayColumn(data, 5).reverse().slice(2); //, 600);
+            var tshareRates = arrayColumn(data, 7).reverse().slice(2); //, 600);
+            var currentStakers = arrayColumn(data, 32).reverse().slice(2); //, 600);
+            var totalStakersChange = arrayColumn(data, 35).reverse().slice(3); //, 600);
+            var averageStakeLength = arrayColumn(data, 9).reverse().slice(2); //, 600);
+            
+            const result_HEXPrice = dates.map((item,index) => {return {x: Date.parse(item), y: prices[index]}});
+            const result_TsharePrice = dates.map((item,index) => {return {x: Date.parse(item), y: tsharePrices[index]}});
+            const result_PayoutPerTshare = dates.map((item,index) => {return {x: Date.parse(item), y: payoutPerTshares[index]}});
+            const result_TshareRate = dates.map((item,index) => {return {x: Date.parse(item), y: tshareRates[index]}});
+            const result_CurrentStakers = dates.map((item,index) => {return {x: Date.parse(item), y: currentStakers[index]}});
+            const result_TotalStakersChange = dates.map((item,index) => {return {x: Date.parse(item), y: totalStakersChange[index]}});
+            const result_AverageStakeLength = dates.map((item,index) => {return {x: Date.parse(item), y: averageStakeLength[index]}});
+            
+            var options_TsharePrice = {
                 chart: {
                     type: 'area',
                     height: 400,
@@ -299,24 +317,42 @@
                     }
                 },
                 title: {
-                    text: title ,
+                    text: 'Prices (USD)' ,
                     style: {
                         color:  'white'
                     },
-                }, 
+                },
+                //subtitle: {
+                //    text: "$" + tsharePrices[tsharePrices.length - 1].toFixed(2),
+                //    align: 'left',
+                //    style: {
+                //        color:  'white'
+                //    },
+                //},
                 series: [{
-                    name: 'Data',
-                    data: data
-                }],
+                    name: 'T-Share Price',
+                    data: result_TsharePrice
+                },
+                //{
+                //    name: 'HEX Price',
+                //    data: result_HEXPrice
+                //},
+                ],
                 xaxis: {
                     type: 'datetime',
                     labels: { style: { colors: 'white', }, },
                 },
                 yaxis: [{
-                    labels: { style: { colors: 'white', },  },
-                    logarithmic: log,
+                    labels: { style: { colors: 'white', }, formatter: function (value) { return "$" + value.toFixed(2); }, },
+                    logarithmic: true,
                     opposite: true,
-                }],
+                }, 
+                //{
+                //    labels: { style: { colors: 'white', }, formatter: function (value) { return "$" + value.toFixed(5); }, },
+                //    logarithmic: true,
+                    //opposite: true,
+                //}
+                ],
                 markers: {
                     size: 0
                 },
@@ -330,97 +366,233 @@
                 dataLabels: {
                     enabled: false,
                 }
-            } 
-        }
-        
-        let createDataResult = (dates, data) => {
-            return dates.map((item,index) => {return {x: Date.parse(item), y: data[index]}}); 
-        }
+            }
+            var chart_TsharePrice = new ApexCharts(document.querySelector("#chart_TsharePrice"), options_TsharePrice);
+            chart_TsharePrice.render();
 
-        let chart_TsharePrice = undefined;
-        let chart_CurrentStakers = undefined;
-        let chart_TotalStakersChange = undefined;
-        let chart_AverageStakeLength = undefined;
-        let chart_TshareRate = undefined; 
-        let chart_PayoutPerTshare = undefined; 
-        let chartsLoaded = false;
-        let columnIndex = {
-              day: {id:0,name:"Hex Day"}
-            , date: {id:1,name:"Date"}
-            , price: {id:2,name:"Price (USD)"}
-            , priceChangeUV2UV3: {id:3,name:"Price Change % (USD)"}
-            , roiMultiplierFromATL: {id:4,name:"ROI Multiplier from All Time Low"}
-            , payoutPerTshareHEX: {id:5,name:"Payout Per T-Share (HEX)"}
-            , tshareRateUSD:{id:6,name:"T-Share Price (USD)"}
-            , tshareRateHEX:{id:7,name:"T-Share Rate (HEX)"}
-            , tshareRateIncrease:{id:8,name:"Increase in T-Share Rate (HEX)"}
-            , averageStakeLength:{id:9,name:"Avg Stake Length (Years)"}
-            , actualAPYRate:{id:10,name:"APY Rate (Interest + EES Penalties)"}
-            , liquidityUV2UV3_HEX:{id:11,name:"Liquidity Pool (HEX)"}
-            , liquidityUV2UV3_USDC:{id:12,name:"Liquidity Pool (USDC)"}
-            , liquidityUV2UV3_ETH:{id:13,name:"Liquidity Pool (ETH)"}
-            , totalValueLocked:{id:14,name:"Total Value Locked (USD)"}
-            , marketCap:{id:15,name:"Market Cap (USD)"}
-            , tshareMarketCap:{id:16,name:"T-Share Market Cap (USD)"}
-            , totalTshares:{id:17,name:"T-Share (SHARES)"}
-            , totalTsharesChange:{id:18,name:"Change in T-Shares (SHARES)"}
-            , totalHEX:{id:19,name:"Total Supply (HEX)"}
-            , dailyMintedInflationTotal:{id:20,name:"Minted Inflation (HEX)"}
-            , circulatingHEX:{id:21,name:"Circulating Supply (HEX)"}
-            , circulatingSupplyChange:{id:22,name:"Change in Circulating Supply (HEX)"}
-            , stakedHEX:{id:23,name:"Staked Supply"}
-            , stakedSupplyChange:{id:24,name:"Change in Staked Supply (HEX)"}
-            , stakedHEXGA:{id:25,name:"Staked Supply GA (HEX)"}
-            , stakedHEXGAChange:{id:26,name:"Change in Staked Supply GA (HEX)"}
-            , stakedHEXPercent:{id:27,name:"Staked % of Coins"}
-            , dailyPayoutHEX:{id:28,name:"Payout (HEX)"}
-            , penaltiesHEX:{id:29,name:"Penalties (HEX)"}
-            , numberOfHolders:{id:30,name:"Total Holders"}
-            , numberOfHoldersChange:{id:31,name:"Change in Total Holders"}
-            , currentStakerCount:{id:32,name:"Current Stakers"}
-            , currentStakerCountChange:{id:33,name:"Change in Current Stakers"}
-            , totalStakerCount:{id:34,name:"Total Stakers"}
-            , totalStakerCountChange:{id:35,name:"Change in Total Stakers"}
-            , currentHolders:{id:36,name:"Current Holders"}
-            , currentHoldersChange:{id:37,name:"Change in Current Holders"}
-        }
-        function createChart(data) {
+            var options_CurrentStakers = {
+                chart: {
+                    type: 'area',
+                    height: 400,
+                    toolbar: {
+                        show: true,
+                        offsetY: 0,
+                    },
+                },
+                title: {
+                    text: 'Current Stakers',
+                    style: {
+                        color:  'white'
+                    },
+                },
+                series: [{
+                    name: 'Current Stakers',
+                    data: result_CurrentStakers
+                }],
+                xaxis: {
+                    type: 'datetime',
+                    labels: { style: { colors: 'white', }, },
+                },
+                yaxis: [{
+                    labels: { style: { colors: 'white', }, formatter: function (value) { return value.toFixed(1); }, },
+                    logarithmic: false,
+                    opposite: true,
+                }],
+                markers: {
+                    size: 0
+                },
+                tooltip: {
+                    theme: 'dark'
+                },
+                stroke: {
+                    show: true,
+                    width: 3,
+                },
+                dataLabels: {
+                    enabled: false,
+                }
+            }
+            var chart_CurrentStakers = new ApexCharts(document.querySelector("#chart_CurrentStakers"), options_CurrentStakers);
+            chart_CurrentStakers.render();
 
-            var dates = arrayColumn(data, 1).reverse().slice(2); //, 600);
-            var prices = arrayColumn(data, 2).reverse().slice(2); //, 600);
-            var tsharePrices = arrayColumn(data, 6).reverse().slice(2); //, 600);
-            var payoutPerTshares = arrayColumn(data, 5).reverse().slice(2); //, 600);
-            var tshareRates = arrayColumn(data, 7).reverse().slice(2); //, 600);
-            var currentStakers = arrayColumn(data, 32).reverse().slice(2); //, 600);
-            var totalStakersChange = arrayColumn(data, 35).reverse().slice(3); //, 600);
-            var averageStakeLength = arrayColumn(data, 9).reverse().slice(2); //, 600);
-            
-            const result_HEXPrice = createDataResult(dates, prices); 
-            const result_TsharePrice = createDataResult(dates, tsharePrices); 
-            const result_PayoutPerTshare = createDataResult(dates, payoutPerTshares);
-            const result_TshareRate = createDataResult(dates, tshareRates);
-            const result_CurrentStakers = createDataResult(dates, currentStakers);
-            const result_TotalStakersChange = createDataResult(dates, totalStakersChange);  
-            const result_AverageStakeLength = createDataResult(dates, averageStakeLength); 
-            
-            let options_TsharePrice = createChartOptions('Prices (USD)', result_TsharePrice, function (value) { return "$" + value.toFixed(2); }, true); 
-            chart_TsharePrice = new ApexCharts(document.querySelector("#chart_TsharePrice"), options_TsharePrice);
-            
-            let options_currentStakers = createChartOptions('Current Stakers', result_CurrentStakers, function (value) { return value.toFixed(1); }, false);  
-            chart_CurrentStakers = new ApexCharts(document.querySelector("#chart_CurrentStakers"), options_currentStakers);
-         
-            let options_totalStakersChange = createChartOptions('New Stakers', result_TotalStakersChange, function (value) { return value.toFixed(1); }, false);   
-            chart_TotalStakersChange = new ApexCharts(document.querySelector("#chart_TotalStakersChange"), options_totalStakersChange);
-        
-            let options_AverageStakeLength = createChartOptions('Average Stake Length (YEARS)', result_AverageStakeLength, function (value) { return value.toFixed(1); }, false);   
-            chart_AverageStakeLength = new ApexCharts(document.querySelector("#chart_AverageStakeLength"), options_AverageStakeLength);
-          
-            let options_TshareRate = createChartOptions('T-Share Rate (HEX)', result_TshareRate, function (value) { return value.toFixed(1); }, false);   
-            chart_TshareRate = new ApexCharts(document.querySelector("#chart_TshareRate"), options_TshareRate);
-            
-            let options_PayoutPerTshare = createChartOptions('Payout Per T-Share Rate (HEX) - ' + payoutPerTshares[payoutPerTshares.length - 1].toFixed(3), result_PayoutPerTshare, function (value) { return value.toFixed(3); }, false);   
-            chart_PayoutPerTshare = new ApexCharts(document.querySelector("#chart_PayoutPerTshare"), options_PayoutPerTshare);
-            
+            var options_TotalStakersChange = {
+                chart: {
+                    type: 'area',
+                    height: 400,
+                    toolbar: {
+                        show: true,
+                        offsetY: 0,
+                    },
+                },
+                title: {
+                    text: 'New Stakers',
+                    style: {
+                        color:  'white'
+                    },
+                },
+                series: [{
+                    name: 'New Stakers',
+                    data: result_TotalStakersChange
+                }],
+                xaxis: {
+                    type: 'datetime',
+                    labels: { style: { colors: 'white', }, },
+                },
+                yaxis: [{
+                    labels: { style: { colors: 'white', }, formatter: function (value) { return value.toFixed(1); }, },
+                    logarithmic: false,
+                    opposite: true,
+                }],
+                markers: {
+                    size: 0
+                },
+                tooltip: {
+                    theme: 'dark'
+                },
+                stroke: {
+                    show: true,
+                    width: 3,
+                },
+                dataLabels: {
+                    enabled: false,
+                }
+            }
+            var chart_TotalStakersChange = new ApexCharts(document.querySelector("#chart_TotalStakersChange"), options_TotalStakersChange);
+            chart_TotalStakersChange.render();
+
+            var options_AverageStakeLength = {
+                chart: {
+                    type: 'area',
+                    height: 400,
+                    toolbar: {
+                        show: true,
+                        offsetY: 0,
+                    },
+                },
+                title: {
+                    text: 'Average Stake Length (YEARS)',
+                    style: {
+                        color:  'white'
+                    },
+                },
+                series: [{
+                    name: 'Average Stake Length',
+                    data: result_AverageStakeLength
+                }],
+                xaxis: {
+                    type: 'datetime',
+                    labels: { style: { colors: 'white', }, },
+                },
+                yaxis: [{
+                    labels: { style: { colors: 'white', }, formatter: function (value) { return value.toFixed(1); }, },
+                    logarithmic: false,
+                    opposite: true,
+                }],
+                markers: {
+                    size: 0
+                },
+                tooltip: {
+                    theme: 'dark'
+                },
+                stroke: {
+                    show: true,
+                    width: 3,
+                },
+                dataLabels: {
+                    enabled: false,
+                }
+            }
+            var chart_AverageStakeLength = new ApexCharts(document.querySelector("#chart_AverageStakeLength"), options_AverageStakeLength);
+            chart_AverageStakeLength.render();
+
+            var options_TshareRate = {
+                chart: {
+                    type: 'area',
+                    height: 400,
+                    toolbar: {
+                        show: true,
+                        offsetY: 0,
+                    },
+                },
+                title: {
+                    text: 'T-Share Rate (HEX)',
+                    style: {
+                        color:  'white'
+                    },
+                },
+                series: [{
+                    name: 'T-Share Rate',
+                    data: result_TshareRate
+                }],
+                xaxis: {
+                    type: 'datetime',
+                    labels: { style: { colors: 'white', }, },
+                },
+                yaxis: {
+                    labels: { style: { colors: 'white', }, formatter: function (value) { return value.toFixed(1); }, },
+                    logarithmic: false,
+                    opposite: true,
+                },
+                markers: {
+                    size: 0
+                },
+                tooltip: {
+                    theme: 'dark'
+                },
+                stroke: {
+                    show: true,
+                    width: 3,
+                },
+                dataLabels: {
+                    enabled: false,
+                }
+            }
+            var chart_TshareRate = new ApexCharts(document.querySelector("#chart_TshareRate"), options_TshareRate);
+            chart_TshareRate.render();
+
+            var options_PayoutPerTshare = {
+                chart: {
+                    type: 'area',
+                    height: 400,
+                    toolbar: {
+                        show: true,
+                        offsetY: 0,
+                    },
+                },
+                title: {
+                    text: 'Payout Per T-Share (HEX) - ' + payoutPerTshares[payoutPerTshares.length - 1].toFixed(3),
+                    style: {
+                        color:  'white'
+                    },
+                },
+                series: [{
+                    name: 'HEX Payout',
+                    data: result_PayoutPerTshare
+                }],
+                xaxis: {
+                    type: 'datetime',
+                    labels: { style: { colors: 'white', }, },
+                },
+                yaxis: [{
+                    labels: { style: { colors: 'white', }, formatter: function (value) { return value.toFixed(3); } },
+                    opposite: true,
+                }],
+                markers: {
+                    size: 0.5
+                },
+                tooltip: {
+                    theme: 'dark'
+                },
+                stroke: {
+                    show: true,
+                    width: 2,
+                },
+                dataLabels: {
+                    enabled: false,
+                }
+            }
+            var chart_PayoutPerTshare = new ApexCharts(document.querySelector("#chart_PayoutPerTshare"), options_PayoutPerTshare);
+            chart_PayoutPerTshare.render();
 
             /////////////////////////// PIE CHART STAKED
             var options = {
@@ -442,22 +614,11 @@
                 }
                 }]
             };
+
             var chart_StakedVsCirculating = new ApexCharts(document.querySelector("#chart_StakedVsCirculating"), options);
             //chart.render();
-
-            chartsLoaded = true;
         }
-
-        let buttonTemplate = (column) => {
-            let name = columnIndex[column].name;
-            let title = '<button onclick="openChart(\'' + column + '\')" style="padding: 6px 40px; margin-bottom: 10px; outline: none;">' + name + '</button>'; 
-            return title;
-        }
-        let titleTemplate = (column) => {
-            let name = columnIndex[column].name;
-            return name;
-        }
-
+        
         function createDataTable(data) {
             return $('#dataTable').on('draw.dt', function () {
                 $("#loadercontainer").css("display","none");
@@ -564,8 +725,8 @@
                             }
                             return data;
                         }
-                    }, 
-                    { title: titleTemplate('price'), className: "text-center colPrice grey" , render: function(data, type, row) {
+                    },
+                    { title: "Price (USD)", className: "text-center colPrice grey" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 //if ((Number(data) * 1000) < 1) {
                                 //    return currencyFormatterPriceFive.format(data);
@@ -579,14 +740,14 @@
                             return data;
                         }
                     },
-                    { title: titleTemplate('priceChangeUV2UV3'), className: "text-center colPriceChange grey" , render: function(data, type, row) {
+                    { title: "Price Change % (USD)", className: "text-center colPriceChange grey" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 if (data < 0) { return '<div class="red-negative">' + Number(data/100).toLocaleString(undefined,{style: 'percent', minimumFractionDigits:1}) + '</div>'; }
                                 return Number(data/100).toLocaleString(undefined,{style: 'percent', minimumFractionDigits:1}); } 
                             return data;
                         }
                     },
-                    { title: titleTemplate('roiMultiplierFromATL'), className: "text-center colROI teal" , render: function(data, type, row) {
+                    { title: "ROI Multiplier from All Time Low", className: "text-center colROI teal" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") {
                                 return Number(data).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + "x";
                             }
@@ -594,78 +755,78 @@
                         }
                     },
 
-                    { title: titleTemplate('payoutPerTshareHEX'), className: "text-center colPayoutPerTshare pink", render: function(data, type, row) {
+                    { title: "Payout Per T-Share (HEX)", className: "text-center colPayoutPerTshare pink", render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(undefined,{minimumFractionDigits:3}); } 
                             return data;
                         } 
                     },
-                    { title: titleTemplate('tshareRateUSD'), className: "text-center colTsharePrice pink" , render: function(data, type, row) {
+                    { title: "T-Share Price (USD)", className: "text-center colTsharePrice pink" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return currencyFormatterNoDecimal.format(data); }
                             return data;
                         }
                     },
-                    { title: titleTemplate('tshareRateHEX'), className: "text-center colTshareRate pink" , render: function(data, type, row) {
+                    { title: "T-Share Rate (HEX)", className: "text-center colTshareRate pink" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(undefined,{minimumFractionDigits:1, maximumFractionDigits:1}); }
                             return data;
                         }
                     },
-                    { title: titleTemplate('tshareRateIncrease'), className: "text-center colTshareRateIncrease blue" , render: function(data, type, row) {
+                    { title: "Increase in  T-Share Rate (HEX)", className: "text-center colTshareRateIncrease blue" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(undefined,{minimumFractionDigits:1, maximumFractionDigits:1}); }
                             return data;
                         }
                     },
 
-                    { title: titleTemplate('averageStakeLength'), className: "text-center colAvgStakeLength purple", render: function(data, type, row) {
+                    { title: "Avg Stake Length (Years)", className: "text-center colAvgStakeLength purple", render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2}); } 
                             return data;
                         } 
                     },
-                    { title: titleTemplate('actualAPYRate'), className: "text-center colAPYRate purple" , render: function(data, type, row) {
+                    { title: "APY Rate (Interest + EES Penalties)", className: "text-center colAPYRate purple" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data/100).toLocaleString(undefined,{style: 'percent', minimumFractionDigits:2}); } 
                             return data;
                         }
                     },
 
-                    { title: titleTemplate('liquidityUV2UV3_HEX'), className: "text-center colLiquidity_HEX grey" , render: function(data, type, row) {
+                    { title: "Liquidity Pool (HEX)", className: "text-center colLiquidity_HEX grey" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}); }
                             return data;
                         }
                     },
-                    { title: titleTemplate('liquidityUV2UV3_USDC'), className: "text-center colLiquidity_USDC grey" , render: function(data, type, row) {
+                    { title: "Liquidity Pool (USDC)", className: "text-center colLiquidity_USDC grey" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}); }
                             return data;
                         }
                     },
-                    { title: titleTemplate('liquidityUV2UV3_ETH'), className: "text-center colLiquidity_ETH grey" , render: function(data, type, row) {
+                    { title: "Liquidity Pool (ETH)", className: "text-center colLiquidity_ETH grey" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}); }
                             return data;
                         }
                     },
 
-                    { title: titleTemplate('totalValueLocked'), className: "text-center colTotalValueLocked teal" , render: function(data, type, row) {
+                    { title: "Total Value Locked (USD)", className: "text-center colTotalValueLocked teal" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 var { amount, symbol } = nFormatter(data, 2);
                                 return "$" + Number(amount).toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2}) + symbol; }
                             return data;
                         }
                     },
-                    { title: titleTemplate('marketCap'), className: "text-center colMarketcap grey" , render: function(data, type, row) {
+                    { title: "Market Cap (USD)", className: "text-center colMarketcap grey" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 var { amount, symbol } = nFormatter(data, 2);
                                 return "$" + Number(amount).toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2}) + symbol; }
                             return data;
                         }
                     },
-                    { title: titleTemplate('tshareMarketCap'), className: "text-center colTshareMarketcap pink" , render: function(data, type, row) {
+                    { title: "T-Share Market Cap (USD)", className: "text-center colTshareMarketcap pink" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 var { amount, symbol } = nFormatter(data, 2);
                                 return "$" + Number(amount).toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2}) + symbol; }
@@ -673,13 +834,13 @@
                         }
                     },
 
-                    { title: titleTemplate('totalTshares'), className: "text-center colTshares grey" , render: function(data, type, row) {
+                    { title: "T-Shares (SHARES)", className: "text-center colTshares grey" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) }
                             return data;
                         }
                     },
-                    { title: titleTemplate('totalTsharesChange'), className: "text-center colTsharesChange blue" , render: function(data, type, row) {
+                    { title: "Change in T-Shares (SHARES)", className: "text-center colTsharesChange blue" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") {
                                 if (data < 0) { 
                                     return '<div class="red-negative">' + "(" + Math.abs(Number(data)).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + ")" + '</div>';
@@ -690,13 +851,13 @@
                         }
                     },
 
-                    { title: titleTemplate('totalHEX'), className: "text-center colTotalSupply grey" , render: function(data, type, row) {
+                    { title: "Total Supply (HEX)", className: "text-center colTotalSupply grey" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}); }
                             return data;
                         }
                     },
-                    { title: titleTemplate('dailyMintedInflationTotal'), className: "text-center colMintedInflation teal" , render: function(data, type, row) {
+                    { title: "Minted Inflation (HEX)", className: "text-center colMintedInflation teal" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") {
                                 if (data < 0) { 
                                     return '<div class="red-negative">' + "(" + Math.abs(Number(data)).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + ")" + '</div>';
@@ -707,13 +868,13 @@
                         }
                     },
                     
-                    { title: titleTemplate('circulatingHEX'), className: "text-center colCirculatingSupply grey" , render: function(data, type, row) {
+                    { title: "Circulating Supply (HEX)", className: "text-center colCirculatingSupply grey" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}); }
                             return data;
                         }
                     },
-                    { title: titleTemplate('circulatingSupplyChange'), className: "text-center colCirculatingSupplyChange blue" , render: function(data, type, row) {
+                    { title: "Change in Circulating Supply (HEX)", className: "text-center colCirculatingSupplyChange blue" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") {
                                 if (data < 0) { 
                                     return '<div class="red-negative">' + "(" + Math.abs(Number(data)).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + ")" + '</div>';
@@ -723,13 +884,13 @@
                             return data;
                         }
                     },
-                    { title: titleTemplate('stakedHEX'), className: "text-center colStakedSupply grey" , render: function(data, type, row) {
+                    { title: "Staked Supply (HEX)", className: "text-center colStakedSupply grey" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}); }
                             return data;
                         }
                     },
-                    { title: titleTemplate('stakedSupplyChange'), className: "text-center colStakedSupplyChange blue" , render: function(data, type, row) {
+                    { title: "Change in Staked Supply (HEX)", className: "text-center colStakedSupplyChange blue" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") {
                                 if (data < 0) { 
                                     return '<div class="red-negative">' + "(" + Math.abs(Number(data)).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + ")" + '</div>';
@@ -739,13 +900,13 @@
                             return data;
                         }
                     },
-                    { title: titleTemplate('stakedHEXGA'), className: "text-center colStakedSupplyGA grey" , render: function(data, type, row) {
+                    { title: "Staked Supply GA (HEX)", className: "text-center colStakedSupplyGA grey" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}); }
                             return data;
                         }
                     },
-                    { title: titleTemplate('stakedHEXGAChange'), className: "text-center colStakedSupplyGAChange blue" , render: function(data, type, row) {
+                    { title: "Change in Staked Supply GA (HEX)", className: "text-center colStakedSupplyGAChange blue" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") {
                                 if (data < 0) { 
                                     return '<div class="red-negative">' + "(" + Math.abs(Number(data)).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + ")" + '</div>';
@@ -755,32 +916,32 @@
                             return data;
                         }
                     },
-                    { title: titleTemplate('stakedHEXPercent'), className: "text-center colStakedPercent grey" , render: function(data, type, row) {
+                    { title: "Staked % of Coins", className: "text-center colStakedPercent grey" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data/100).toLocaleString(undefined,{style: 'percent', minimumFractionDigits:2}); } 
                             return data;
                         }
                     },
 
-                    { title: titleTemplate('dailyPayoutHEX'), className: "text-center colPayout grey" , render: function(data, type, row) {
+                    { title: "Payout (HEX)", className: "text-center colPayout grey" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}); }
                             return data;
                         }
                     },
-                    { title: titleTemplate('penaltiesHEX'), className: "text-center colPenalties grey" , render: function(data, type, row) {
+                    { title: "Penalties (HEX)", className: "text-center colPenalties grey" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}); }
                             return data;
                         }
                     },
-                    { title: titleTemplate('numberOfHolders'), className: "text-center colTotalHolders grey" , render: function(data, type, row) {
+                    { title: "Total Holders", className: "text-center colTotalHolders grey" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;
                         }
                     },
-                    { title: titleTemplate('numberOfHoldersChange'), className: "text-center colTotalHoldersChange blue" , render: function(data, type, row) {
+                    { title: "Change in Total Holders", className: "text-center colTotalHoldersChange blue" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") {
                                 if (data < 0) { 
                                     return "(" + Math.abs(Number(data)).toLocaleString() + ")";
@@ -790,13 +951,13 @@
                             return data;
                         }
                     },
-                    { title: titleTemplate('currentStakerCount'), className: "text-center colCurrentStakers purple" , render: function(data, type, row) {
+                    { title: "Current Stakers", className: "text-center colCurrentStakers purple" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;
                         }
                     },
-                    { title: titleTemplate('currentStakerCountChange'), className: "text-center colCurrentStakersChange blue" , render: function(data, type, row) {
+                    { title: "Change in Current Stakers", className: "text-center colCurrentStakersChange blue" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") {
                                 if (data < 0) { 
                                     return '<div class="red-negative">' + "(" + Math.abs(Number(data)).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + ")" + '</div>';
@@ -806,13 +967,13 @@
                             return data;
                         }
                     },
-                    { title: titleTemplate('totalStakerCount'), className: "text-center colTotalStakers purple" , render: function(data, type, row) {
+                    { title: "Total Stakers", className: "text-center colTotalStakers purple" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;
                         }
                     },
-                    { title: titleTemplate('totalStakerCountChange'), className: "text-center colTotalStakersChange blue" , render: function(data, type, row) {
+                    { title: "Change in Total Stakers", className: "text-center colTotalStakersChange blue" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") {
                                 if (data < 0) { 
                                     return '<div class="red-negative">' + "(" + Math.abs(Number(data)).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + ")" + '</div>';
@@ -822,13 +983,13 @@
                             return data;
                         }
                     },
-                    { title: titleTemplate('currentHolders'), className: "text-center colCurrentHolders purple" , render: function(data, type, row) {
+                    { title: "Current Holders", className: "text-center colCurrentHolders purple" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(); }
                             return data;
                         }
                     },
-                    { title: titleTemplate('currentHoldersChange'), className: "text-center colCurrentHoldersChange blue" , render: function(data, type, row) {
+                    { title: "Change in Current Holders", className: "text-center colCurrentHoldersChange blue" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") {
                                 if (data < 0) { 
                                     return '<div class="red-negative">' + "(" + Math.abs(Number(data)).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + ")" + '</div>';
@@ -898,47 +1059,10 @@
             $('#divAbout').toggle();
         }
 
-        let chartsRendered = false;
         function openCharts(){
-            $('#divCharts').show();
-            if(!chartsRendered){
-                for (const property in columnIndex) {
-                    if(property != 'currentStakerCountChange'){ 
-                        $('#divCharts').prepend(buttonTemplate(property));
-                        //console.log(`${property}: ${columnIndex[property]}`);
-                    }
-                }  
-                chartsRendered = true;
-            }
+            $('#divCharts').toggle();
         }
 
-        function closeCharts(){
-            $('#divCharts').hide();
-
-        }
-
-        let chart = undefined; 
-        let openChart = (column) => {
-            if(chart) closeChart();
-            let dateIndex = columnIndex['date'].id;
-            let columnIndexId = columnIndex[column].id;
-            let dates = arrayColumn(rowData, dateIndex).reverse().slice(2);
-            let columnData = arrayColumn(rowData, columnIndexId).reverse().slice(2);
-            let result = createDataResult(dates, columnData); 
-            let options = createChartOptions(columnIndex[column].name, result, function (value) { return value.toFixed(1); }, false);  
-            $('#divChart').show(); 
-            $('#divChart').prepend( '<div id="' + column + '" style="margin-right: 0px;"></div>' ); 
-            chart = new ApexCharts(document.querySelector("#" + column), options); 
-            chart.name = column;
-            chart.render();
-        }
-
-        let closeChart = () => {
-            $('#' + chart.name + '').remove();
-            $('#divChart').hide(); 
-            chart = undefined;
-        }
-        
         function openCalculator(){
             $('#divCalculator').toggle();
         }
@@ -1089,8 +1213,7 @@
                     </center>`;
 
                 $("#divStake").html(html);
-                $("#divStake").show(); 
-
+                $("#divStake").show();
             } catch (error) {
                 console.log(error);
             }
@@ -1444,14 +1567,16 @@
                 <button id="stakeButton" onclick="calculatorStake()" style="display: none; height: 40px; padding: 0px 20px; margin: 0px 6px; outline: none;">Stake</button></center>
                 <div id="divStake" style="display: none; color: white"></div>
         </div>
-    
-        <div id="divChart" style="display: none; margin-left: 10px; margin-right: 10px;"> 
-            <center><button onclick="closeChart()" style="padding: 6px 40px; margin-bottom: 10px; outline: none;">Close</button></center>
-        </div>
 
         <div id="divCharts" style="display: none; margin-left: 10px; margin-right: 10px;">
-            
-            <center><button onclick="closeCharts()" style="padding: 6px 40px; margin-bottom: 10px; outline: none;">Close</button></center>
+            <div id="chart_TsharePrice" style="margin-right: 0px;"></div>
+            <div id="chart_CurrentStakers" style="margin-right: 0px;"></div>
+            <div id="chart_TotalStakersChange" style="margin-right: 0px;"></div>
+            <div id="chart_AverageStakeLength" style="margin-right: 0px;"></div>
+            <div id="chart_TshareRate" style="margin-right: 0px;"></div>
+            <div id="chart_PayoutPerTshare" style="margin-right: 0px;"></div>
+            <div id="chart_StakedVsCirculating" style="margin-right: 0px;"></div>
+            <center><button onclick="openCharts()" style="padding: 6px 40px; margin-bottom: 10px; outline: none;">Close</button></center>
         </div>
 
         <div id="tablecontainer"><table id="dataTable" class="display" width="100%" data-page-length='10'></table></div>

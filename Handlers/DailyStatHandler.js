@@ -12,7 +12,15 @@ let getDataRunning = false;
 let currentDayGlobal = 0;
 let DailyStat = MongoDb.DailyStat;
 let currentDailyStat = undefined;
- 
+
+function isEmpty(obj) {
+	for(var prop in obj) {
+			if(obj.hasOwnProperty(prop))
+					return false;
+	} 
+	return true;
+}
+
 function getNum(val) {
   if (isNaN(val)) {
     return 0;

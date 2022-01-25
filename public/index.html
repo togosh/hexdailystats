@@ -317,7 +317,7 @@
                     }
                 },
                 title: {
-                    text: 'Prices (USD)' ,
+                    text: 'T-Share Price (USD)' ,
                     style: {
                         color:  'white'
                     },
@@ -1143,7 +1143,7 @@
 
         function calculatorStake() {   
             try {
-            var payoutPerTshare = rowData[0][5];
+            var payoutPerTshare = liveData.payoutPerTshare; //rowData[0][5];
 
             var tsharesYear1 = calculatorTshares(365 * 1);
             var tsharesYear3 = calculatorTshares(365 * 3);
@@ -1399,7 +1399,7 @@
 
         <div id="divCalculator" style="display: none; margin-left: 10px; margin-right: 10px; margin-bottom: 10px;">
             <center>
-                <select id="currencyList" onchange="calculatorCurrencySelect()" style="height: 30px; width: 200px">
+                <select id="currencyList" onchange="calculatorCurrencySelect()" style="height: 30px; width: 200px; margin: 0px 10px 10px 0px">
                     <option value="USD" selected="selected" label="US dollar">USD</option>
                     <option value="EUR" label="Euro">EUR</option>
                     <option value="GBP" label="British pound">GBP</option>
@@ -1566,6 +1566,12 @@
                 <span id="calculatorOutput" style="color: white; width: 100px;">0.00 HEX</span>
                 <button id="stakeButton" onclick="calculatorStake()" style="display: none; height: 40px; padding: 0px 20px; margin: 0px 6px; outline: none;">Stake</button></center>
                 <div id="divStake" style="display: none; color: white"></div>
+                <div style="margin: 10px 0px 0px 0px;">
+                    <center>
+                        Also try <a href="https://hexcalc.net/" target="_blank" style="color: grey"><u>HEXcalc.net</u></a> and 
+                        <a href="https://stakehex.today/" target="_blank" style="color: grey"><u>StakeHEX.today</u></a>
+                    </center>
+                </div>
         </div>
 
         <div id="divCharts" style="display: none; margin-left: 10px; margin-right: 10px;">
@@ -1618,14 +1624,15 @@
         </ul>
     </center>
     
-    <div id="nomicsSection" style="padding-top: 10px; padding-bottom: 20px;">
+    <div id="linkSection" style="padding-top: 10px; padding-bottom: 20px;">
         <div><center><a href="https://codeakk.medium.com/hex-development-data-a1b1822446fa" target="_blank">Codeak</a> | 
             <a href="https://gist.github.com/togosh/5ff8a9a51740f30c96b3ee013e44b798" target="_blank">API</a> | 
             <a href="https://etherscan.io/address/0x2b591e99afe9f32eaa6214f7b7629768c40eeb39#readContract" target="_blank">Etherscan</a> | 
             <a href="https://thegraph.com/legacy-explorer/subgraph/uniswap/uniswap-v2" target="_blank">Uniswap</a> | 
-            <a href="https://nomics.com" target="_blank">Nomics</a></center></div>
+            <a href="https://github.com/togosh/hexdailystats" target="_blank">Github</a></center></div>
     </div>
     <center><a href="https://stakedwealth.com/" target="_blank"><img src="stakedwealth.jpg" style="width:303px; padding-bottom:10px;"></a></center>
     <center><a href="https://www.freedomtv.info/" target="_blank"><img src="kryptosparbuch.jpg" style="width:300px; padding-bottom:10px;"></a></center>
-    <center><a href="https://www.freedomtv.info/" style="width:300px; padding-bottom:30px;" target="_blank">freedomtv.info</a></center>
+    <center><a href="https://www.freedomtv.info/" style="width:300px;" target="_blank">freedomtv.info</a></center>
+    <center><button onclick="window.open('https://t.me/HEXDailyStats','_blank');" type="button" style="height: 40px; width: 300px; margin: 30px 0px 30px 0px;">Submit Feedback</button></center>
 </div>

@@ -89,6 +89,10 @@
         var calculatorOutputValue = 0;
         var table = undefined;
 
+        const sleep = (ms) => {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
         var socket = io.connect();
 
         socket.on('hexPrice', function (price) {
@@ -658,7 +662,7 @@
                         }  else if (text == "Current Stakers") {
                             $th.attr('title', 'Unique addresses with active stakes (not ended and not good accounted)');
                         } else if (text == "Payout Per T-Share (HEX)") {
-                            $th.attr('title', '((Circulating Supply + Staked Supply) * 10000 / 100448995) + (Penalties / 2)');
+                            $th.attr('title', '(((Circulating Supply + Staked Supply) * 10000 / 100448995) + (Penalties / 2)) / Tshares');
                         } else if (text == "Total Value Locked (USD)") {
                             $th.attr('title', '(Price * Staked Supply)');
                         } 
@@ -1059,7 +1063,15 @@
             $('#divAbout').toggle();
         }
 
-        function openCharts(){
+        async function openCharts(){
+            $('#divCharts').toggle();
+            await sleep(10);
+            $('#divCharts').toggle();
+            await sleep(10);
+            $('#divCharts').toggle();
+        }
+
+        function closeCharts(){
             $('#divCharts').toggle();
         }
 
@@ -1582,7 +1594,8 @@
             <div id="chart_TshareRate" style="margin-right: 0px;"></div>
             <div id="chart_PayoutPerTshare" style="margin-right: 0px;"></div>
             <div id="chart_StakedVsCirculating" style="margin-right: 0px;"></div>
-            <center><button onclick="openCharts()" style="padding: 6px 40px; margin-bottom: 10px; outline: none;">Close</button></center>
+            <center><div style="margin-bottom: 10px;">Also try: <a href="https://lookintohex.com/" target="_blank"><u>LookIntoHEX.com</u></a></div></center>
+            <center><button onclick="closeCharts()" style="padding: 6px 40px; margin-bottom: 10px; outline: none;">Close</button></center>
         </div>
 
         <div id="tablecontainer"><table id="dataTable" class="display" width="100%" data-page-length='10'></table></div>
@@ -1603,7 +1616,18 @@
             <li>APY: (Daily Payout / Staked Supply * 365.25)</li></br>
             <li>Total Value Locked: (Price * Staked)</li></br>
             <li>Minted Inflation: (Difference in Total Supply)</li></br>
-            <li>Payout Per Tshare: ((Circulating Supply + Staked Supply) * 10000 / 100448995) + (Penalties / 2)</li></br>
+            <li>Payout Per Tshare: (((Circulating Supply + Staked Supply) * 10000 / 100448995) + (Penalties / 2)) / Tshares</li></br>
+            <li>Total Holders: All addresses that have ever held HEX</li></br>
+            <li>Current Holders: All addresses with current HEX balance greater than zero</li></br>
+            <li>Total Stakers: All unique addresses that have ever created a HEX stake</li></br>
+            <li>Current Stakers: All unique addresses with at least one stake open that hasnt ended or good accounted yet</li></br>
+            <li>HEX Price:</li>
+            Day 1-13 - <a href="https://t.me/HEXDailyStats/760">AA (Adoption Amplifier)</a></br>
+            Day 14-166 - UV1</br>
+            Day 167-299 - UV1 & UV2 average</br>
+            Day 300-522 - UV2</br>
+            Day 522+ - UV2 & UV3 weighted liquidity</br>
+            Day 695+ - UV2</br>
         </ul>
         <ul id="divLegendLinks" style="display: none; text-align: left; max-width: 360px; margin-bottom: 0px; margin-top: 16px;">
             <li><a href="https://apphex.win/charts/" target="_blank">Apphex.win/charts</a></li></br>

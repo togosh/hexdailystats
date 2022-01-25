@@ -4,19 +4,19 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
-    "apexcharts": "^3.27.3",
+    "apexcharts": "^3.33.0",
     "cors": "^2.8.5",
     "es6-promise": "^4.2.8",
-    "express": "^4.17.1",
+    "express": "^4.17.2",
     "fetch-retry": "^5.0.1",
     "jquery": "^3.6.0",
-    "jsdom": "^16.6.0",
-    "mongoose": "^5.13.9",
+    "jsdom": "^19.0.0",
+    "mongoose": "^6.1.7",
     "node-cron": "^3.0.0",
-    "node-fetch": "^3.0.0",
-    "node-schedule": "^2.0.0",
-    "socket.io": "^4.2.0",
-    "twitter-api-client": "^1.3.8"
+    "node-fetch": "^3.2.0",
+    "node-schedule": "^2.1.0",
+    "socket.io": "^4.4.1",
+    "twitter-api-client": "^1.5.1"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

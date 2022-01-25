@@ -22,6 +22,14 @@ const onlyUnique = (value, index, self) => {
     return self.indexOf(value) === index;
 }
 
+function isEmpty(obj) {
+	for(var prop in obj) {
+			if(obj.hasOwnProperty(prop))
+					return false;
+	} 
+	return true;
+}
+
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 var fetchRetry = require('fetch-retry')(fetch, { 
     retryOn: async function(attempt, error, response) {
@@ -61,6 +69,7 @@ module.exports = {
     ,sleep: sleep
     ,onlyUnique: onlyUnique
     ,fetchRetry: fetchRetry
+    ,isEmpty: isEmpty
     ,CONFIG: CONFIG
     ,FETCH_SIZE: FETCH_SIZE
     ,HEX_CONTRACT_ADDRESS: HEX_CONTRACT_ADDRESS

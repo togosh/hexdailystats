@@ -250,51 +250,7 @@ io.on('connection', (socket) => {
         socket.emit("rowData", rowData);
       }
     }
-  });
- 
-  //createAllRows();
-  //update_shiftRowsDown();
-  //copyColumns();
-
-  //////////////////////////////////////////////////////////////////
-  // Create New Row
-
-  //createRow(623);
-  //create_dailyUpdates();
-  //create_totalTshareChanges();
-  //get_shareRateChangeByDay(623);
-  //create_tshareRateHEXIncreases();
-  //create_uniswapV2HEXPrice();
-  //create_uniswapV3HEXPrice();
-  //createUV2UV3Liquidity();
-  //create_uniswapV2V3CombinedHEXPrice();
-  //create_priceChangeUV2UV3s();
-  //create_tshareRateUSDs();
-  //create_roiMultiplierFromATLs();
-
-  //create_stakeStartsHistorical();
-  //create_stakeStartGAsHistorical();
-  //create_stakedSupplyGAChanges();
-  //update_stakedSupplyWithGA();
-  //create_stakedSupplyChanges();
-  //create_currentStakerCountChanges();
-  //create_tshareMarketCaps();
-  //create_totalValueLockeds();
-  //create_actualAPYRates();
-  //create_stakeEnds_stakeGoodAccountings_Historical();
-
-  //create_numberOfHolders();
-  //create_numberOfHoldersChanges();
-  //create_circulatingSupplys();
-  //create_totalHEXs();
-  //create_stakedHEXPercents();
-  //create_marketCaps();
-  //create_circulatingSupplyChanges();
-  //create_dailyMintedInflationTotals();
-  //create_totalStakerCountChanges();
-  //create_currentHoldersChanges();
-  
-  //if (!getStakeStartsCountHistorical){create_stakeStartsCountHistorical();}
+  }); 
 });
 
 async function getCurrencyData() {
@@ -475,50 +431,28 @@ let test = async () => {
   //var test2 = test;
 }; test();
 
-cron.schedule('1 * * * * *', async () => {
-  log('**** DAILY DATA TIMER 1!');
-   
-  if (!DailyStatMaintenance){ 
-    try{ 
-        let latestDailyData = await DailyStat.find().sort({currentDay:-1}); 
-        let dailyDataCurrentDayEnd = latestDailyData[0].currentDay;
-        let dailyDataCurrentDayStart = latestDailyData[4].currentDay; 
-        
-        for (let i = dailyDataCurrentDayStart; i <= dailyDataCurrentDayEnd; i++) { 
-          
-          let ds = await DailyStat.find({currentDay:i}); 
-
-          for(var key in ds[0]){
-          if(key != '$op' && ds[0][key] === null){
-              DailyStatMaintenance = true;
-              await DailyStatHandler.getDailyData(i);  
-              if (!getRowDataRunning){ getRowData(); }
-              io.emit("currentDay", currentDayGlobal);
-              break;
-            }
-          }
-
-        }
-        DailyStatMaintenance = false;
-    
-    }
-    catch (err) {
-      log('DAILY DATA TIMER 1() ----- ERROR ---' + err.toString() + " - " + err.stack);
-    } finally { 
-      DailyStatMaintenance = false; 
-    }
-    DailyStatMaintenance = false;  
-  }
-});
-
-cron.schedule('2 * * * * *', async () => {
-  log('**** DAILY DATA TIMER 2!');
+cron.schedule('15 * * * * *', async () => {
+  log('**** DAILY DATA MAINTENANCE TIMER !');
   
   if (!getDataRunning && !DailyStatMaintenance){ 
     try{
       let latestDay = await TheGraph.get_latestDay(); 
       let latestDailyData = await DailyStat.find().sort({currentDay:-1});
-      let latestDailyDataCurrentDay = latestDailyData[0].currentDay; 
+      let latestDailyDataCurrentDay = latestDailyData[0].currentDay;  
+      let dailyDataCurrentDayStart = latestDailyData[4].currentDay; 
+      
+      for (let i = dailyDataCurrentDayStart; i <= latestDailyDataCurrentDay; i++) {  
+        let ds = await DailyStat.find({currentDay:i});  
+        for(var key in ds[0]){
+          if(key != '$op' && ds[0][key] === null){
+            DailyStatMaintenance = true;
+            await DailyStatHandler.getDailyData(i);  
+            if (!getRowDataRunning){ getRowData(); }
+            io.emit("currentDay", currentDayGlobal);
+            break;
+          }
+        } 
+      }
 
       if(latestDay > latestDailyDataCurrentDay) {
         DailyStatMaintenance = true;
@@ -527,15 +461,13 @@ cron.schedule('2 * * * * *', async () => {
           if (!getRowDataRunning){ getRowData(); }
           io.emit("currentDay", currentDayGlobal);
         }
-      }
-      DailyStatMaintenance = false;
+      } 
     }
     catch (err) {
-      log('DAILY DATA TIMER 2() ----- ERROR ---' + err.toString() + " - " + err.stack);
+      log('DAILY DATA MAINTENANCE TIMER () ----- ERROR ---' + err.toString() + " - " + err.stack);
     } finally { 
       DailyStatMaintenance = false;
-    }
-    DailyStatMaintenance = false;
+    } 
   }
 });
 

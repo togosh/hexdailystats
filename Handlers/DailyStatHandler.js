@@ -382,7 +382,7 @@ async function getDailyData(day) {
 
       // Create Full Object, Set Calculated Values
       try {
-        const dailyStat = new DailyStat({ 
+         let dailyStatPackage = {
 
           // CORE DATA
           date:               date,
@@ -454,7 +454,9 @@ async function getDailyData(day) {
           totalStakerCountChange:   totalStakerCountChange,
 
           totalValueLocked:         totalValueLocked,
-        });
+        };
+
+        const dailyStat = new DailyStat(dailyStatPackage);
 
         log("*** 100 - PRINT ************");
         log(dailyStat);
@@ -466,8 +468,8 @@ async function getDailyData(day) {
           if (err) log(err); 
           else{
             if (CONFIG.twitter.enabled && currentDayGlobal == newDay) {
-              Twitter.tweet(dailyStat); await sleep(30000);
-              Twitter.tweetBshare(dailyStat);
+              Twitter.tweet(dailyStatPackage); await sleep(30000);
+              Twitter.tweetBshare(dailyStatPackage);
             }
           }
           resolve(true);

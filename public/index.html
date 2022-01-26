@@ -1081,7 +1081,11 @@
 
         function divLiveSectionToggle(){
             $('#divLiveSection').toggle();
-        }        
+        }     
+        
+        function divEthereumSectionToggle(){
+            $('#divEthereumSection').toggle();
+        }     
 
         function display_c(){
             var refresh=1000; // Refresh rate in milli seconds
@@ -1363,7 +1367,7 @@
         </center>
         <center>
             <div style="margin-bottom: 10px;">
-                <div id="divEthereumSectionHeader" style="padding-top: 8px; text-align:center; font-size: 16px;  max-width: 340px; cursor: pointer;"><b>ETHEREUM</b></div>
+                <div id="divEthereumSectionHeader" style="padding-top: 8px; text-align:center; font-size: 16px;  max-width: 340px; cursor: pointer;" onclick="divEthereumSectionToggle();"><b>ETHEREUM</b></div>
                 <div id="divEthereumSection" class="divLive" style="text-align:center; font-size: 16px; max-width: 340px; border-radius: 0px;"></div>
             </div>
         </center>

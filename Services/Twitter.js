@@ -40,6 +40,9 @@ async function tweet(dailyStat){
 	if (CONFIG.twitter.enabled && !DEBUG && dailyStat){ //&& !objectHasNullProperties(dailyStat)){
 	try {
     console.log("tweet() ---- ENABLED");
+  log("tweet() ---- OBJECT");
+  log(dailyStat);
+  log("!objectHasNullProperties(dailyStat) --- " + !objectHasNullProperties(dailyStat));
 	var mediaId = ''; 
   var tweetStatus = "";
 

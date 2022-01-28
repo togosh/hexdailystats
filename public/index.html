@@ -93,7 +93,7 @@
             return new Promise(resolve => setTimeout(resolve, ms));
         }
 
-        var socket = io.connect();
+        var socket = io({transports: ['websocket'],}).connect();
 
         socket.on('hexPrice', function (price) {
             if (price && price !== ''){

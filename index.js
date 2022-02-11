@@ -128,9 +128,9 @@ if (cluster.isMaster) {
   setupPrimary();
 
   // needed for packets containing buffers
-  cluster.setupPrimary({
-    serialization: "advanced",
-  });
+  //cluster.setupPrimary({
+  //  serialization: "advanced",
+  //});
 
   const MongoDb = require('./Services/MongoDB');
   const TheGraph = require('./Services/TheGraph');

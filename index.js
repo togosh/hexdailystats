@@ -7,6 +7,7 @@ var DEBUG = CONFIG.debug;
 const cluster = require('cluster');
 const totalCPUs = require('os').cpus().length;
 
+const { setupMaster, setupWorker } = require("@socket.io/sticky");
 const { createAdapter, setupPrimary } = require("@socket.io/cluster-adapter");
 
 //////////////////////////////////////////////////////////////////////////////////////////// CORE DATA
@@ -65,6 +66,63 @@ if (cluster.isMaster) {
   });
 
   //////////////////////////////////////////////////////////////////////////////////////////////// TESTING TESTING TESTING
+
+  const http = require('http');
+  require('es6-promise').polyfill();
+
+  const express = require('express');
+  const path = require('path');
+  const fs = require('fs');
+  const https = require('https');
+  var cors = require('cors');
+
+  const { JSDOM } = require( "jsdom" );
+  const { window } = new JSDOM( "" );
+  const $ = require( "jquery" )( window );
+
+  var hostname = CONFIG.hostname;
+  if (DEBUG){ hostname = '127.0.0.1'; }
+
+  var httpPort = 80;
+  if (DEBUG){ httpPort = 3000; }
+  const httpsPort = 443;
+
+  var httpsOptions = undefined;
+  if(!DEBUG){ httpsOptions = {
+    cert: fs.readFileSync(CONFIG.https.cert),
+    ca: fs.readFileSync(CONFIG.https.ca),
+    key: fs.readFileSync(CONFIG.https.key)
+  };}
+
+  const app = express();
+
+  const httpServer = http.createServer(app);
+  var httpsServer = undefined;
+  if(!DEBUG){ httpsServer = https.createServer(httpsOptions, app);}
+
+  if(!DEBUG){ app.use((req, res, next) => {if(req.protocol === 'http') { res.redirect(301, 'https://' + hostname); } next(); }); }
+
+  app.use(express.static(path.join(__dirname, 'public')));
+
+  app.get("/", function(req, res){ res.sendFile('/index.html', {root: __dirname}); });
+
+  httpServer.listen(httpPort, hostname, () => { log(`Server running at http://${hostname}:${httpPort}/`);});
+
+  if(!DEBUG){ httpsServer.listen(httpsPort, hostname, () => {
+      log('listening on *:' + httpsPort);
+    });
+  }
+
+  if(DEBUG) {
+    // setup sticky sessions
+    setupMaster(httpServer, {
+      loadBalancingMethod: "least-connection",
+    });
+  } else {
+    setupMaster(httpsServer, {
+      loadBalancingMethod: "least-connection",
+    });
+  }
 
   // setup connections between the workers
   setupPrimary();
@@ -496,19 +554,22 @@ if (cluster.isMaster) {
 
   app.get("/", function(req, res){ res.sendFile('/index.html', {root: __dirname}); });
 
-  httpServer.listen(httpPort, hostname, () => { log(`Server running at http://${hostname}:${httpPort}/`);});
+  //httpServer.listen(httpPort, hostname, () => { log(`Server running at http://${hostname}:${httpPort}/`);});
 
-  if(!DEBUG){ httpsServer.listen(httpsPort, hostname, () => {
-      log('listening on *:' + httpsPort);
-    });
-  }
+  //if(!DEBUG){ httpsServer.listen(httpsPort, hostname, () => {
+  //    log('listening on *:' + httpsPort);
+  //  });
+  //}
 
   var io = undefined;
-  if(DEBUG){ io = require('socket.io')(httpServer, {transports: ["websocket"]});
-  } else { io = require('socket.io')(httpsServer, {secure: true, transports: ["websocket"]}); }
+  if(DEBUG){ io = require('socket.io')(httpServer);
+  } else { io = require('socket.io')(httpsServer, {secure: true}); }
 
   // use the cluster adapter
   io.adapter(createAdapter());
+
+  // setup connection with the primary process
+  setupWorker(io);
 
   io.on('connection', (socket) => {
     log('SOCKET -- ************* CONNECTED: ' + socket.id + ' *************');

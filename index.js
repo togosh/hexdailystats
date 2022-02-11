@@ -425,8 +425,8 @@ var ethereumData = undefined;
   }
 
   var io = undefined;
-  if(DEBUG){ io = require('socket.io')(httpServer, {transports: ["websocket"]});
-  } else { io = require('socket.io')(httpsServer, {secure: true, transports: ["websocket"]}); }
+  if(DEBUG){ io = require('socket.io')(httpServer);
+  } else { io = require('socket.io')(httpsServer, {secure: true}); }
 
   io.on('connection', (socket) => {
     log('SOCKET -- ************* CONNECTED: ' + socket.id + ' *************');

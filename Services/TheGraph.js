@@ -5,6 +5,8 @@ const onlyUnique = h.onlyUnique;
 const fetchRetry = h.fetchRetry;
 const FETCH_SIZE = h.FETCH_SIZE;
 const HEX_CONTRACT_ADDRESS = h.HEX_CONTRACT_ADDRESS;
+const USDC_CONTRACT_ADDRESS = h.USDC_CONTRACT_ADDRESS;
+const WETH_CONTRACT_ADDRESS = h.WETH_CONTRACT_ADDRESS;
 const UNISWAP_V2_HEXUSDC = h.UNISWAP_V2_HEXUSDC;
 const UNISWAP_V2_HEXETH = h.UNISWAP_V2_HEXETH;
 const UNISWAP_V3_HEXUSDC = h.UNISWAP_V3_HEXUSDC;
@@ -931,15 +933,6 @@ async function getUniswapV2() {
   }
   
   async function getUniswapV3Historical(blockNumber) {
-    //var pools = await getUniswapV3Pools();
-    //await sleep(200);
-    var pools = [ 
-      UNISWAP_V3_HEXUSDC,
-      UNISWAP_V3_HEXETH
-    ]
-  
-    if (pools == undefined) {return;}
-  
     return await fetchRetry('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3', {
       method: 'POST',
       highWaterMark: FETCH_SIZE,
@@ -947,10 +940,14 @@ async function getUniswapV2() {
       body: JSON.stringify({ query: `
         query {
           pools (
-            orderBy: volumeUSD, orderDirection: desc,
+            orderBy: totalValueLockedUSD, orderDirection: desc,
             block: {number: ` + blockNumber + `},
             where: {
-              id_in: ` + JSON.stringify(pools) + `
+              token0: "` + HEX_CONTRACT_ADDRESS + `",
+              token1_in: [
+                "` + USDC_CONTRACT_ADDRESS + `",
+                "` + WETH_CONTRACT_ADDRESS + `"
+              ]
             }
           ){
             id
@@ -977,20 +974,20 @@ async function getUniswapV2() {
         var token1TVL = res.data.pools[i].totalValueLockedToken1;
   
         if (token0Name == "HEX" && token1Name == "USD Coin") {
-          liquidityUV3_HEX += token0TVL;
-          liquidityUV3_USDC = token1TVL;
+          liquidityUV3_HEX += parseInt(token0TVL);
+          liquidityUV3_USDC += parseInt(token1TVL);
         } 
         
         if (token0Name == "HEX" && token1Name == "Wrapped Ether") {
-          liquidityUV3_HEX += token0TVL;
-          liquidityUV3_ETH = token1TVL;
+          liquidityUV3_HEX += parseInt(token0TVL);
+          liquidityUV3_ETH += parseInt(token1TVL);
         }
       }
   
       return {
-        liquidityUV3_HEX: parseInt(liquidityUV3_HEX), //parseFloat(parseFloat(liquidityUV3_HEX).toFixed(4)),
-        liquidityUV3_USDC: parseInt(liquidityUV3_USDC), //parseFloat(parseFloat(liquidityUV3_USDC).toFixed(4)),
-        liquidityUV3_ETH: parseInt(liquidityUV3_ETH), //parseFloat(parseFloat(liquidityUV3_ETH).toFixed(4))
+        liquidityUV3_HEX: liquidityUV3_HEX,
+        liquidityUV3_USDC: liquidityUV3_USDC,
+        liquidityUV3_ETH: liquidityUV3_ETH,
       }
     } catch (error){
       return {
@@ -1003,16 +1000,6 @@ async function getUniswapV2() {
   }
   
   async function getUniswapV3() {
-    //var pools = await getUniswapV3Pools();
-    //await sleep(200);
-
-    var pools = [ 
-      UNISWAP_V3_HEXUSDC,
-      UNISWAP_V3_HEXETH
-    ]
-  
-    if (pools == undefined) {return;}
-  
     return await fetchRetry('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3', {
       method: 'POST',
       highWaterMark: FETCH_SIZE,
@@ -1020,8 +1007,13 @@ async function getUniswapV2() {
       body: JSON.stringify({ query: `
         query {
           pools (
-            orderBy: volumeUSD, orderDirection: desc,
-            where: {id_in: ` + JSON.stringify(pools) + `
+            orderBy: totalValueLockedUSD, orderDirection: desc,
+            where: {
+              token0: "` + HEX_CONTRACT_ADDRESS + `",
+              token1_in: [
+                "` + USDC_CONTRACT_ADDRESS + `",
+                "` + WETH_CONTRACT_ADDRESS + `"
+              ]
             }
           ){
             id
@@ -1049,20 +1041,20 @@ async function getUniswapV2() {
           var token1TVL = res.data.pools[i].totalValueLockedToken1;
     
           if (token0Name == "HEX" && token1Name == "USD Coin") {
-            liquidityUV3_HEX += token0TVL;
-            liquidityUV3_USDC = token1TVL;
+            liquidityUV3_HEX += parseInt(token0TVL);
+            liquidityUV3_USDC += parseInt(token1TVL);
           } 
           
           if (token0Name == "HEX" && token1Name == "Wrapped Ether") {
-            liquidityUV3_HEX += token0TVL;
-            liquidityUV3_ETH = token1TVL;
+            liquidityUV3_HEX += parseInt(token0TVL);
+            liquidityUV3_ETH += parseInt(token1TVL);
           }
         }
     
         return {
-          liquidityUV3_HEX: parseInt(liquidityUV3_HEX), //parseFloat(parseFloat(liquidityUV3_HEX).toFixed(4)),
-          liquidityUV3_USDC: parseInt(liquidityUV3_USDC), //parseFloat(parseFloat(liquidityUV3_USDC).toFixed(4)),
-          liquidityUV3_ETH: parseInt(liquidityUV3_ETH), //parseFloat(parseFloat(liquidityUV3_ETH).toFixed(4))
+          liquidityUV3_HEX: liquidityUV3_HEX,
+          liquidityUV3_USDC: liquidityUV3_USDC,
+          liquidityUV3_ETH: liquidityUV3_ETH,
         }
       } else {
         return {
@@ -1410,6 +1402,12 @@ module.exports = {
     }
     ,getUniswapV3Historical: async (blockNumber) => {
         return await getUniswapV3Historical(blockNumber);
+    }
+    ,getUniswapV2HEXUSDCHistorical: async (dateEpoch) => {
+      return await getUniswapV2HEXUSDCHistorical(dateEpoch);
+    }
+    ,getUniswapV2HEXETHHistorical: async (dateEpoch) => {
+      return await getUniswapV2HEXETHHistorical(dateEpoch);
     }
     ,getEthereumBlock: async (day) => {
         return await getEthereumBlock(day);

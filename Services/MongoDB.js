@@ -1,9 +1,12 @@
 const Etherscan = require('./Etherscan'); 
+const TheGraph = require('../Services/TheGraph');  
 const h = require('../Helpers/helpers'); 
+const isEmpty = h.isEmpty;
 const CONFIG = h.CONFIG; 
 const log = h.log;
 const sleep = h.sleep;
 const mongoCollectionName = CONFIG.mongoCollectionName;
+const day2Epoch = 1575417600 + 86400;
 require('es6-promise').polyfill();
 
 var mongoose = require('mongoose');
@@ -583,15 +586,15 @@ async function createUV2UV3Liquidity(){
     //log("COMBINED - HEX - " + (liquidityUV3_HEX + liquidityUV2_HEXUSDC + liquidityUV2_HEXETH) + " USDC - " + (liquidityUV3_USDC + liquidityUV2_USDC) + " ETH - " + (liquidityUV3_ETH + liquidityUV2_ETH));
     //return;
     try {
-      for (var day = 314; day <= 314; day++) {  // Starts on Day 167 End 595
+      for (var day = 740; day <= 801; day++) {  // Starts on Day 167 End 595
         var rowFind = await DailyStat.findOne({currentDay: { $eq: day}});
         if (!isEmpty(rowFind)) {
           // UV2
           var startTime = day2Epoch + ((day - 2) * 86400) - 86400;
           
-          var { liquidityUV2_HEXUSDC, liquidityUV2_USDC } = await getUniswapV2HEXUSDCHistorical(startTime);
+          var { liquidityUV2_HEXUSDC, liquidityUV2_USDC } = await TheGraph.getUniswapV2HEXUSDCHistorical(startTime);
           sleep(700);
-          var { liquidityUV2_HEXETH, liquidityUV2_ETH } = await getUniswapV2HEXETHHistorical(startTime);
+          var { liquidityUV2_HEXETH, liquidityUV2_ETH } = await TheGraph.getUniswapV2HEXETHHistorical(startTime);
           sleep(300);
   
           rowFind.liquidityUV2_HEXUSDC = liquidityUV2_HEXUSDC;
@@ -600,9 +603,9 @@ async function createUV2UV3Liquidity(){
           rowFind.liquidityUV2_ETH = liquidityUV2_ETH;
   
           // UV3
-          var blockNumber = await getEthereumBlock(day)
+          var blockNumber = await TheGraph.getEthereumBlock(day)
   
-          var { liquidityUV3_HEX, liquidityUV3_USDC, liquidityUV3_ETH } = await getUniswapV3Historical(blockNumber);
+          var { liquidityUV3_HEX, liquidityUV3_USDC, liquidityUV3_ETH } = await TheGraph.getUniswapV3Historical(blockNumber);
   
           rowFind.liquidityUV3_HEX = liquidityUV3_HEX;
           rowFind.liquidityUV3_USDC = liquidityUV3_USDC;
@@ -613,7 +616,7 @@ async function createUV2UV3Liquidity(){
           rowFind.liquidityUV2UV3_USDC = (liquidityUV2_USDC + liquidityUV3_USDC);
           rowFind.liquidityUV2UV3_ETH = (liquidityUV2_ETH + liquidityUV3_ETH);
   
-          log("COMBINED - HEX - " + (rowFind.liquidityUV2UV3_HEX) + " USDC - " + (rowFind.liquidityUV2UV3_USDC) + " ETH - " + (rowFind.liquidityUV2UV3_ETH));
+          log("DAY: " + day + " COMBINED - HEX - " + (rowFind.liquidityUV2UV3_HEX) + " USDC - " + (rowFind.liquidityUV2UV3_USDC) + " ETH - " + (rowFind.liquidityUV2UV3_ETH));
           rowFind.save(function (err) {
             if (err) return log("createUV2UV3Liquidity - SAVE ERROR: " + err);
           });
@@ -1382,6 +1385,9 @@ module.exports = {
     }
     ,updateOneColumn: async (day, column, value) => {
       return await updateOneColumn(day, column, value);
+    }
+    ,createUV2UV3Liquidity: async() => {
+      return await createUV2UV3Liquidity();
     }
  }
  

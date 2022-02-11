@@ -4,11 +4,6 @@ const log = h.log;
 const CONFIG = h.CONFIG;
 var DEBUG = CONFIG.debug;
 
-const cluster = require('cluster');
-const totalCPUs = require('os').cpus().length;
-
-const { createAdapter, setupPrimary } = require("@socket.io/cluster-adapter");
-
 //////////////////////////////////////////////////////////////////////////////////////////// CORE DATA
 var rowData = undefined;
 var rowDataObjects = undefined;
@@ -19,60 +14,7 @@ var currencyRates = undefined;
 var hexSiteData = undefined;
 var ethereumData = undefined;
 
-//////////////////////////////////////////////////////////////////////////////////////////// MASTER - CREATE WORKERS
-if (cluster.isMaster) {
-  console.log(`Master ${process.pid} is running - Number of CPUs is ${totalCPUs}`);
-
-  for (let i = 0; i < totalCPUs; i++) {
-    var worker = cluster.fork();
-    worker.on('message', function(msg) {
-      if (msg.grabData) {
-        log('Worker to Master: grabData!!!');
-        grabData();
-      }
-      if (msg.kill){
-        var workers = JSON.parse(JSON.stringify(cluster.workers));
-        log("Worker to Master: kill all workers!");
-        for (const id in workers) { cluster.workers[id].kill(); }
-      }
-    });
-  }
-
-  cluster.on('exit', (worker, code, signal) => {
-    console.log(`Worker ${worker.process.pid} died, creating another`);
-    var worker = cluster.fork();
-    worker.on('message', function(msg) {
-      if (msg.grabData) {
-        log('Worker to Master: grabData!!!');
-        grabData();
-      }
-      if (msg.kill){
-        var workers = JSON.parse(JSON.stringify(cluster.workers));
-        log("Worker to Master: kill all workers!");
-        for (const id in workers) { cluster.workers[id].kill(); }
-      }
-    });
-    worker.send({ 
-      liveData:         liveData,
-      ethereumData:     ethereumData,
-      hexSiteData:      hexSiteData,
-      hexPrice:         hexPrice,
-      currencyRates:    currencyRates,
-      rowData:          rowData,
-      rowDataObjects:   rowDataObjects,
-      currentDayGlobal: currentDayGlobal,
-    })
-  });
-
-  //////////////////////////////////////////////////////////////////////////////////////////////// TESTING TESTING TESTING
-
-  // setup connections between the workers
-  setupPrimary();
-
-  // needed for packets containing buffers
-  cluster.setupPrimary({
-    serialization: "advanced",
-  });
+//////////////////////////////////////////////////////////////////////////////////////////// MASTER
 
   const MongoDb = require('./Services/MongoDB');
   const TheGraph = require('./Services/TheGraph');
@@ -107,8 +49,7 @@ if (cluster.isMaster) {
 
     hexSiteData = await buildHexSiteData(rowDataObjects);
 
-    //io.emit("rowData", rowData);
-    for (const id in cluster.workers) { cluster.workers[id].send({ rowData: rowData, rowDataObjects: rowDataObjects, hexSiteData: hexSiteData}); }
+    io.emit("rowData", rowData);
   }
 
   async function grabData() {
@@ -146,8 +87,7 @@ if (cluster.isMaster) {
       if (currentDayGlobal == undefined || (currentDay != currentDayGlobal && currentDay > currentDayGlobal)) {
         log("currentDay EMIT");
         currentDayGlobal = currentDay;
-        //io.emit("currentDay", currentDayGlobal);
-        for (const id in cluster.workers) { cluster.workers[id].send({ currentDayGlobal: currentDayGlobal }); }
+        io.emit("currentDay", currentDayGlobal);
       }
     } catch (error){
       log("ERROR: " + "getAndSet_currentGlobalDay()");
@@ -181,8 +121,7 @@ if (cluster.isMaster) {
               DailyStatMaintenance = true;
               await DailyStatHandler.getDailyData(i);
               if (!getRowDataRunning){ getRowData(); }
-              //io.emit("currentDay", currentDayGlobal);
-              for (const id in cluster.workers) { cluster.workers[id].send({ currentDay: currentDayGlobal }); }
+              io.emit("currentDay", currentDayGlobal);
               break;
             }
           }
@@ -193,8 +132,7 @@ if (cluster.isMaster) {
           for (let i = latestDailyDataCurrentDay + 1; i <= latestDay; i++) {
             await DailyStatHandler.getDailyData(i);
             if (!getRowDataRunning){ getRowData(); }
-            //io.emit("currentDay", currentDayGlobal);
-            for (const id in cluster.workers) { cluster.workers[id].send({ currentDay: currentDayGlobal }); }
+            io.emit("currentDay", currentDayGlobal);
           }
         }
       }
@@ -291,13 +229,11 @@ if (cluster.isMaster) {
       //console.log(liveDataNew);
       if (liveDataNew && (JSON.stringify(liveDataNew) !== JSON.stringify(liveData))){
         liveData = liveDataNew;
-        //io.emit("liveData", liveData);
-        for (const id in cluster.workers) { cluster.workers[id].send({ liveData: liveData }); }
+        io.emit("liveData", liveData);
 
         if (liveData.price) {
           hexPrice = liveData.price.toFixed(4);
-          //io.emit("hexPrice", hexPrice);
-          for (const id in cluster.workers) { cluster.workers[id].send({ hexPrice: hexPrice }); }
+          io.emit("hexPrice", hexPrice);
         }
       }
     }
@@ -371,8 +307,7 @@ if (cluster.isMaster) {
       //console.log(ethereumDataNew);
       if (ethereumDataNew && (JSON.stringify(ethereumDataNew) !== JSON.stringify(ethereumData))){
         ethereumData = ethereumDataNew;
-        //io.emit("ethereumData", ethereumData);
-        for (const id in cluster.workers) { cluster.workers[id].send({ ethereumData: ethereumData }); }
+        io.emit("ethereumData", ethereumData);
       }
     }
     } catch (error){
@@ -417,8 +352,7 @@ if (cluster.isMaster) {
       if (rates) {
         currencyRates = rates;
         log('SOCKET -- ****EMIT: currencyRates');
-        //io.emit("currencyRates", currencyRates);
-        for (const id in cluster.workers) { cluster.workers[id].send({ currencyRates: currencyRates }); }
+        io.emit("currencyRates", currencyRates);
       }
     } catch (error) {
       log("getCurrencyData() - ERROR: " + error);
@@ -442,19 +376,6 @@ if (cluster.isMaster) {
       return undefined;
     });
   }
-
-} else { ///////////////////////////////////////////////////////////////////////////////////// WORKER - UPDATE DATA
-  process.on('message', function(msg) { 
-    if (msg.liveData)         { liveData          = msg.liveData;         io.local.emit("liveData",         liveData);          }
-    if (msg.ethereumData)     { ethereumData      = msg.ethereumData;     io.local.emit("ethereumData",     ethereumData);      }
-    if (msg.hexSiteData)      { hexSiteData       = msg.hexSiteData;                                                            }
-    if (msg.hexPrice)         { hexPrice          = msg.hexPrice;         io.local.emit("hexPrice",         hexPrice);          }
-    if (msg.currencyRates)    { currencyRates     = msg.currencyRates;    io.local.emit("currencyRates",    currencyRates);     }
-    if (msg.rowData)          { rowData           = msg.rowData;          io.local.emit("rowData",          rowData);           }
-    if (msg.rowDataObjects)   { rowDataObjects    = msg.rowDataObjects;                                                         }
-    if (msg.currentDayGlobal) { currentDayGlobal  = msg.currentDayGlobal; io.local.emit("currentDay",       currentDayGlobal);  }
-  }); 
-  // https://socket.io/docs/v4/broadcasting-events/#with-multiple-socketio-servers
 
   //////////////////////////////////////////////////////////////////////////////////////////// WORKER - START SERVER
   const http = require('http');
@@ -507,9 +428,6 @@ if (cluster.isMaster) {
   if(DEBUG){ io = require('socket.io')(httpServer, {transports: ["websocket"]});
   } else { io = require('socket.io')(httpsServer, {secure: true, transports: ["websocket"]}); }
 
-  // use the cluster adapter
-  io.adapter(createAdapter());
-
   io.on('connection', (socket) => {
     log('SOCKET -- ************* CONNECTED: ' + socket.id + ' *************');
     //if (!getDataRunning){ DailyStatHandler.getDailyData(); }
@@ -536,24 +454,7 @@ if (cluster.isMaster) {
   });
 
   app.get("/" + CONFIG.urls.grabdata, function (req, res) {
-    process.send({ grabData: true });
+    grabData();
     res.send(new Date().toISOString() + ' - Grab Data!');
   });
 
-  if (DEBUG){
-  app.get("/kill", function (req, res) {
-    process.send({ kill: true });
-    res.send(new Date().toISOString() + ' - Kill Workers!');
-  });
-  }
-}
-
-
-/////////////////////////////////////////////////////////////////////////////////// MASTER - GET DATA
-//if (cluster.isMaster){
-  //let test = async () => {
-  //await MongoDb.updateOneColumn(756, "tshareRateHEX", null);
-  //var test = await DailyStat.find({currentDay:null});
-  //var test2 = test;
-  //}; test();
-//}

@@ -1025,6 +1025,11 @@
                 $('#divLegendLinks').get(0).scrollIntoView();
             });
 
+            $('#buttonPools').click(function() { 
+                $('#divPools').toggle();
+                $('#divPools').get(0).scrollIntoView();
+            });
+
             $('#buttonDark').click(function() { 
                 if( $('#styleDark').attr('disabled') == "disabled" ) {
                     $('#styleDark').removeAttr('disabled');
@@ -1397,7 +1402,8 @@
                     <div style="padding: 20px 40px">
                         <center><a href="https://codeakk.medium.com/hex-development-data-a1b1822446fa" target="_blank"><img width="300" src="codeak.jpg"></img></a></center>
                         <center><div class="text">Codeak - Developer</br></br>  
-                            <a href="https://codeakk.medium.com/hex-development-data-a1b1822446fa" target="_blank">Medium</a>
+                            <a href="https://codeakk.medium.com/hex-development-data-a1b1822446fa" target="_blank">Medium</a> |
+                            <a href="https://github.com/codeakk" target="_blank">Github</a>
                         </div></center>
                     </div>
 
@@ -1598,7 +1604,7 @@
             <div id="chart_TshareRate" style="margin-right: 0px;"></div>
             <div id="chart_PayoutPerTshare" style="margin-right: 0px;"></div>
             <div id="chart_StakedVsCirculating" style="margin-right: 0px;"></div>
-            <center><div style="margin-bottom: 10px;">Also try: <a href="https://lookintohex.com/" target="_blank"><u>LookIntoHEX.com</u></a></div></center>
+            <center><div style="margin-bottom: 10px;">Also try: <a href="https://lookintohex.com/" target="_blank"><u>LookIntoHEX.com</u></a>, <a href="https://hexgraphs.com/" target="_blank"><u>HEXgraphs.com</u></a> and <a href="https://www.whalesonly.com/charts" target="_blank"><u>WhalesOnly.com/charts</u></a></div></center>
             <center><button onclick="closeCharts()" style="padding: 6px 40px; margin-bottom: 10px; outline: none;">Close</button></center>
         </div>
 
@@ -1611,6 +1617,18 @@
             </div>
         </div>
     </div>
+    <center>
+        <button id="buttonPools" style="width: 300px; height: 48px; margin-bottom: 10px;">Liquidity Pools</button>
+        <ul id="divPools" style="display: none; text-align: left; max-width: 360px; margin-bottom: 0px; margin-top: 16px;">
+            <li><a href="https://info.uniswap.org/#/pools/0x69d91b94f0aaf8e8a2586909fa77a5c2c89818d5">0x69d - USDC - UniswapV3 - 0.3% Fee</a></li></br>
+            <li><a href="https://info.uniswap.org/#/pools/0xe05e653453f733786f2dabae0ffa1e96cfcc4b25">0xe05 - USDC - UniswapV3 - 1.0% Fee</a></li></br>
+            <li><a href="https://v2.info.uniswap.org/pair/0xf6dcdce0ac3001b2f67f750bc64ea5beb37b5824">0xf6d - USDC - UniswapV2 - 0.3% Fee</a></li></br>
+            </br>
+            <li><a href="https://info.uniswap.org/#/pools/0x9e0905249ceefffb9605e034b534544684a58be6">0x9e0 - WETH - UniswapV3 - 0.3% Fee</a></li></br>
+            <li><a href="https://info.uniswap.org/#/pools/0x82743c07bf3be4d55876f87bca6cce5f84429bd0">0x827 - WETH - UniswapV3 - 1.0% Fee</a></li></br>
+            <li><a href="https://v2.info.uniswap.org/pair/0x55d5c232d921b9eaa6b37b5845e439acd04b4dba">0x55d - WETH - UniswapV2 - 0.3% Fee</a></li></br>
+        </ul>
+    </center>
 
     <center>
         <button id="buttonLegendLinks" style="width: 150px; height: 48px; margin-bottom: 10px;">Links</button>
@@ -1625,28 +1643,32 @@
             <li>Current Holders: All addresses with current HEX balance greater than zero</li></br>
             <li>Total Stakers: All unique addresses that have ever created a HEX stake</li></br>
             <li>Current Stakers: All unique addresses with at least one stake open that hasnt ended or good accounted yet</li></br>
-            <li>HEX Price:</li>
+            <li>HEX Price:</br>
             Day 1-13 - <a href="https://t.me/HEXDailyStats/760">AA (Adoption Amplifier)</a></br>
             Day 14-166 - UV1</br>
             Day 167-299 - UV1 & UV2 average</br>
             Day 300-522 - UV2</br>
             Day 522+ - UV2 & UV3 weighted liquidity</br>
             Day 695+ - UV2</br>
+            Day 780+ - UV2 & UV3 weighted liquidity</li></br>
         </ul>
         <ul id="divLegendLinks" style="display: none; text-align: left; max-width: 360px; margin-bottom: 0px; margin-top: 16px;">
             <li><a href="https://apphex.win/charts/" target="_blank">Apphex.win/charts</a></li></br>
+            <li><a href="https://twitter.com/WhaleHEX" target="_blank">Twitter.com/WhaleHex</a></li></br>
             <li><a href="https://hex.vision/" target="_blank">Hex.vision</a></li></br>
             <li><a href="https://lookintohex.com/" target="_blank">LookIntoHex.com</a></li></br>
             <li><a href="https://hexgraphs.com/" target="_blank">HexGraphs.com</a></li></br>
             <li><a href="https://whalesonly.com/charts" target="_blank">WhalesOnly.com/charts</a></li></br>
-            <li><a href="https://www.reddit.com/user/hex_crypto_bull/" target="_blank">Reddit.com/user/hex_crypto_bull</a></li></br>
+            <li><a href="https://www.reddit.com/r/HexCryptoReport/" target="_blank">Reddit.com/r/HexCryptoReport</a></li></br>
+            <li><a href="https://stakehex.today/" target="_blank">StakeHEX.today</a></li></br>
             <li><a href="https://hexcalc.net/" target="_blank">HexCalc.net</a></li></br>
             <li><a href="https://reddit.com/r/HEXcrypto/comments/o04mzm/new_to_hex_staking_ladder_tool/" target="_blank">Staking Ladder Tool</a></li></br>
-            <li><a href="https://stakehex.today/" target="_blank">StakeHEX.today</a></li></br>
             <li><a href="https://hexnoob.com/end-stake-calculator" target="_blank">End Stake Calculator</a></li></br>
             <li><a href="https://info.uniswap.org/#/pools/0x69d91b94f0aaf8e8a2586909fa77a5c2c89818d5" target="_blank">Info.Uniswap.org</a></li></br>
             <li><a href="https://t.me/HexAudit" target="_blank">Hex Token Supply Audit</a></li></br>
-            <li><a href="https://twitter.com/WhaleHEX" target="_blank">Twitter.com/WhaleHex</a></li></br>
+            <li><a href="https://staker.app/" target="_blank">Staker.app</a></li></br>
+            <li><a href="https://hexwallet.app/" target="_blank">HEXwallet.app</a></li></br>
+            <li><a href="http://customhex.com/" target="_blank">CustomHEX.com</a></li></br>
             <li><a href="https://everyhexlink.com/" target="_blank">EveryHexLink.com</a></li></br>
             <li><a href="https://hexnoob.com/" target="_blank">HEXnoob.com</a></li></br>
         </ul>

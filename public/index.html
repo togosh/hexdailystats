@@ -267,7 +267,11 @@
                 "<div style='height: 24px'>" +
                     "<div style='float: left;'><b>Add Liquidity</b>&nbsp;</div>" +
                     "<div style='float: right;'>" + Number(data.addLiquidity).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + " USD</div>" +
-                "</div>" + "</div>";
+                "</div>" +
+                "<div style='height: 24px'>" +
+                    "<div style='float: left;'><b>Gas Price</b>&nbsp;</div>" +
+                    "<div style='float: right;'>" + Number(data.gwei).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + " GWEI</div>" +
+                "</div>" +  "</div>";
 
                 //console.log(htmlNew);
 
@@ -1027,7 +1031,7 @@
 
             $('#buttonPools').click(function() { 
                 $('#divPools').toggle();
-                $('#divPools').get(0).scrollIntoView();
+                //$('#divPools').get(0).scrollIntoView();
             });
 
             $('#buttonDark').click(function() { 
@@ -1608,6 +1612,19 @@
             <center><button onclick="closeCharts()" style="padding: 6px 40px; margin-bottom: 10px; outline: none;">Close</button></center>
         </div>
 
+        <center>
+            <button id="buttonPools" style="width: 300px; height: 48px; margin-bottom: 10px;">Liquidity Pools</button>
+            <ul id="divPools" style="display: none; text-align: left; max-width: 360px; margin-bottom: 0px; margin-top: 16px;">
+                <li><a href="https://info.uniswap.org/#/pools/0x69d91b94f0aaf8e8a2586909fa77a5c2c89818d5">0x69d - USDC - UniswapV3 - 0.3% Fee</a></li></br>
+                <li><a href="https://info.uniswap.org/#/pools/0xe05e653453f733786f2dabae0ffa1e96cfcc4b25">0xe05 - USDC - UniswapV3 - 1.0% Fee</a></li></br>
+                <li><a href="https://v2.info.uniswap.org/pair/0xf6dcdce0ac3001b2f67f750bc64ea5beb37b5824">0xf6d - USDC - UniswapV2 - 0.3% Fee</a></li></br>
+                </br>
+                <li><a href="https://info.uniswap.org/#/pools/0x9e0905249ceefffb9605e034b534544684a58be6">0x9e0 - WETH - UniswapV3 - 0.3% Fee</a></li></br>
+                <li><a href="https://info.uniswap.org/#/pools/0x82743c07bf3be4d55876f87bca6cce5f84429bd0">0x827 - WETH - UniswapV3 - 1.0% Fee</a></li></br>
+                <li><a href="https://v2.info.uniswap.org/pair/0x55d5c232d921b9eaa6b37b5845e439acd04b4dba">0x55d - WETH - UniswapV2 - 0.3% Fee</a></li></br>
+            </ul>
+        </center>
+
         <div id="tablecontainer"><table id="dataTable" class="display" width="100%" data-page-length='10'></table></div>
         <div id="loadercontainer">
         <div class="d-flex justify-content-center text-secondary" id="loader">
@@ -1617,18 +1634,6 @@
             </div>
         </div>
     </div>
-    <center>
-        <button id="buttonPools" style="width: 300px; height: 48px; margin-bottom: 10px;">Liquidity Pools</button>
-        <ul id="divPools" style="display: none; text-align: left; max-width: 360px; margin-bottom: 0px; margin-top: 16px;">
-            <li><a href="https://info.uniswap.org/#/pools/0x69d91b94f0aaf8e8a2586909fa77a5c2c89818d5">0x69d - USDC - UniswapV3 - 0.3% Fee</a></li></br>
-            <li><a href="https://info.uniswap.org/#/pools/0xe05e653453f733786f2dabae0ffa1e96cfcc4b25">0xe05 - USDC - UniswapV3 - 1.0% Fee</a></li></br>
-            <li><a href="https://v2.info.uniswap.org/pair/0xf6dcdce0ac3001b2f67f750bc64ea5beb37b5824">0xf6d - USDC - UniswapV2 - 0.3% Fee</a></li></br>
-            </br>
-            <li><a href="https://info.uniswap.org/#/pools/0x9e0905249ceefffb9605e034b534544684a58be6">0x9e0 - WETH - UniswapV3 - 0.3% Fee</a></li></br>
-            <li><a href="https://info.uniswap.org/#/pools/0x82743c07bf3be4d55876f87bca6cce5f84429bd0">0x827 - WETH - UniswapV3 - 1.0% Fee</a></li></br>
-            <li><a href="https://v2.info.uniswap.org/pair/0x55d5c232d921b9eaa6b37b5845e439acd04b4dba">0x55d - WETH - UniswapV2 - 0.3% Fee</a></li></br>
-        </ul>
-    </center>
 
     <center>
         <button id="buttonLegendLinks" style="width: 150px; height: 48px; margin-bottom: 10px;">Links</button>
@@ -1656,19 +1661,18 @@
             <li><a href="https://apphex.win/charts/" target="_blank">Apphex.win/charts</a></li></br>
             <li><a href="https://twitter.com/WhaleHEX" target="_blank">Twitter.com/WhaleHex</a></li></br>
             <li><a href="https://hex.vision/" target="_blank">Hex.vision</a></li></br>
+            <li><a href="https://uniswap.vision/?ticker=UniswapV2:HEXUSDC&interval=1D" target="_blank">Uniswap.vision</a></li></br>
             <li><a href="https://lookintohex.com/" target="_blank">LookIntoHex.com</a></li></br>
             <li><a href="https://hexgraphs.com/" target="_blank">HexGraphs.com</a></li></br>
             <li><a href="https://whalesonly.com/charts" target="_blank">WhalesOnly.com/charts</a></li></br>
             <li><a href="https://www.reddit.com/r/HexCryptoReport/" target="_blank">Reddit.com/r/HexCryptoReport</a></li></br>
             <li><a href="https://stakehex.today/" target="_blank">StakeHEX.today</a></li></br>
             <li><a href="https://hexcalc.net/" target="_blank">HexCalc.net</a></li></br>
-            <li><a href="https://reddit.com/r/HEXcrypto/comments/o04mzm/new_to_hex_staking_ladder_tool/" target="_blank">Staking Ladder Tool</a></li></br>
             <li><a href="https://hexnoob.com/end-stake-calculator" target="_blank">End Stake Calculator</a></li></br>
-            <li><a href="https://info.uniswap.org/#/pools/0x69d91b94f0aaf8e8a2586909fa77a5c2c89818d5" target="_blank">Info.Uniswap.org</a></li></br>
-            <li><a href="https://t.me/HexAudit" target="_blank">Hex Token Supply Audit</a></li></br>
             <li><a href="https://staker.app/" target="_blank">Staker.app</a></li></br>
             <li><a href="https://hexwallet.app/" target="_blank">HEXwallet.app</a></li></br>
             <li><a href="http://customhex.com/" target="_blank">CustomHEX.com</a></li></br>
+            <li><a href="https://backuphex.com/" target="_blank">BackupHEX.com</a></li></br>
             <li><a href="https://everyhexlink.com/" target="_blank">EveryHexLink.com</a></li></br>
             <li><a href="https://hexnoob.com/" target="_blank">HEXnoob.com</a></li></br>
         </ul>
@@ -1681,8 +1685,5 @@
             <a href="https://thegraph.com/legacy-explorer/subgraph/uniswap/uniswap-v2" target="_blank">Uniswap</a> | 
             <a href="https://github.com/togosh/hexdailystats" target="_blank">Github</a></center></div>
     </div>
-    <center><a href="https://stakedwealth.com/" target="_blank"><img src="stakedwealth.jpg" style="width:303px; padding-bottom:10px;"></a></center>
-    <center><a href="https://www.freedomtv.info/" target="_blank"><img src="kryptosparbuch.jpg" style="width:300px; padding-bottom:10px;"></a></center>
-    <center><a href="https://www.freedomtv.info/" style="width:300px;" target="_blank">freedomtv.info</a></center>
-    <center><button onclick="window.open('https://t.me/HEXDailyStats','_blank');" type="button" style="height: 40px; width: 300px; margin: 30px 0px 30px 0px;">Submit Feedback</button></center>
+    <center><button onclick="window.open('https://t.me/HEXDailyStats','_blank');" type="button" style="height: 40px; width: 300px; margin: 10px 0px 30px 0px;">Submit Feedback</button></center>
 </div>

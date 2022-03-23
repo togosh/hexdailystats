@@ -340,6 +340,7 @@ async function getEthereumData() {
       erc20transfer: (average * 65000 / 1000000000 * price),
       uniswapSwap: (average * 200000 / 1000000000 * price),
       addLiquidity: (average * 175000 / 1000000000 * price),
+      gwei: average,
     };
   }
   } catch (error){

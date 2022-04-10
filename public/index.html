@@ -306,6 +306,7 @@
             var currentStakers = arrayColumn(data, 32).reverse().slice(2); //, 600);
             var totalStakersChange = arrayColumn(data, 35).reverse().slice(3); //, 600);
             var averageStakeLength = arrayColumn(data, 9).reverse().slice(2); //, 600);
+            var totalTshares = arrayColumn(data, 17).reverse().slice(2); //, 600);
             
             const result_HEXPrice = dates.map((item,index) => {return {x: Date.parse(item), y: prices[index]}});
             const result_TsharePrice = dates.map((item,index) => {return {x: Date.parse(item), y: tsharePrices[index]}});
@@ -314,6 +315,7 @@
             const result_CurrentStakers = dates.map((item,index) => {return {x: Date.parse(item), y: currentStakers[index]}});
             const result_TotalStakersChange = dates.map((item,index) => {return {x: Date.parse(item), y: totalStakersChange[index]}});
             const result_AverageStakeLength = dates.map((item,index) => {return {x: Date.parse(item), y: averageStakeLength[index]}});
+            const result_TotalTshares = dates.map((item,index) => {return {x: Date.parse(item), y: totalTshares[index]}});
             
             var options_TsharePrice = {
                 chart: {
@@ -322,10 +324,19 @@
                     toolbar: {
                         show: true,
                         offsetY: 0,
+                        tools: {
+                            download: false,
+                            selection: true,
+                            zoom: true,
+                            zoomin: false,
+                            zoomout: false,
+                            pan: false,
+                            reset: true
+                        }
                     }
                 },
                 title: {
-                    text: 'T-Share Price (USD)' ,
+                    text: 'T-Share Price (USD) - ' + Number(tsharePrices[tsharePrices.length - 1]).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}),
                     style: {
                         color:  'white'
                     },
@@ -385,10 +396,19 @@
                     toolbar: {
                         show: true,
                         offsetY: 0,
+                        tools: {
+                            download: false,
+                            selection: true,
+                            zoom: true,
+                            zoomin: false,
+                            zoomout: false,
+                            pan: false,
+                            reset: true
+                        }
                     },
                 },
                 title: {
-                    text: 'Current Stakers',
+                    text: 'Current Stakers - ' + Number(currentStakers[currentStakers.length - 1]).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}),
                     style: {
                         color:  'white'
                     },
@@ -430,10 +450,19 @@
                     toolbar: {
                         show: true,
                         offsetY: 0,
+                        tools: {
+                            download: false,
+                            selection: true,
+                            zoom: true,
+                            zoomin: false,
+                            zoomout: false,
+                            pan: false,
+                            reset: true
+                        }
                     },
                 },
                 title: {
-                    text: 'New Stakers',
+                    text: 'New Stakers - ' + Number(totalStakersChange[totalStakersChange.length - 1]).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}),
                     style: {
                         color:  'white'
                     },
@@ -475,10 +504,19 @@
                     toolbar: {
                         show: true,
                         offsetY: 0,
+                        tools: {
+                            download: false,
+                            selection: true,
+                            zoom: true,
+                            zoomin: false,
+                            zoomout: false,
+                            pan: false,
+                            reset: true
+                        }
                     },
                 },
                 title: {
-                    text: 'Average Stake Length (YEARS)',
+                    text: 'Avg Stake Length (YEARS) - ' + Number(averageStakeLength[averageStakeLength.length - 1]).toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2}),
                     style: {
                         color:  'white'
                     },
@@ -520,10 +558,19 @@
                     toolbar: {
                         show: true,
                         offsetY: 0,
+                        tools: {
+                            download: false,
+                            selection: true,
+                            zoom: true,
+                            zoomin: false,
+                            zoomout: false,
+                            pan: false,
+                            reset: true
+                        }
                     },
                 },
                 title: {
-                    text: 'T-Share Rate (HEX)',
+                    text: 'T-Share Rate (HEX) - ' + Number(tshareRates[tshareRates.length - 1]).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}),
                     style: {
                         color:  'white'
                     },
@@ -565,10 +612,19 @@
                     toolbar: {
                         show: true,
                         offsetY: 0,
+                        tools: {
+                            download: false,
+                            selection: true,
+                            zoom: true,
+                            zoomin: false,
+                            zoomout: false,
+                            pan: false,
+                            reset: true
+                        }
                     },
                 },
                 title: {
-                    text: 'Payout Per T-Share (HEX) - ' + payoutPerTshares[payoutPerTshares.length - 1].toFixed(3),
+                    text: 'Payout Per T-Share (HEX) - ' + Number(payoutPerTshares[payoutPerTshares.length - 1]).toLocaleString(undefined,{minimumFractionDigits:3, maximumFractionDigits:3}),
                     style: {
                         color:  'white'
                     },
@@ -625,6 +681,59 @@
 
             var chart_StakedVsCirculating = new ApexCharts(document.querySelector("#chart_StakedVsCirculating"), options);
             //chart.render();
+
+            var options_TotalTshares = {
+                chart: {
+                    type: 'area',
+                    height: 400,
+                    toolbar: {
+                        show: true,
+                        offsetY: 0,
+                        tools: {
+                            download: false,
+                            selection: true,
+                            zoom: true,
+                            zoomin: false,
+                            zoomout: false,
+                            pan: false,
+                            reset: true
+                        }
+                    },
+                },
+                title: {
+                    text: 'Total T-Shares - ' + Number(totalTshares[totalTshares.length - 1]).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}),
+                    style: {
+                        color:  'white'
+                    },
+                },
+                series: [{
+                    name: 'Total T-Shares',
+                    data: result_TotalTshares
+                }],
+                xaxis: {
+                    type: 'datetime',
+                    labels: { style: { colors: 'white', }, },
+                },
+                yaxis: [{
+                    labels: { style: { colors: 'white', }, formatter: function (value) { return value.toFixed(3); } },
+                    opposite: true,
+                }],
+                markers: {
+                    size: 0.5
+                },
+                tooltip: {
+                    theme: 'dark'
+                },
+                stroke: {
+                    show: true,
+                    width: 2,
+                },
+                dataLabels: {
+                    enabled: false,
+                }
+            }
+            var chart_TotalTshares = new ApexCharts(document.querySelector("#chart_TotalTshares"), options_TotalTshares);
+            chart_TotalTshares.render();
         }
         
         function createDataTable(data) {
@@ -1195,14 +1304,6 @@
                       <td style="padding: 0px 4px;">` + Number(tsharesYear15).toLocaleString(undefined,{minimumFractionDigits:3, maximumFractionDigits:3}) + `</td>
                     </tr>
                     <tr>
-                        <td style="text-align: left; padding: 0px 4px;"><b></b>B-Shares</td>
-                        <td style="padding: 0px 4px;">` + Number((tsharesYear1 * 1000)).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + `</td>
-                        <td style="padding: 0px 4px;">` + Number((tsharesYear3 * 1000)).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + `</td>
-                        <td style="padding: 0px 4px;">` + Number((tsharesYear5 * 1000)).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + `</td>
-                        <td style="padding: 0px 4px;">` + Number((tsharesYear10 * 1000)).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + `</td>
-                        <td style="padding: 0px 4px;">` + Number((tsharesYear15 * 1000)).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + `</td>
-                    </tr>
-                    <tr>
                         <td style="text-align: left; padding: 0px 4px;"><b></b>Price 1x</td>
                         <td style="padding: 0px 4px;">` + nFormatterLocale((Number(calculatorOutputValue) + (tsharesYear1 * payoutPerTshare * 365)) * liveData.price, 0) + `</td>
                         <td style="padding: 0px 4px;">` + nFormatterLocale((Number(calculatorOutputValue) + (tsharesYear3 * payoutPerTshare * 365 * 3)) * liveData.price, 0) + `</td>
@@ -1366,8 +1467,7 @@
         <a href="https://twitter.com/HEXDailyStats" target="_blank">Twitter</a> |
         <a href="https://t.me/HEXDailyStats" target="_blank">Telegram</a>
         </div></center>
-        <center><button id="buttonCharts" onclick="openCharts()" style="width: 150px; padding: 6px 40px; margin-bottom: 10px; outline: none;">Charts</button><button id="buttonCalculator" onclick="openCalculator()" style="width: 150px; padding: 6px 40px; margin-bottom: 10px; outline: none;">Calculator</button></center>
-
+        
         <center>
             <div style="margin-bottom: 10px;">
                 <div id="divLiveSectionHeader" style="padding-top: 8px; text-align:center; font-size: 16px;  max-width: 340px; cursor: pointer;" onclick="divLiveSectionToggle();"><b>LIVE DATA</b></div>
@@ -1423,9 +1523,26 @@
             </div>
         </div>
 
+        <center><button id="buttonCharts" onclick="openCharts()" style="width: 300px; height: 48px; padding: 6px 40px; margin-bottom: 10px; outline: none;">Charts</button></center>
+
+        <div id="divCharts" style="display: none; margin-left: 10px; margin-right: 10px;">
+            <div id="chart_TsharePrice" style="margin-right: 0px;"></div>
+            <div id="chart_CurrentStakers" style="margin-right: 0px;"></div>
+            <div id="chart_TotalStakersChange" style="margin-right: 0px;"></div>
+            <div id="chart_AverageStakeLength" style="margin-right: 0px;"></div>
+            <div id="chart_TshareRate" style="margin-right: 0px;"></div>
+            <div id="chart_PayoutPerTshare" style="margin-right: 0px;"></div>
+            <div id="chart_StakedVsCirculating" style="margin-right: 0px;"></div>
+            <div id="chart_TotalTshares" style="margin-right: 0px;"></div>
+            <center><div style="margin-bottom: 10px;">Also try: <a href="https://lookintohex.com/" target="_blank"><u>LookIntoHEX.com</u></a>, <a href="https://hexgraphs.com/" target="_blank"><u>HEXgraphs.com</u></a> and <a href="https://www.whalesonly.com/charts" target="_blank"><u>WhalesOnly.com/charts</u></a></div></center>
+            <center><button onclick="closeCharts()" style="padding: 6px 40px; margin-bottom: 10px; outline: none;">Close</button></center>
+        </div>
+
+        <center><button id="buttonCalculator" onclick="openCalculator()" style="width: 300px; height: 48px; padding: 6px 40px; margin-bottom: 10px; outline: none;">Calculator</button></center>
+
         <div id="divCalculator" style="display: none; margin-left: 10px; margin-right: 10px; margin-bottom: 10px;">
             <center>
-                <select id="currencyList" onchange="calculatorCurrencySelect()" style="height: 30px; width: 200px; margin: 0px 10px 10px 0px">
+                <select id="currencyList" onchange="calculatorCurrencySelect()" style="height: 40px; width: 200px; margin: 0px 10px 10px 0px">
                     <option value="USD" selected="selected" label="US dollar">USD</option>
                     <option value="EUR" label="Euro">EUR</option>
                     <option value="GBP" label="British pound">GBP</option>
@@ -1587,10 +1704,10 @@
                     <option value="ZAR" label="South African rand">ZAR</option>
                     <option value="ZMW" label="Zambian kwacha">ZMW</option>
                 </select>
-                <input id="calculatorAmount" style="color: black !important; width: 100px;" placeholder="0" onkeypress='return event.charCode >= 48 && event.charCode <= 57'>
-                <button onclick="calculatorConvert()" style="height: 40px; padding: 0px 20px; margin: 0px 6px; outline: none;">Convert</button>
+                <input id="calculatorAmount" style="height: 40px; color: black !important; width: 100px;" placeholder="0" onkeypress='return event.charCode >= 48 && event.charCode <= 57'>
+                <button onclick="calculatorConvert()" style="height: 48px; padding: 0px 20px; margin: 0px 6px; outline: none;">Convert</button>
                 <span id="calculatorOutput" style="color: white; width: 100px;">0.00 HEX</span>
-                <button id="stakeButton" onclick="calculatorStake()" style="display: none; height: 40px; padding: 0px 20px; margin: 0px 6px; outline: none;">Stake</button></center>
+                <button id="stakeButton" onclick="calculatorStake()" style="display: none; height: 48px; padding: 0px 20px; margin: 0px 6px; outline: none;">Stake</button></center>
                 <div id="divStake" style="display: none; color: white"></div>
                 <div style="margin: 10px 0px 0px 0px;">
                     <center>
@@ -1598,18 +1715,6 @@
                         <a href="https://stakehex.today/" target="_blank" style="color: grey"><u>StakeHEX.today</u></a>
                     </center>
                 </div>
-        </div>
-
-        <div id="divCharts" style="display: none; margin-left: 10px; margin-right: 10px;">
-            <div id="chart_TsharePrice" style="margin-right: 0px;"></div>
-            <div id="chart_CurrentStakers" style="margin-right: 0px;"></div>
-            <div id="chart_TotalStakersChange" style="margin-right: 0px;"></div>
-            <div id="chart_AverageStakeLength" style="margin-right: 0px;"></div>
-            <div id="chart_TshareRate" style="margin-right: 0px;"></div>
-            <div id="chart_PayoutPerTshare" style="margin-right: 0px;"></div>
-            <div id="chart_StakedVsCirculating" style="margin-right: 0px;"></div>
-            <center><div style="margin-bottom: 10px;">Also try: <a href="https://lookintohex.com/" target="_blank"><u>LookIntoHEX.com</u></a>, <a href="https://hexgraphs.com/" target="_blank"><u>HEXgraphs.com</u></a> and <a href="https://www.whalesonly.com/charts" target="_blank"><u>WhalesOnly.com/charts</u></a></div></center>
-            <center><button onclick="closeCharts()" style="padding: 6px 40px; margin-bottom: 10px; outline: none;">Close</button></center>
         </div>
 
         <center>
@@ -1635,9 +1740,9 @@
         </div>
     </div>
 
+    <center><button id="buttonLegendLinks" style="width: 300px; height: 48px; margin-bottom: 10px;">Links</button></center>
     <center>
-        <button id="buttonLegendLinks" style="width: 150px; height: 48px; margin-bottom: 10px;">Links</button>
-        <button id="buttonLegend" style="width: 150px; height: 48px; ">Legend</button>
+        <button id="buttonLegend" style="width: 300px; height: 48px; ">Legend</button>
         <ul id="divLegend" style="display: none; text-align: left; max-width: 360px; margin-bottom: 0px; margin-top: 16px;">
             <li>All Time Low: ($0.00005645)</li></br>
             <li>APY: (Daily Payout / Staked Supply * 365.25)</li></br>
@@ -1678,12 +1783,12 @@
         </ul>
     </center>
     
-    <div id="linkSection" style="padding-top: 10px; padding-bottom: 20px;">
+    <div id="linkSection" style="padding-top: 20px; padding-bottom: 20px;">
         <div><center><a href="https://codeakk.medium.com/hex-development-data-a1b1822446fa" target="_blank">Codeak</a> | 
             <a href="https://gist.github.com/togosh/5ff8a9a51740f30c96b3ee013e44b798" target="_blank">API</a> | 
             <a href="https://etherscan.io/address/0x2b591e99afe9f32eaa6214f7b7629768c40eeb39#readContract" target="_blank">Etherscan</a> | 
             <a href="https://thegraph.com/legacy-explorer/subgraph/uniswap/uniswap-v2" target="_blank">Uniswap</a> | 
             <a href="https://github.com/togosh/hexdailystats" target="_blank">Github</a></center></div>
     </div>
-    <center><button onclick="window.open('https://t.me/HEXDailyStats','_blank');" type="button" style="height: 40px; width: 300px; margin: 10px 0px 30px 0px;">Submit Feedback</button></center>
+    <center><button onclick="window.open('https://t.me/HEXDailyStats','_blank');" type="button" style="height: 48px; width: 300px; margin: 10px 0px 30px 0px;">Submit Feedback</button></center>
 </div>

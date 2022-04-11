@@ -362,7 +362,7 @@
                     labels: { style: { colors: 'white', }, },
                 },
                 yaxis: [{
-                    labels: { style: { colors: 'white', }, formatter: function (value) { return "$" + value.toFixed(2); }, },
+                    labels: { style: { colors: 'white', }, formatter: function (value) { return "$" + Number(value).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) }, },
                     logarithmic: true,
                     opposite: true,
                 }, 
@@ -422,7 +422,7 @@
                     labels: { style: { colors: 'white', }, },
                 },
                 yaxis: [{
-                    labels: { style: { colors: 'white', }, formatter: function (value) { return value.toFixed(1); }, },
+                    labels: { style: { colors: 'white', }, formatter: function (value) { return Number(value).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) }, },
                     logarithmic: false,
                     opposite: true,
                 }],
@@ -476,7 +476,7 @@
                     labels: { style: { colors: 'white', }, },
                 },
                 yaxis: [{
-                    labels: { style: { colors: 'white', }, formatter: function (value) { return value.toFixed(1); }, },
+                    labels: { style: { colors: 'white', }, formatter: function (value) { return Number(value).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) }, },
                     logarithmic: false,
                     opposite: true,
                 }],
@@ -530,7 +530,7 @@
                     labels: { style: { colors: 'white', }, },
                 },
                 yaxis: [{
-                    labels: { style: { colors: 'white', }, formatter: function (value) { return value.toFixed(1); }, },
+                    labels: { style: { colors: 'white', }, formatter: function (value) { return Number(value).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) }, },
                     logarithmic: false,
                     opposite: true,
                 }],
@@ -584,7 +584,7 @@
                     labels: { style: { colors: 'white', }, },
                 },
                 yaxis: {
-                    labels: { style: { colors: 'white', }, formatter: function (value) { return value.toFixed(1); }, },
+                    labels: { style: { colors: 'white', }, formatter: function (value) { return Number(value).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) }, },
                     logarithmic: false,
                     opposite: true,
                 },
@@ -638,7 +638,7 @@
                     labels: { style: { colors: 'white', }, },
                 },
                 yaxis: [{
-                    labels: { style: { colors: 'white', }, formatter: function (value) { return value.toFixed(3); } },
+                    labels: { style: { colors: 'white', }, formatter: function (value) { return Number(value).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) } },
                     opposite: true,
                 }],
                 markers: {
@@ -715,7 +715,7 @@
                     labels: { style: { colors: 'white', }, },
                 },
                 yaxis: [{
-                    labels: { style: { colors: 'white', }, formatter: function (value) { return value.toFixed(3); } },
+                    labels: { style: { colors: 'white', }, formatter: function (value) { return Number(value).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) } },
                     opposite: true,
                 }],
                 markers: {

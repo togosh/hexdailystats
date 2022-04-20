@@ -362,7 +362,7 @@
                     labels: { style: { colors: 'white', }, },
                 },
                 yaxis: [{
-                    labels: { style: { colors: 'white', }, formatter: function (value) { return "$" + Number(value).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) }, },
+                    labels: { style: { colors: 'white', }, formatter: function (value) { return "$" + Number(value).toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2}) }, },
                     logarithmic: true,
                     opposite: true,
                 }, 
@@ -530,7 +530,7 @@
                     labels: { style: { colors: 'white', }, },
                 },
                 yaxis: [{
-                    labels: { style: { colors: 'white', }, formatter: function (value) { return Number(value).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) }, },
+                    labels: { style: { colors: 'white', }, formatter: function (value) { return Number(value).toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2}) }, },
                     logarithmic: false,
                     opposite: true,
                 }],
@@ -638,7 +638,7 @@
                     labels: { style: { colors: 'white', }, },
                 },
                 yaxis: [{
-                    labels: { style: { colors: 'white', }, formatter: function (value) { return Number(value).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) } },
+                    labels: { style: { colors: 'white', }, formatter: function (value) { return Number(value).toLocaleString(undefined,{minimumFractionDigits:3, maximumFractionDigits:3}) } },
                     opposite: true,
                 }],
                 markers: {
@@ -1534,7 +1534,7 @@
             <div id="chart_PayoutPerTshare" style="margin-right: 0px;"></div>
             <div id="chart_StakedVsCirculating" style="margin-right: 0px;"></div>
             <div id="chart_TotalTshares" style="margin-right: 0px;"></div>
-            <center><div style="margin-bottom: 10px;">Also try: <a href="https://lookintohex.com/" target="_blank"><u>LookIntoHEX.com</u></a>, <a href="https://hexgraphs.com/" target="_blank"><u>HEXgraphs.com</u></a> and <a href="https://www.whalesonly.com/charts" target="_blank"><u>WhalesOnly.com/charts</u></a></div></center>
+            <center><div style="margin-bottom: 10px;">Also try: <a href="https://lookintohex.com/" target="_blank"><u>LookIntoHEX.com</u></a>, <a href="https://hexgraphs.com/" target="_blank"><u>HEXgraphs.com</u></a>, <a href="https://www.whalesonly.com/charts" target="_blank"><u>WhalesOnly.com/charts</u></a> & <a href="https://apphex.win/charts/" target="_blank"><u>AppHEX.win/charts</u></a></div></center>
             <center><button onclick="closeCharts()" style="padding: 6px 40px; margin-bottom: 10px; outline: none;">Close</button></center>
         </div>
 
@@ -1740,7 +1740,29 @@
         </div>
     </div>
 
-    <center><button id="buttonLegendLinks" style="width: 300px; height: 48px; margin-bottom: 10px;">Links</button></center>
+    <center>
+        <button id="buttonLegendLinks" style="width: 300px; height: 48px; margin-bottom: 10px;">Links</button>
+        <ul id="divLegendLinks" style="display: none; text-align: left; max-width: 360px; margin-bottom: 0px; margin-top: 16px;">
+            <li><a href="https://apphex.win/charts/" target="_blank">Apphex.win/charts</a></li></br>
+            <li><a href="https://twitter.com/WhaleHEX" target="_blank">Twitter.com/WhaleHex</a></li></br>
+            <li><a href="https://hex.vision/" target="_blank">Hex.vision</a></li></br>
+            <li><a href="https://uniswap.vision/?ticker=UniswapV2:HEXUSDC&interval=1D" target="_blank">Uniswap.vision</a></li></br>
+            <li><a href="https://lookintohex.com/" target="_blank">LookIntoHex.com</a></li></br>
+            <li><a href="https://hexgraphs.com/" target="_blank">HexGraphs.com</a></li></br>
+            <li><a href="https://whalesonly.com/charts" target="_blank">WhalesOnly.com/charts</a></li></br>
+            <li><a href="https://www.reddit.com/r/HexCryptoReport/" target="_blank">Reddit.com/r/HexCryptoReport</a></li></br>
+            <li><a href="https://stakehex.today/" target="_blank">StakeHEX.today</a></li></br>
+            <li><a href="https://hexcalc.net/" target="_blank">HexCalc.net</a></li></br>
+            <li><a href="https://hexnoob.com/end-stake-calculator" target="_blank">End Stake Calculator</a></li></br>
+            <li><a href="https://staker.app/" target="_blank">Staker.app</a></li></br>
+            <li><a href="https://hexwallet.app/" target="_blank">HEXwallet.app</a></li></br>
+            <li><a href="http://customhex.com/" target="_blank">CustomHEX.com</a></li></br>
+            <li><a href="https://backuphex.com/" target="_blank">BackupHEX.com</a></li></br>
+            <li><a href="https://everyhexlink.com/" target="_blank">EveryHexLink.com</a></li></br>
+            <li><a href="https://hexnoob.com/" target="_blank">HEXnoob.com</a></li></br>
+            <li><a href="https://hex.com/links" target="_blank">HEX.com/links</a></li></br>
+        </ul>
+    </center>
     <center>
         <button id="buttonLegend" style="width: 300px; height: 48px; ">Legend</button>
         <ul id="divLegend" style="display: none; text-align: left; max-width: 360px; margin-bottom: 0px; margin-top: 16px;">
@@ -1761,25 +1783,6 @@
             Day 522+ - UV2 & UV3 weighted liquidity</br>
             Day 695+ - UV2</br>
             Day 780+ - UV2 & UV3 weighted liquidity</li></br>
-        </ul>
-        <ul id="divLegendLinks" style="display: none; text-align: left; max-width: 360px; margin-bottom: 0px; margin-top: 16px;">
-            <li><a href="https://apphex.win/charts/" target="_blank">Apphex.win/charts</a></li></br>
-            <li><a href="https://twitter.com/WhaleHEX" target="_blank">Twitter.com/WhaleHex</a></li></br>
-            <li><a href="https://hex.vision/" target="_blank">Hex.vision</a></li></br>
-            <li><a href="https://uniswap.vision/?ticker=UniswapV2:HEXUSDC&interval=1D" target="_blank">Uniswap.vision</a></li></br>
-            <li><a href="https://lookintohex.com/" target="_blank">LookIntoHex.com</a></li></br>
-            <li><a href="https://hexgraphs.com/" target="_blank">HexGraphs.com</a></li></br>
-            <li><a href="https://whalesonly.com/charts" target="_blank">WhalesOnly.com/charts</a></li></br>
-            <li><a href="https://www.reddit.com/r/HexCryptoReport/" target="_blank">Reddit.com/r/HexCryptoReport</a></li></br>
-            <li><a href="https://stakehex.today/" target="_blank">StakeHEX.today</a></li></br>
-            <li><a href="https://hexcalc.net/" target="_blank">HexCalc.net</a></li></br>
-            <li><a href="https://hexnoob.com/end-stake-calculator" target="_blank">End Stake Calculator</a></li></br>
-            <li><a href="https://staker.app/" target="_blank">Staker.app</a></li></br>
-            <li><a href="https://hexwallet.app/" target="_blank">HEXwallet.app</a></li></br>
-            <li><a href="http://customhex.com/" target="_blank">CustomHEX.com</a></li></br>
-            <li><a href="https://backuphex.com/" target="_blank">BackupHEX.com</a></li></br>
-            <li><a href="https://everyhexlink.com/" target="_blank">EveryHexLink.com</a></li></br>
-            <li><a href="https://hexnoob.com/" target="_blank">HEXnoob.com</a></li></br>
         </ul>
     </center>
     

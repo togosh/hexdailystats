@@ -33,6 +33,13 @@ function isEmpty(obj) {
 	return true;
 }
 
+function getNum(val) {
+  if (isNaN(val)) {
+    return 0;
+  }
+  return val;
+}
+
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 var fetchRetry = require('fetch-retry')(fetch, { 
     retryOn: async function(attempt, error, response) {
@@ -73,6 +80,7 @@ module.exports = {
     ,onlyUnique: onlyUnique
     ,fetchRetry: fetchRetry
     ,isEmpty: isEmpty
+    ,getNum: getNum
     ,CONFIG: CONFIG
     ,FETCH_SIZE: FETCH_SIZE
     ,HEX_CONTRACT_ADDRESS: HEX_CONTRACT_ADDRESS

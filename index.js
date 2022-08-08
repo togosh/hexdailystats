@@ -218,6 +218,7 @@ async function grabData() {
   if (!getRowDataRunning){ getRowData(); }
   //if (!getDataRunning){ await DailyStatHandler.getDailyData(); }
   if (!getEthereumDataRUNNING){ runEthereumData(); }
+  //MongoDb.create_penalties_Historical();
 }
 
 httpServer.listen(httpPort, hostname, () => { log(`Server running at http://${hostname}:${httpPort}/`);});

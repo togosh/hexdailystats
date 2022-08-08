@@ -971,21 +971,21 @@ async function create_actualAPYRates(){
     } } catch (error) { log("ERROR"); log(error); }
 }
 
-async function create_stakeEnds_stakeGoodAccountings_Historical(){
-  getStakeStartHistorical = true;
-  log("create_stakeEnds_stakeGoodAccountings_Historical");
-    for (var day = 596; day <= 596; day++) {
+async function create_penalties_Historical(){
+  log("create_penalties_Historical");
+    for (var day = 1; day <= 722; day++) {
       try {
         var rowFind = await DailyStat.findOne({currentDay: { $eq: day}});
         if (!isEmpty(rowFind)) {
           
-          var penaltiesHEX = await get_dailyPenalties_Historical(day);
+          //var penaltiesHEX = await get_dailyPenalties_Historical(day);
+          var penaltiesHEX = h.getNum((rowFind.dailyPayoutHEX - ((rowFind.circulatingHEX + rowFind.stakedHEX) * 10000 / 100448995)) * 2);
 
           rowFind.penaltiesHEX = penaltiesHEX;
 
-          log("create_stakeEnds_stakeGoodAccountings_Historical - SAVE: " + " - " + penaltiesHEX + " ------ " + day);
-          rowFind.save(function (err) { if (err) return log("create_stakeEnds_stakeGoodAccountings_Historical - SAVE ERROR: " + err);});
-        } else { log("create_stakeEnds_stakeGoodAccountings_Historical - MISSING DAY: " + day);  }
+          log("create_penalties_Historical - SAVE: " + " - " + penaltiesHEX + " ------ " + day);
+          rowFind.save(function (err) { if (err) return log("create_penalties_Historical - SAVE ERROR: " + err);});
+        } else { log("create_penalties_Historical - MISSING DAY: " + day);  }
       
         await sleep(100);
 
@@ -994,20 +994,18 @@ async function create_stakeEnds_stakeGoodAccountings_Historical(){
         day--;
       }
     }
-
-    getStakeStartHistorical = false;
 }
  
 async function create_numberOfHolders(){
     log("create_numberOfHolders");
-    try { for (var day = 591; day <= 595; day++) {
+    try { for (var day = 944; day <= 974; day++) {  // 944 - 974
   
         var rowFind = await DailyStat.findOne({currentDay: { $eq: day}});
   
         if (!isEmpty(rowFind)){
-          var blockNumber = await getEthereumBlock(day + 1);
+          var blockNumber = await TheGraph.getEthereumBlock(day + 1);
           sleep(100);
-          var numberOfHolders = await get_numberOfHolders_Historical(blockNumber);
+          var numberOfHolders = await TheGraph.get_numberOfHolders_Historical(blockNumber);
           if (numberOfHolders) {
             rowFind.numberOfHolders = numberOfHolders;
           } else {
@@ -1024,14 +1022,14 @@ async function create_numberOfHolders(){
  
 async function create_numberOfHoldersChanges(){
     log("create_numberOfHoldersChanges");
-    try { for (var day = 2; day <= 595; day++) {
+    try { for (var day = 973; day <= 974; day++) { //943 974
   
         var rowFind = await DailyStat.findOne({currentDay: { $eq: day}}); sleep(100);
         var rowFind2 = await DailyStat.findOne({currentDay: { $eq: day + 1}});
   
         if (!isEmpty(rowFind) && !isEmpty(rowFind2)){
           if (rowFind.numberOfHolders && rowFind2.numberOfHolders) {
-            rowFind2.numberOfHoldersChange = rowFind2.numberOfHolders - getNum(rowFind.numberOfHolders);
+            rowFind2.numberOfHoldersChange = rowFind2.numberOfHolders - h.getNum(rowFind.numberOfHolders);
           } else if (!rowFind.numberOfHolders && rowFind2.numberOfHolders) {
             rowFind2.numberOfHoldersChange = rowFind2.numberOfHolders;
           }else {
@@ -1388,6 +1386,15 @@ module.exports = {
     }
     ,createUV2UV3Liquidity: async() => {
       return await createUV2UV3Liquidity();
+    }
+    ,create_numberOfHolders: async() => {
+      return await create_numberOfHolders();
+    }
+    ,create_numberOfHoldersChanges: async() => {
+      return await create_numberOfHoldersChanges();
+    }
+    ,create_penalties_Historical: async() => {
+      return await create_penalties_Historical();
     }
  }
  

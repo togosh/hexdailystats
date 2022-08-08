@@ -1460,5 +1460,8 @@ module.exports = {
     ,get_latestStakeStartId: async (blockNumber) => {
       return await get_latestStakeStartId(blockNumber);
     }
+    ,get_numberOfHolders_Historical: async (blockNumber) => {
+      return await get_numberOfHolders_Historical(blockNumber);
+    }
  }
  

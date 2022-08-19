@@ -379,7 +379,7 @@ async function getLiveData() {
   try {
   if (!getDataRunning){
     var priceUV2 = await TheGraph.getUniswapV2HEXDailyPrice(); await sleep(1000);
-    //var priceUV3 = await getUniswapV3HEXDailyPrice(); await sleep(1000);
+    var priceUV3 = await TheGraph.getUniswapV3HEXDailyPrice(); await sleep(1000);
     
     var { liquidityUV2_HEXUSDC, liquidityUV2_USDC } = await TheGraph.getUniswapV2HEXUSDC_Polling(); await sleep(1000);
     var { liquidityUV2_HEXETH, liquidityUV2_ETH } = await TheGraph.getUniswapV2HEXETH(); await sleep(1000);
@@ -390,9 +390,9 @@ async function getLiveData() {
     var liquidityUV2UV3_USDC = parseInt(liquidityUV2_USDC + liquidityUV3_USDC);
     var liquidityUV2UV3_ETH  = parseInt(liquidityUV2_ETH + liquidityUV3_ETH);
 
-    //var priceUV2UV3 = parseFloat(((priceUV2 * (liquidityUV2_USDC / liquidityUV2UV3_USDC)) + 
-    //(priceUV3 * (liquidityUV3_USDC / liquidityUV2UV3_USDC))).toFixed(8));
-    var priceUV2UV3 = priceUV2;
+    var priceUV2UV3 = parseFloat(((priceUV2 * (liquidityUV2_USDC / liquidityUV2UV3_USDC)) + 
+    (priceUV3 * (liquidityUV3_USDC / liquidityUV2UV3_USDC))).toFixed(8));
+    //var priceUV2UV3 = priceUV2;
     
     var tshareRateHEX = await TheGraph.get_shareRateChange(); await sleep(500);
     tshareRateHEX = parseFloat(tshareRateHEX);

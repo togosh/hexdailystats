@@ -875,7 +875,19 @@ async function getUniswapV2() {
     });
   }
   
-  async function getUniswapV3HEXDailyPrice(){
+  async function getUniswapV3HEXDailyPrice(day){
+
+    var startTime = day2Epoch + ((day - 2) * 86400);
+    var endTime = startTime - 86400;
+    let where = "";
+    
+    if (day != undefined ){
+      where = `
+          date_lt: ` + (startTime)+ `,
+          date_gte: ` + endTime + `,
+        `
+    }
+
     return await fetchRetry('https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3', {
       method: 'POST',
       highWaterMark: FETCH_SIZE,
@@ -887,7 +899,8 @@ async function getUniswapV2() {
             orderBy: date, 
             orderDirection: desc, 
             where: { 
-              token: "` + HEX_CONTRACT_ADDRESS + `"
+              token: "` + HEX_CONTRACT_ADDRESS + `",
+              ` + where + `
             }) 
               { 
                 date
@@ -1390,6 +1403,9 @@ async function get_GraphData(query){
 module.exports = { 
     getUniswapV2HEXDailyPrice: async (day) => { 
         return await getUniswapV2HEXDailyPrice(day);
+    }
+    ,getUniswapV3HEXDailyPrice: async (day) => { 
+      return await getUniswapV3HEXDailyPrice(day);
     }
     ,getUniswapV2HEXUSDC_Polling: async (day) => {
         return await getUniswapV2HEXUSDC_Polling(day);

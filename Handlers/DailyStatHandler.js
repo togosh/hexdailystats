@@ -53,6 +53,22 @@ let get_priceUV2 = async (currentDay) => {
   else return currentDailyStat.priceUV2;
 }
 
+let get_priceUV3 = async (currentDay) => {
+  if(!currentDailyStat || !currentDailyStat.priceUV3) {
+    try {
+      let priceUV3 = await TheGraph.getUniswapV3HEXDailyPrice(currentDay); await sleep(1000);
+      log("*** 007a - priceUV3: " + priceUV3);
+      return priceUV3;
+    }
+    catch (err) {
+      log('getDailyData() ----- priceUV3 --- ' + err.toString() + " - " + err.stack );
+      //Alert(); 
+      return undefined;
+    }
+  }
+  else return currentDailyStat.priceUV3;
+}
+
 let get_liquidityUV2USDC = async (currentDay) => {
   if(!currentDailyStat || (!currentDailyStat.liquidityUV2_HEXUSDC && !currentDailyStat.liquidityUV2_USDC)) {
     try { 
@@ -245,7 +261,7 @@ async function getDailyData(day) {
 
       let priceUV2 = await get_priceUV2(currentDay);
       
-      var priceUV3 = priceUV2; //await getUniswapV3HEXDailyPrice(); await sleep(1000); 
+      var priceUV3 = await get_priceUV3(currentDay); await sleep(1000); 
 
       var {liquidityUV2_HEXUSDC, liquidityUV2_USDC} = await get_liquidityUV2USDC(currentDay);
       

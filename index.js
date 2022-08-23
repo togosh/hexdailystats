@@ -234,7 +234,7 @@ if(DEBUG){ io = require('socket.io')(httpServer);
 
 io.on('connection', (socket) => {
 	log('SOCKET -- ************* CONNECTED: ' + socket.id + ' *************');
-	if (rowData){ socket.emit("rowData", rowData); };
+	if (rowData){ socket.emit("rowData", rowData.slice(0, 49)); };
   //if (!getDataRunning){ DailyStatHandler.getDailyData(); }
   //if (!getRowDataRunning){ getRowData(); }
   socket.emit("hexPrice", hexPrice);
@@ -243,13 +243,10 @@ io.on('connection', (socket) => {
   socket.emit("currencyRates", currencyRates);
   socket.emit("ethereumData", ethereumData);
 
-  socket.on("sendLatestData", (arg) => { // delete later
-    if (rowData && arg && Number.isInteger(arg)) {
-      log("sendLatestData TRY - User: " + arg + " - Server: " + rowData[0][0]);
-      if (rowData[0][0] > arg) {
+  socket.on("sendLatestData", () => { // delete later
+    if (rowData) { 
         log("sendLatestData - SUCCESS");
-        socket.emit("rowData", rowData);
-      }
+        socket.emit("entireRowData", rowData);
     }
   }); 
 });
@@ -438,10 +435,11 @@ cron.schedule('15 * * * * *', async () => {
   
   if (!getDataRunning && !DailyStatMaintenance){ 
     try{
+      let daysBackToCheck = 4;
       let latestDay = await TheGraph.get_latestDay(); 
-      let latestDailyData = await DailyStat.find().sort({currentDay:-1});
+      let latestDailyData = await DailyStat.find().limit(daysBackToCheck).sort({currentDay:-1});
       let latestDailyDataCurrentDay = latestDailyData[0].currentDay;  
-      let dailyDataCurrentDayStart = latestDailyData[4].currentDay; 
+      let dailyDataCurrentDayStart = latestDailyData[latestDailyData.length-1].currentDay; 
       
       for (let i = dailyDataCurrentDayStart; i <= latestDailyDataCurrentDay; i++) {  
         let ds = await DailyStat.find({currentDay:i});  

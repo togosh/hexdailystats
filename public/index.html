@@ -177,6 +177,53 @@
                     } else {
                         console.log("ROWDATA HANDLER ---- CREATE TABLE");
                         table = createDataTable(data); 
+                        table.row.add($('<tr><td colspan="4"><button id="buttonLoadMore" onClick="function call(){ socket.emit(\'sendLatestData\'); };call()" style="width: 300px; height: 48px; margin-bottom: 10px; border: 2px solid grey;">Load More</button></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td></tr>'));
+                        table.draw(); 
+                        console.log("STARTING ORDER: " + table.colReorder.order());
+                    }
+                } catch (error) {
+                    console.log("SOCKET ON rowData - ERROR - " + error.toString());
+                } finally {
+                    rowData = data; 
+                }
+            }
+        });
+
+        socket.on('entireRowData', function (data) {
+            if (data && !arraysEqual(rowData, data)) {
+                try {
+                    console.log(new Date().toISOString() + " - " + "rowData updated");
+                    console.log("rowData -----");
+                    console.log(rowData);
+                    console.log("data ------");
+                    console.log(data);
+                    
+                    createChart(data);
+
+                    if (table) {
+                        table.clear();
+                        console.log("ROWDATA HANDLER ---- TABLE EXISTS, ADD ROW");
+                        console.log(data[0]);
+
+                        console.log("NEWEST DAY: " + data[0][0] + " - CLIENT DAY: " + rowData[0][0]);
+
+                        if (rowData.length < data.length){ 
+                            var orderIndexes = table.colReorder.order();
+                            console.log("colOrder: " + table.colReorder.order());
+
+                            for (var x = data.length-1; x > 0; x--){
+                                var row = data[(x - 1)];
+                                var rowOrdered = orderIndexes.map(i => row[i]);
+                                console.log("x: " + x);
+                                console.log(rowOrdered);
+                                table.row.add(rowOrdered);
+                            }
+                            console.log("DRAW ");
+                            table.draw(); 
+                        }
+                    } else {
+                        console.log("ROWDATA HANDLER ---- CREATE TABLE");
+                        table = createDataTable(data); 
                         console.log("STARTING ORDER: " + table.colReorder.order());
                     }
                 } catch (error) {

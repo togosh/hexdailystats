@@ -927,7 +927,8 @@
                     },
                     { title: "T-Share Price (USD)", className: "text-center colTsharePrice pink" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
-                                return currencyFormatterNoDecimal.format(data); }
+                                return currencyFormatterNoDecimal.format(data); 
+                            }
                             return data;
                         }
                     },

@@ -249,6 +249,9 @@ io.on('connection', (socket) => {
         socket.emit("entireRowData", rowData);
     }
   }); 
+  socket.on("needRowData", () => {
+    socket.emit('rowData', rowData.slice(0, 49)); 
+  });
 });
 
 async function getCurrencyData() {

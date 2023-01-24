@@ -234,7 +234,7 @@ if(DEBUG){ io = require('socket.io')(httpServer);
 
 io.on('connection', (socket) => {
 	log('SOCKET -- ************* CONNECTED: ' + socket.id + ' *************');
-	if (rowData){ socket.emit("rowData", rowData.slice(0, 49)); };
+	if (rowData){ socket.emit("rowData", rowData); }; //rowData.slice(0, 49)); };
   //if (!getDataRunning){ DailyStatHandler.getDailyData(); }
   //if (!getRowDataRunning){ getRowData(); }
   socket.emit("hexPrice", hexPrice);
@@ -243,12 +243,14 @@ io.on('connection', (socket) => {
   socket.emit("currencyRates", currencyRates);
   socket.emit("ethereumData", ethereumData);
 
-  socket.on("sendLatestData", () => { // delete later
+  /*
+  socket.on("sendLatestData", () => {
     if (rowData) { 
         log("sendLatestData - SUCCESS");
         socket.emit("entireRowData", rowData);
     }
   }); 
+  */
   socket.on("needRowData", () => {
     socket.emit('rowData', rowData.slice(0, 49)); 
   });

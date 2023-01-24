@@ -177,7 +177,7 @@
                     } else {
                         console.log("ROWDATA HANDLER ---- CREATE TABLE");
                         table = createDataTable(data); 
-                        table.row.add($('<tr><td colspan="4"><button id="buttonLoadMore" onClick="function call(){ socket.emit(\'sendLatestData\'); };call()" style="width: 300px; height: 48px; margin-bottom: 10px; border: 2px solid grey;">Load More</button></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td></tr>'));
+                        //table.row.add($('<tr><td colspan="4"><button id="buttonLoadMore" onClick="function call(){ socket.emit(\'sendLatestData\'); };call()" style="width: 300px; height: 48px; margin-bottom: 10px; border: 2px solid grey;">Load More</button></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td></tr>'));
                         table.draw(); 
                         console.log("STARTING ORDER: " + table.colReorder.order());
                     }
@@ -189,6 +189,7 @@
             }
         });
 
+        /*
         socket.on('entireRowData', function (data) {
             if (data && !arraysEqual(rowData, data)) {
                 try {
@@ -233,6 +234,7 @@
                 }
             }
         });
+        */
 
         socket.on('currencyRates', function (data) {
             if (data) {

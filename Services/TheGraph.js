@@ -964,9 +964,12 @@ async function getUniswapV2() {
             }
           ){
             id
+            feeTier
             token0 { name }
             token1 { name }
             liquidity
+            volumeToken0
+            volumeToken1
             totalValueLockedToken0
             totalValueLockedToken1
             volumeUSD
@@ -981,19 +984,31 @@ async function getUniswapV2() {
       var liquidityUV3_ETH = 0;
       var liquidityUV3_HEX = 0;
       for(var i = 0; i < res.data.pools.length; i++) {
-        var token0Name = res.data.pools[i].token0.name;
-        var token1Name = res.data.pools[i].token1.name;
-        var token0TVL = res.data.pools[i].totalValueLockedToken0;
-        var token1TVL = res.data.pools[i].totalValueLockedToken1;
-  
+        var current = res.data.pools[i];
+
+        //const id = current.id
+        const token0Name = current.token0.name;
+        const token1Name = current.token1.name;
+
+        var tvlToken0 = current.totalValueLockedToken0;
+        var tvlToken1 = current.totalValueLockedToken1;
+
+        if (blockNumber >= 14317965) { // ~March 4th 2022 ~Day 824?
+          const feePercent = parseFloat(current.feeTier) / 10000 / 100;
+          const tvlAdjust0 = current.volumeToken0 ? (parseFloat(current.volumeToken0) * feePercent) / 2 : 0;
+          const tvlAdjust1 = current.volumeToken1 ? (parseFloat(current.volumeToken1) * feePercent) / 2 : 0;
+          tvlToken0 = current ? parseFloat(current.totalValueLockedToken0) - tvlAdjust0 : 0;
+          tvlToken1 = current ? parseFloat(current.totalValueLockedToken1) - tvlAdjust1 : 0;
+        }
+
         if (token0Name == "HEX" && token1Name == "USD Coin") {
-          liquidityUV3_HEX += parseInt(token0TVL);
-          liquidityUV3_USDC += parseInt(token1TVL);
+          liquidityUV3_HEX += parseInt(tvlToken0);
+          liquidityUV3_USDC += parseInt(tvlToken1);
         } 
         
         if (token0Name == "HEX" && token1Name == "Wrapped Ether") {
-          liquidityUV3_HEX += parseInt(token0TVL);
-          liquidityUV3_ETH += parseInt(token1TVL);
+          liquidityUV3_HEX += parseInt(tvlToken0);
+          liquidityUV3_ETH += parseInt(tvlToken1);
         }
       }
   
@@ -1030,9 +1045,12 @@ async function getUniswapV2() {
             }
           ){
             id
+            feeTier
             token0 { name }
             token1 { name }
             liquidity
+            volumeToken0
+            volumeToken1
             totalValueLockedToken0
             totalValueLockedToken1
             volumeUSD
@@ -1048,19 +1066,26 @@ async function getUniswapV2() {
   
       if (res && res.data && res.data.pools) {
         for(var i = 0; i < res.data.pools.length; i++) {
-          var token0Name = res.data.pools[i].token0.name;
-          var token1Name = res.data.pools[i].token1.name;
-          var token0TVL = res.data.pools[i].totalValueLockedToken0;
-          var token1TVL = res.data.pools[i].totalValueLockedToken1;
+          var current = res.data.pools[i];
+
+          //const id = current.id
+          const token0Name = current.token0.name;
+          const token1Name = current.token1.name;
+          
+          const feePercent = parseFloat(current.feeTier) / 10000 / 100;
+          const tvlAdjust0 = current.volumeToken0 ? (parseFloat(current.volumeToken0) * feePercent) / 2 : 0;
+          const tvlAdjust1 = current.volumeToken1 ? (parseFloat(current.volumeToken1) * feePercent) / 2 : 0;
+          const tvlToken0 = current ? parseFloat(current.totalValueLockedToken0) - tvlAdjust0 : 0;
+          const tvlToken1 = current ? parseFloat(current.totalValueLockedToken1) - tvlAdjust1 : 0;
     
           if (token0Name == "HEX" && token1Name == "USD Coin") {
-            liquidityUV3_HEX += parseInt(token0TVL);
-            liquidityUV3_USDC += parseInt(token1TVL);
+            liquidityUV3_HEX += parseInt(tvlToken0);
+            liquidityUV3_USDC += parseInt(tvlToken1);
           } 
           
           if (token0Name == "HEX" && token1Name == "Wrapped Ether") {
-            liquidityUV3_HEX += parseInt(token0TVL);
-            liquidityUV3_ETH += parseInt(token1TVL);
+            liquidityUV3_HEX += parseInt(tvlToken0);
+            liquidityUV3_ETH += parseInt(tvlToken1);
           }
         }
     

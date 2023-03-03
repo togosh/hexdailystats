@@ -58,7 +58,7 @@ async function tweet(dailyStat){
   tweetStatus += "Payout Per Tshare - " + Number(dailyStat.payoutPerTshareHEX).toLocaleString(undefined,{minimumFractionDigits:3, maximumFractionDigits:3}) + " HEX\r\n";
   tweetStatus += "\r\n";
 
-  tweetStatus += "Avg Stake Length - " + Number(dailyStat.averageStakeLength).toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2}) + " yrs\r\n";
+  tweetStatus += "Avg Mining Length - " + Number(dailyStat.averageStakeLength).toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2}) + " yrs\r\n";
   //tweetStatus += "APY Rate - " + Number(dailyStat.actualAPYRate).toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2}) + "%\r\n";
   tweetStatus += "\r\n";
 
@@ -69,7 +69,7 @@ async function tweet(dailyStat){
   tweetStatus += "\r\n";
 
   tweetStatus += "Current Holders - " + Number(dailyStat.currentHolders).toLocaleString(undefined) + " (+" + Number(dailyStat.currentHoldersChange).toLocaleString(undefined) + ")" + "\r\n";
-  tweetStatus += "Current Stakers - " + Number(dailyStat.currentStakerCount).toLocaleString(undefined) + " (+" + Number(dailyStat.currentStakerCountChange).toLocaleString(undefined) + ")" + "\r\n";
+  tweetStatus += "Current Miners - " + Number(dailyStat.currentStakerCount).toLocaleString(undefined) + " (+" + Number(dailyStat.currentStakerCountChange).toLocaleString(undefined) + ")" + "\r\n";
   //tweetStatus += "Total Holders - " + Number(dailyStat.numberOfHolders).toLocaleString(undefined) + " (+" + Number(dailyStat.numberOfHoldersChange).toLocaleString(undefined) + ")" + "\r\n";
   //tweetStatus += "Total Stakers - " + Number(dailyStat.totalStakerCount).toLocaleString(undefined) + " (+" + Number(dailyStat.totalStakerCountChange).toLocaleString(undefined) + ")" + "\r\n";
   tweetStatus += "\r\n";
@@ -129,7 +129,7 @@ async function tweetBshare(dailyStat){
   //tweetStatus += "\r\n";
 
   tweetStatus += "Current Holders - " + Number(dailyStat.currentHolders).toLocaleString(undefined) + " (+" + Number(dailyStat.currentHoldersChange).toLocaleString(undefined) + ")" + "\r\n";
-  tweetStatus += "Current Stakers - " + Number(dailyStat.currentStakerCount).toLocaleString(undefined) + " (+" + Number(dailyStat.currentStakerCountChange).toLocaleString(undefined) + ")" + "\r\n";
+  tweetStatus += "Current Miners - " + Number(dailyStat.currentStakerCount).toLocaleString(undefined) + " (+" + Number(dailyStat.currentStakerCountChange).toLocaleString(undefined) + ")" + "\r\n";
   //tweetStatus += "Total Holders - " + Number(dailyStat.numberOfHolders).toLocaleString(undefined) + " (+" + Number(dailyStat.numberOfHoldersChange).toLocaleString(undefined) + ")" + "\r\n";
   //tweetStatus += "Total Stakers - " + Number(dailyStat.totalStakerCount).toLocaleString(undefined) + " (+" + Number(dailyStat.totalStakerCountChange).toLocaleString(undefined) + ")" + "\r\n";
   tweetStatus += "\r\n";

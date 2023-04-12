@@ -386,11 +386,12 @@ async function getLiveData() {
     var { liquidityUV2_HEXUSDC, liquidityUV2_USDC } = await TheGraph.getUniswapV2HEXUSDC_Polling(); await sleep(1000);
     var { liquidityUV2_HEXETH, liquidityUV2_ETH } = await TheGraph.getUniswapV2HEXETH(); await sleep(1000);
     
-    var { liquidityUV3_HEX, liquidityUV3_USDC, liquidityUV3_ETH } = await TheGraph.getUniswapV3(); await sleep(1000);
+    var { liquidityUV3_HEX, liquidityUV3_USDC, liquidityUV3_ETH, liquidityUV3_DAI } = await TheGraph.getUniswapV3(); await sleep(1000);
     
     var liquidityUV2UV3_HEX = parseInt(liquidityUV2_HEXUSDC + liquidityUV2_HEXETH + liquidityUV3_HEX);
     var liquidityUV2UV3_USDC = parseInt(liquidityUV2_USDC + liquidityUV3_USDC);
     var liquidityUV2UV3_ETH  = parseInt(liquidityUV2_ETH + liquidityUV3_ETH);
+    var liquidityUV2UV3_DAI = parseInt(liquidityUV3_DAI);
 
     var priceUV2UV3 = parseFloat(((priceUV2 * (liquidityUV2_USDC / liquidityUV2UV3_USDC)) + 
     (priceUV3 * (liquidityUV3_USDC / liquidityUV2UV3_USDC))).toFixed(8));
@@ -416,6 +417,7 @@ async function getLiveData() {
       liquidityHEX: liquidityUV2UV3_HEX,
       liquidityUSDC: liquidityUV2UV3_USDC,
       liquidityETH: liquidityUV2UV3_ETH,
+      liquidityDAI: liquidityUV2UV3_DAI,
       penaltiesHEX: penaltiesHEX,
       payoutPerTshare: payoutPerTshare,
       stakedHEX: stakedHEX,

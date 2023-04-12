@@ -250,6 +250,10 @@
                 //console.log(data);
                 liveData = data;
 
+                var liquidityETHString = "";
+                if (Number(data.liquidityETH < 1000)){ liquidityETHString = getLiqiudityString(data.liquidityETH, 0);
+                } else { liquidityETHString = getLiqiudityString(data.liquidityETH, 1); }
+
                 //  var htmlNew = "<div><b>LIVE DATA</b></div>
                 var htmlNew = "<div style='padding: 0px 40px;'>" +
                 "<div style='height: 24px'>" +
@@ -282,7 +286,11 @@
                 "</div>" +
                 "<div style='height: 24px'>" +
                     "<div style='float: left;'><b>Liquidity ETH</b>&nbsp;</div>" +
-                    "<div style='float: right;'>" + getLiqiudityString(data.liquidityETH, 1) + " ETH</div>" +
+                    "<div style='float: right;'>" + liquidityETHString + " ETH</div>" +
+                "</div>" +
+                "<div style='height: 24px'>" +
+                    "<div style='float: left;'><b>Liquidity DAI</b>&nbsp;</div>" +
+                    "<div style='float: right;'>" + getLiqiudityString(data.liquidityDAI, 1) + " DAI</div>" +
                 "</div>";
 
                 $("#divLiveSection").html(htmlNew);
@@ -1770,6 +1778,9 @@
                 <li><a href="https://info.uniswap.org/#/pools/0x9e0905249ceefffb9605e034b534544684a58be6">0x9e0 - WETH - UniswapV3 - 0.3% Fee</a></li></br>
                 <li><a href="https://info.uniswap.org/#/pools/0x82743c07bf3be4d55876f87bca6cce5f84429bd0">0x827 - WETH - UniswapV3 - 1.0% Fee</a></li></br>
                 <li><a href="https://v2.info.uniswap.org/pair/0x55d5c232d921b9eaa6b37b5845e439acd04b4dba">0x55d - WETH - UniswapV2 - 0.3% Fee</a></li></br>
+                </br>
+                <li><a href="https://info.uniswap.org/#/pools/0x5c28b5f471d97f53fcf132f16f9f3c0c888c1a01">0x5c2 - DAI - UniswapV3 - 0.3% Fee</a></li></br>
+                <li><a href="https://info.uniswap.org/#/pools/0x63f7d912eae3e7a2ec19afdad0d7c7533ae0781c">0x63f - DAI - UniswapV3 - 1.0% Fee</a></li></br>
             </ul>
         </center>
 

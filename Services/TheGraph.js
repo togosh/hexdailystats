@@ -7,6 +7,7 @@ const FETCH_SIZE = h.FETCH_SIZE;
 const HEX_CONTRACT_ADDRESS = h.HEX_CONTRACT_ADDRESS;
 const USDC_CONTRACT_ADDRESS = h.USDC_CONTRACT_ADDRESS;
 const WETH_CONTRACT_ADDRESS = h.WETH_CONTRACT_ADDRESS;
+const DAI_CONTRACT_ADDRESS = h.DAI_CONTRACT_ADDRESS;
 const UNISWAP_V2_HEXUSDC = h.UNISWAP_V2_HEXUSDC;
 const UNISWAP_V2_HEXETH = h.UNISWAP_V2_HEXETH;
 const UNISWAP_V3_HEXUSDC = h.UNISWAP_V3_HEXUSDC;
@@ -1040,7 +1041,8 @@ async function getUniswapV2() {
               token0: "` + HEX_CONTRACT_ADDRESS + `",
               token1_in: [
                 "` + USDC_CONTRACT_ADDRESS + `",
-                "` + WETH_CONTRACT_ADDRESS + `"
+                "` + WETH_CONTRACT_ADDRESS + `",
+                "` + DAI_CONTRACT_ADDRESS + `"
               ]
             }
           ){
@@ -1063,6 +1065,7 @@ async function getUniswapV2() {
       var liquidityUV3_USDC = 0;
       var liquidityUV3_ETH = 0;
       var liquidityUV3_HEX = 0;
+      var liquidityUV3_DAI = 0;
   
       if (res && res.data && res.data.pools) {
         for(var i = 0; i < res.data.pools.length; i++) {
@@ -1087,18 +1090,25 @@ async function getUniswapV2() {
             liquidityUV3_HEX += parseInt(tvlToken0);
             liquidityUV3_ETH += parseInt(tvlToken1);
           }
+
+          if (token0Name == "HEX" && token1Name == "Dai Stablecoin") {
+            liquidityUV3_HEX += parseInt(tvlToken0);
+            liquidityUV3_DAI += parseInt(tvlToken1);
+          }
         }
     
         return {
           liquidityUV3_HEX: liquidityUV3_HEX,
           liquidityUV3_USDC: liquidityUV3_USDC,
           liquidityUV3_ETH: liquidityUV3_ETH,
+          liquidityUV3_DAI: liquidityUV3_DAI
         }
       } else {
         return {
           liquidityUV3_HEX: 0,
           liquidityUV3_USDC: 0,
           liquidityUV3_ETH: 0,
+          liquidityUV3_DAI: 0
         }
       }
     });

@@ -68,8 +68,14 @@ async function tweet(dailyStat){
   tweetStatus += "USDC Liquidity - " + Number(liquidityUSDCFormatted.amount).toLocaleString(undefined) + liquidityUSDCFormatted.symbol + "\r\n";
   tweetStatus += "\r\n";
 
-  tweetStatus += "Current Holders - " + Number(dailyStat.currentHolders).toLocaleString(undefined) + " (+" + Number(dailyStat.currentHoldersChange).toLocaleString(undefined) + ")" + "\r\n";
-  tweetStatus += "Current Miners - " + Number(dailyStat.currentStakerCount).toLocaleString(undefined) + " (+" + Number(dailyStat.currentStakerCountChange).toLocaleString(undefined) + ")" + "\r\n";
+  var currentHoldersChangeSign = "";
+  if (Number(dailyStat.currentHoldersChange) > 0){ currentHoldersChangeSign = "+"; }
+
+  var currentStakerCountChangeSign = "";
+  if (Number(dailyStat.currentStakerCountChange) > 0){ currentStakerCountChangeSign = "+"; }
+
+  tweetStatus += "Current Holders - " + Number(dailyStat.currentHolders).toLocaleString(undefined) + " (" + currentHoldersChangeSign + Number(dailyStat.currentHoldersChange).toLocaleString(undefined) + ")" + "\r\n";
+  tweetStatus += "Current Miners - " + Number(dailyStat.currentStakerCount).toLocaleString(undefined) + " (" + currentStakerCountChangeSign + Number(dailyStat.currentStakerCountChange).toLocaleString(undefined) + ")" + "\r\n";
   //tweetStatus += "Total Holders - " + Number(dailyStat.numberOfHolders).toLocaleString(undefined) + " (+" + Number(dailyStat.numberOfHoldersChange).toLocaleString(undefined) + ")" + "\r\n";
   //tweetStatus += "Total Stakers - " + Number(dailyStat.totalStakerCount).toLocaleString(undefined) + " (+" + Number(dailyStat.totalStakerCountChange).toLocaleString(undefined) + ")" + "\r\n";
   tweetStatus += "\r\n";
@@ -128,8 +134,14 @@ async function tweetBshare(dailyStat){
   //tweetStatus += "USDC Liquidity - " + Number(liquidityUSDCFormatted.amount).toLocaleString(undefined) + liquidityUSDCFormatted.symbol + "\r\n";
   //tweetStatus += "\r\n";
 
-  tweetStatus += "Current Holders - " + Number(dailyStat.currentHolders).toLocaleString(undefined) + " (+" + Number(dailyStat.currentHoldersChange).toLocaleString(undefined) + ")" + "\r\n";
-  tweetStatus += "Current Miners - " + Number(dailyStat.currentStakerCount).toLocaleString(undefined) + " (+" + Number(dailyStat.currentStakerCountChange).toLocaleString(undefined) + ")" + "\r\n";
+  var currentHoldersChangeSign = "";
+  if (Number(dailyStat.currentHoldersChange) > 0){ currentHoldersChangeSign = "+"; }
+
+  var currentStakerCountChangeSign = "";
+  if (Number(dailyStat.currentStakerCountChange) > 0){ currentStakerCountChangeSign = "+"; }
+
+  tweetStatus += "Current Holders - " + Number(dailyStat.currentHolders).toLocaleString(undefined) + " (" + currentHoldersChangeSign + Number(dailyStat.currentHoldersChange).toLocaleString(undefined) + ")" + "\r\n";
+  tweetStatus += "Current Miners - " + Number(dailyStat.currentStakerCount).toLocaleString(undefined) + " (" + currentStakerCountChangeSign + Number(dailyStat.currentStakerCountChange).toLocaleString(undefined) + ")" + "\r\n";
   //tweetStatus += "Total Holders - " + Number(dailyStat.numberOfHolders).toLocaleString(undefined) + " (+" + Number(dailyStat.numberOfHoldersChange).toLocaleString(undefined) + ")" + "\r\n";
   //tweetStatus += "Total Stakers - " + Number(dailyStat.totalStakerCount).toLocaleString(undefined) + " (+" + Number(dailyStat.totalStakerCountChange).toLocaleString(undefined) + ")" + "\r\n";
   tweetStatus += "\r\n";

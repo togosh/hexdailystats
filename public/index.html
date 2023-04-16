@@ -1340,7 +1340,19 @@
         
         function divEthereumSectionToggle(){
             $('#divEthereumSection').toggle();
-        }     
+        }    
+
+        function divLiveSection_PulsechainToggle(){
+            $('#divLiveSection_Pulsechain').toggle();
+        }    
+
+        function divLiveSection_PulsechainPricesToggle(){
+            $('#divLiveSection_PulsechainPrices').toggle();
+        }    
+
+        function divLiveSection_PulsechainTokensToggle(){
+            $('#divLiveSection_PulsechainTokens').toggle();
+        }    
 
         function display_c(){
             var refresh=1000; // Refresh rate in milli seconds
@@ -1619,11 +1631,11 @@
             </div>
             <div class="col-sm" style="text-align: left; min-width: 360px; max-width: 360px;">
                 <div style="margin-bottom: 10px;">
-                    <div id="divLiveSectionHeader_Pulsechain" style="padding-top: 8px; text-align:center; font-size: 16px;  max-width: 330px; cursor: pointer;" onclick="divLiveSectionToggle();"><b>PULSECHAIN V3</b></div>
+                    <div id="divLiveSectionHeader_Pulsechain" style="padding-top: 8px; text-align:center; font-size: 16px;  max-width: 330px; cursor: pointer;" onclick="divLiveSection_PulsechainToggle();"><b>PULSECHAIN V3</b></div>
                     <div id="divLiveSection_Pulsechain" class="divLive" style="text-align:center; font-size: 16px; max-width: 330px; border-radius: 0px;"></div>
                 </div>
                 <div style="margin-bottom: 10px;">
-                    <div id="divLiveSectionHeader_PulsechainPrices" style="padding-top: 8px; text-align:center; font-size: 16px;  max-width: 330px; cursor: pointer;" onclick="divLiveSectionToggle();"><b>PULSECHAIN V3</b></div>
+                    <div id="divLiveSectionHeader_PulsechainPrices" style="padding-top: 8px; text-align:center; font-size: 16px;  max-width: 330px; cursor: pointer;" onclick="divLiveSection_PulsechainPricesToggle();"><b>PULSECHAIN V3</b></div>
                     <div id="divLiveSection_PulsechainPrices" class="divLive" style="text-align:center; font-size: 16px; max-width: 330px; border-radius: 0px;"></div>
                 </div>
             </div>
@@ -1632,7 +1644,7 @@
         <center>
         <div style="min-width: 360px; max-width: 360px;">
             <div style="margin-bottom: 10px;">
-                <div id="divLiveSectionHeader_PulsechainTokens" style="padding-top: 8px; text-align:center; font-size: 16px;  max-width: 330px; cursor: pointer;" onclick="divLiveSectionToggle();"><b>PULSECHAIN V3</b></div>
+                <div id="divLiveSectionHeader_PulsechainTokens" style="padding-top: 8px; text-align:center; font-size: 16px;  max-width: 330px; cursor: pointer;" onclick="divLiveSection_PulsechainTokensToggle();"><b>PULSECHAIN V3</b></div>
                 <div id="divLiveSection_PulsechainTokens" class="divLive" style="text-align:center; font-size: 16px; max-width: 330px; border-radius: 0px;"></div>
             </div>
         </div>

@@ -97,6 +97,16 @@ thead .grey {
   background-color: #10172d;
 }
 
+#divLiveSectionHeader_Pulsechain, #divLiveSectionHeader_PulsechainPrices, #divLiveSectionHeader_PulsechainTokens {
+  color:white;
+  background-color: #10172d;
+}
+
+#divLiveSection_Pulsechain, #divLiveSection_PulsechainPrices, #divLiveSection_PulsechainTokens {
+  color:white;
+  background-color: #10172d;
+}
+
 .dataTables_scrollBody::-webkit-scrollbar {
   height: 50px;
 }

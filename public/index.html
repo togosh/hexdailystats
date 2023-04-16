@@ -291,9 +291,88 @@
                 "<div style='height: 24px'>" +
                     "<div style='float: left;'><b>Liquidity DAI</b>&nbsp;</div>" +
                     "<div style='float: right;'>" + getLiqiudityString(data.liquidityDAI, 1) + " DAI</div>" +
+                "</div>" +
+                "<div style='height: 24px'>" +
                 "</div>";
 
                 $("#divLiveSection").html(htmlNew);
+
+                var htmlNew_Pulsechain = "<div style='padding: 0px 40px;'>" +
+                "<div style='height: 24px'>" +
+                    "<div style='float: left;'><b>HEX Price</b>&nbsp;</div>" +
+                    "<div style='float: right;'>" + Number(data.price_Pulsechain).toLocaleString(undefined,{minimumFractionDigits:3, maximumFractionDigits:3}) + " USD</div>" +
+                "</div>" +
+                "<div style='height: 24px'>" +
+                    "<div style='float: left;'><b>T-Share Price</b>&nbsp;</div>" +
+                    "<div style='float: right;'>" + Number(data.tsharePrice_Pulsechain).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + " USD</div>" +
+                "</div>" +
+                "<div style='height: 24px'>" +
+                    "<div style='float: left;'><b>T-Share Rate</b>&nbsp;</div>" +
+                    "<div style='float: right;'>" + Number(data.tshareRateHEX_Pulsechain).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + " HEX</div>" +
+                "</div>"  +
+                "<div style='height: 24px'>" +
+                    "<div style='float: left;'><b>Payout per T-Share</b>&nbsp;</div>" +
+                    "<div style='float: right;'>" + Number(data.payoutPerTshare_Pulsechain).toLocaleString(undefined,{minimumFractionDigits:3, maximumFractionDigits:3}) + " HEX</div>" +
+                "</div>" +
+                "<div style='height: 24px'>" +
+                    "<div style='float: left;'><b>Penalties</b>&nbsp;</div>" +
+                    "<div style='float: right;'>" + getLiqiudityString(data.penaltiesHEX_Pulsechain, 1) + " HEX</div>" +
+                "</div>" +
+                "<div style='height: 24px'>" +
+                    "<div style='float: left;'><b>Liquidity HEX</b>&nbsp;</div>" +
+                    "<div style='float: right;'>" + getLiqiudityString(data.liquidityHEX_Pulsechain, 1) + " HEX</div>" +
+                "</div>" +
+                "<div style='height: 24px'>" +
+                    "<div style='float: left;'><b>Liquidity PLS</b>&nbsp;</div>" +
+                    "<div style='float: right;'>" + getLiqiudityString(data.liquidityPLS_Pulsechain, 1) + " PLS</div>" +
+                "</div>" +
+                "<div style='height: 24px'>" +
+                    "<div style='float: left;'><b>Liquidity PLSX</b>&nbsp;</div>" +
+                    "<div style='float: right;'>" + getLiqiudityString(data.liquidityPLSX_Pulsechain, 1) + " PLSX</div>" +
+                "</div>" +
+                "<div style='height: 24px'>" +
+                    "<div style='float: left;'><b>Liquidity INC</b>&nbsp;</div>" +
+                    "<div style='float: right;'>" + getLiqiudityString(data.liquidityINC_Pulsechain, 1) + " INC</div>" +
+                "</div>" +
+                "<div style='height: 24px'>" +
+                    "<div style='float: left;'><b>Liquidity DAI</b>&nbsp;</div>" +
+                    "<div style='float: right;'>" + getLiqiudityString(data.liquidityDAI_Pulsechain, 1) + " DAI</div>" +
+                "</div>";
+                $("#divLiveSection_Pulsechain").html(htmlNew_Pulsechain);
+
+                var htmlNew_PulsechainPrices = "<div style='padding: 0px 40px;'>" +
+                "<div style='height: 24px'>" +
+                    "<div style='float: left;'><b>PLS Price</b>&nbsp;</div>" +
+                    "<div style='float: right;'>" + Number(data.pricePLS_Pulsechain).toLocaleString(undefined,{minimumFractionDigits:4, maximumFractionDigits:4}) + " USD</div>" +
+                "</div>" +
+                "<div style='height: 24px'>" +
+                    "<div style='float: left;'><b>PRC20 Transfer</b>&nbsp;</div>" +
+                    "<div style='float: right;'>" + Number(data.erc20transfer_Pulsechain).toLocaleString(undefined,{minimumFractionDigits:7, maximumFractionDigits:7}) + " USD</div>" +
+                "</div>" +
+                "<div style='height: 24px'>" +
+                    "<div style='float: left;'><b>PulseX Swap</b>&nbsp;</div>" +
+                    "<div style='float: right;'>" + Number(data.pulseXSwap_Pulsechain).toLocaleString(undefined,{minimumFractionDigits:7, maximumFractionDigits:7}) + " USD</div>" +
+                "</div>" +
+                "<div style='height: 24px'>" +
+                    "<div style='float: left;'><b>Add Liquidity</b>&nbsp;</div>" +
+                    "<div style='float: right;'>" + Number(data.addLiquidity_Pulsechain).toLocaleString(undefined,{minimumFractionDigits:7, maximumFractionDigits:7}) + " USD</div>" +
+                "</div>" +
+                "<div style='height: 24px'>" +
+                    "<div style='float: left;'><b>Gas Price</b>&nbsp;</div>" +
+                    "<div style='float: right;'>" + Number(data.beat).toLocaleString(undefined,{minimumFractionDigits:1, maximumFractionDigits:1}) + " BEAT</div>" +
+                "</div>";
+                $("#divLiveSection_PulsechainPrices").html(htmlNew_PulsechainPrices);
+
+                var htmlNew_PulsechainTokens = "<div style='padding: 0px 40px;'>" +
+                "<div style='height: 24px'>" +
+                    "<div style='float: left;'><b>PLSX Price</b>&nbsp;</div>" +
+                    "<div style='float: right;'>" + Number(data.pricePLSX_Pulsechain).toLocaleString(undefined,{minimumFractionDigits:3, maximumFractionDigits:3}) + " USD</div>" +
+                "</div>" +
+                "<div style='height: 24px'>" +
+                    "<div style='float: left;'><b>INC Price</b>&nbsp;</div>" +
+                    "<div style='float: right;'>" + Number(data.priceINC_Pulsechain).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + " USD</div>" +
+                "</div>";
+                $("#divLiveSection_PulsechainTokens").html(htmlNew_PulsechainTokens);
             }
         });
 
@@ -1526,18 +1605,39 @@
         <a href="https://t.me/HEXDailyStats" target="_blank">Telegram</a>
         </div></center>
         
-        <center>
-            <div style="margin-bottom: 10px;">
-                <div id="divLiveSectionHeader" style="padding-top: 8px; text-align:center; font-size: 16px;  max-width: 340px; cursor: pointer;" onclick="divLiveSectionToggle();"><b>LIVE DATA</b></div>
-                <div id="divLiveSection" class="divLive" style="text-align:center; font-size: 16px; max-width: 340px; border-radius: 0px;"></div>
+        <div style="margin-top: 20px; font-size: 20px;">
+        <div style="display: flex; flex-wrap: wrap; justify-content: center;">
+            <div class="col-sm" style="text-align: left; min-width: 360px; max-width: 360px;">
+                <div style="margin-bottom: 10px;">
+                    <div id="divLiveSectionHeader" style="padding-top: 8px; text-align:center; font-size: 16px;  max-width: 330px; cursor: pointer;" onclick="divLiveSectionToggle();"><b>ETHEREUM</b></div>
+                    <div id="divLiveSection" class="divLive" style="text-align:center; font-size: 16px; max-width: 330px; border-radius: 0px;"></div>
+                </div>
+                <div style="margin-bottom: 10px;">
+                    <div id="divEthereumSectionHeader" style="padding-top: 8px; text-align:center; font-size: 16px;  max-width: 330px; cursor: pointer;" onclick="divEthereumSectionToggle();"><b>ETHEREUM</b></div>
+                    <div id="divEthereumSection" class="divLive" style="text-align:center; font-size: 16px; max-width: 330px; border-radius: 0px;"></div>
+                </div>
             </div>
-        </center>
-        <center>
-            <div style="margin-bottom: 10px;">
-                <div id="divEthereumSectionHeader" style="padding-top: 8px; text-align:center; font-size: 16px;  max-width: 340px; cursor: pointer;" onclick="divEthereumSectionToggle();"><b>ETHEREUM</b></div>
-                <div id="divEthereumSection" class="divLive" style="text-align:center; font-size: 16px; max-width: 340px; border-radius: 0px;"></div>
+            <div class="col-sm" style="text-align: left; min-width: 360px; max-width: 360px;">
+                <div style="margin-bottom: 10px;">
+                    <div id="divLiveSectionHeader_Pulsechain" style="padding-top: 8px; text-align:center; font-size: 16px;  max-width: 330px; cursor: pointer;" onclick="divLiveSectionToggle();"><b>PULSECHAIN V3</b></div>
+                    <div id="divLiveSection_Pulsechain" class="divLive" style="text-align:center; font-size: 16px; max-width: 330px; border-radius: 0px;"></div>
+                </div>
+                <div style="margin-bottom: 10px;">
+                    <div id="divLiveSectionHeader_PulsechainPrices" style="padding-top: 8px; text-align:center; font-size: 16px;  max-width: 330px; cursor: pointer;" onclick="divLiveSectionToggle();"><b>PULSECHAIN V3</b></div>
+                    <div id="divLiveSection_PulsechainPrices" class="divLive" style="text-align:center; font-size: 16px; max-width: 330px; border-radius: 0px;"></div>
+                </div>
             </div>
+        </div>
+        </div>
+        <center>
+        <div style="min-width: 360px; max-width: 360px;">
+            <div style="margin-bottom: 10px;">
+                <div id="divLiveSectionHeader_PulsechainTokens" style="padding-top: 8px; text-align:center; font-size: 16px;  max-width: 330px; cursor: pointer;" onclick="divLiveSectionToggle();"><b>PULSECHAIN V3</b></div>
+                <div id="divLiveSection_PulsechainTokens" class="divLive" style="text-align:center; font-size: 16px; max-width: 330px; border-radius: 0px;"></div>
+            </div>
+        </div>
         </center>
+
         <div id="divAbout" style="display: none;">
             <div id="aboutSection">
                 <center><div><div class="text" style="max-width: 620px"><b>About:</b> Created to keep historical records of the HEX ecosystem, for research, education and analysis</div>

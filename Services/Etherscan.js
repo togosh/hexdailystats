@@ -3,6 +3,7 @@ const CONFIG = h.CONFIG;
 const HEX_CONTRACT_ADDRESS = h.HEX_CONTRACT_ADDRESS;
 const HEX_CONTRACT_CURRENTDAY = h.HEX_CONTRACT_CURRENTDAY;
 const HEX_CONTRACT_GLOBALINFO = h.HEX_CONTRACT_GLOBALINFO;
+const PULSECHAIN_GAS_API = h.PULSECHAIN_GAS_API;
 const FETCH_SIZE = h.FETCH_SIZE;
 const fetchRetry = h.fetchRetry;
 
@@ -107,6 +108,33 @@ async function getCurrentDay(){
       };
     });
   }
+
+  async function getGas_Pulsechain(){
+    var url = PULSECHAIN_GAS_API;
+    return await fetchRetry(url, {
+      method: 'GET',
+      highWaterMark: FETCH_SIZE,
+      headers: { 'Content-Type': 'application/json' }
+    })
+      .then(res => res.json())
+      .then(res => {
+        try {
+      return {
+        //slow: res.data.slow,
+        //standard: res.data.standard,
+        fast: (res.data.fast),
+        rapid: (res.data.rapid),
+      };
+    } catch (e) {
+      return {
+        //slow: 0,
+        //standard: 0,
+        fast: 0,
+        rapid: 0
+    };
+    }
+    });
+  }
   
 module.exports = { 
   getCurrentDay: async () => {
@@ -120,6 +148,9 @@ module.exports = {
   }
   ,getGas: async () => {
       return await getGas();
+  }
+  ,getGas_Pulsechain: async () => {
+    return await getGas_Pulsechain();
   }
 }
  

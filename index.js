@@ -380,6 +380,7 @@ async function getLiveData() {
   log("getLiveData()");
   try {
   if (!getDataRunning){
+    ///////////////////////////////// ETHEREUM NETWORK
     var priceUV2 = await TheGraph.getUniswapV2HEXDailyPrice(); await sleep(1000);
     var priceUV3 = await TheGraph.getUniswapV3HEXDailyPrice(); await sleep(1000);
     
@@ -399,7 +400,7 @@ async function getLiveData() {
     
     var tshareRateHEX = await TheGraph.get_shareRateChange(); await sleep(500);
     tshareRateHEX = parseFloat(tshareRateHEX);
-    var tshareRateUSD = parseFloat((tshareRateHEX * priceUV2).toFixed(4));
+    var tshareRateUSD = parseFloat((tshareRateHEX * priceUV2UV3).toFixed(4));
 
     if (liquidityUV2_HEXUSDC == 0 || liquidityUV2_USDC == 0 || liquidityUV2_HEXETH == 0 || liquidityUV2_ETH == 0) {
       return undefined;
@@ -409,6 +410,38 @@ async function getLiveData() {
 
     var payout = ((circulatingHEX + stakedHEX) * 10000 / 100448995) + (penaltiesHEX / 2.0);
     var payoutPerTshare = (payout / totalTshares);
+
+    /////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////// PULSECHAIN NETWORK
+
+    var priceHEX_PulseX_Pulsechain = await TheGraph.getPulseXPrice("HEX"); await sleep(1000);
+    var pricePLS_PulseX_Pulsechain = await TheGraph.getPulseXPrice("PULSECHAIN"); await sleep(1000);
+    var pricePLSX_PulseX_Pulsechain = await TheGraph.getPulseXPrice("PULSEX"); await sleep(1000);
+    var priceINC_PulseX_Pulsechain = await TheGraph.getPulseXPrice("INC"); await sleep(1000);
+
+    var liquidity_Pulsechain = await TheGraph.getPulseXPairs(); await sleep(500);
+
+    var tshareRateHEX_Pulsechain = await TheGraph.get_shareRateChange("PULSECHAIN"); await sleep(500);
+    tshareRateHEX_Pulsechain = parseFloat(tshareRateHEX_Pulsechain);
+    var tshareRateUSD_Pulsechain = parseFloat((tshareRateHEX_Pulsechain * priceHEX_PulseX_Pulsechain).toFixed(4));
+
+    var globalInfo = await TheGraph.get_globalInfo("PULSECHAIN"); await sleep(500);
+
+    var circulatingHEX_Pulsechain = globalInfo[0].totalHeartsinCirculation / 100000000;
+    var stakedHEX_Pulsechain = globalInfo[0].lockedHeartsTotal / 100000000;
+    var totalTshares_Pulsechain = globalInfo[0].stakeSharesTotal / 1000000000000;
+    var penaltiesHEX_Pulsechain = globalInfo[0].stakePenaltyTotal / 100000000;
+
+    var payout_Pulsechain = ((circulatingHEX_Pulsechain + stakedHEX_Pulsechain) * 10000 / 100448995) + (penaltiesHEX_Pulsechain / 2.0);
+    var payoutPerTshare_Pulsechain = (payout_Pulsechain / totalTshares_Pulsechain);
+
+    var {rapid, fast} = await Etherscan.getGas_Pulsechain(); await sleep(1000);
+    
+    var erc20transfer_Pulsechain = (fast / 20000 / 1000000000 * pricePLS_PulseX_Pulsechain);
+    var pulseXSwap_Pulsechain = (fast / 4650 / 1000000000  * pricePLS_PulseX_Pulsechain);
+    var addLiquidity_Pulsechain = (fast / 3600 / 1000000000  * pricePLS_PulseX_Pulsechain);
+    var beat = (fast / 1000000000);
+
     
     return {
       price: priceUV2UV3,
@@ -421,7 +454,32 @@ async function getLiveData() {
       penaltiesHEX: penaltiesHEX,
       payoutPerTshare: payoutPerTshare,
       stakedHEX: stakedHEX,
-      circulatingHEX: circulatingHEX
+      circulatingHEX: circulatingHEX,
+
+      price_Pulsechain: priceHEX_PulseX_Pulsechain,
+      tsharePrice_Pulsechain: tshareRateUSD_Pulsechain,
+      tshareRateHEX_Pulsechain: tshareRateHEX_Pulsechain,
+
+      liquidityHEX_Pulsechain: liquidity_Pulsechain.HEX,
+      liquidityPLS_Pulsechain: liquidity_Pulsechain.PLS,
+      liquidityPLSX_Pulsechain: liquidity_Pulsechain.PLSX,
+      liquidityINC_Pulsechain: liquidity_Pulsechain.INC,
+      liquidityUSDC_Pulsechain: liquidity_Pulsechain.USDC,
+      liquidityDAI_Pulsechain: liquidity_Pulsechain.DAI,
+
+      penaltiesHEX_Pulsechain: penaltiesHEX_Pulsechain,
+      payoutPerTshare_Pulsechain: payoutPerTshare_Pulsechain,
+      stakedHEX_Pulsechain: stakedHEX_Pulsechain,
+      circulatingHEX_Pulsechain: circulatingHEX_Pulsechain,
+
+      pricePLS_Pulsechain: pricePLS_PulseX_Pulsechain,
+      pricePLSX_Pulsechain: pricePLSX_PulseX_Pulsechain,
+      priceINC_Pulsechain: priceINC_PulseX_Pulsechain,
+
+      erc20transfer_Pulsechain: erc20transfer_Pulsechain,
+      pulseXSwap_Pulsechain: pulseXSwap_Pulsechain,
+      addLiquidity_Pulsechain: addLiquidity_Pulsechain,
+      beat: beat,
     };
   }
   } catch (error){

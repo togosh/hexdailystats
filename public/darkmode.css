@@ -89,7 +89,7 @@ thead .grey {
 
 #divLiveSectionHeader, #divEthereumSectionHeader {
   color:white;
-  background-color: #10172d;
+  background-color: #163f2b;
 }
 
 #divLiveSection, #divEthereumSection {
@@ -99,7 +99,7 @@ thead .grey {
 
 #divLiveSectionHeader_Pulsechain, #divLiveSectionHeader_PulsechainPrices, #divLiveSectionHeader_PulsechainTokens {
   color:white;
-  background-color: #10172d;
+  background-color: #432565;
 }
 
 #divLiveSection_Pulsechain, #divLiveSection_PulsechainPrices, #divLiveSection_PulsechainTokens {

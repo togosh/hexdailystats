@@ -291,9 +291,9 @@
                 "<div style='height: 24px'>" +
                     "<div style='float: left;'><b>Liquidity DAI</b>&nbsp;</div>" +
                     "<div style='float: right;'>" + getLiqiudityString(data.liquidityDAI, 1) + " DAI</div>" +
-                "</div>" +
-                "<div style='height: 24px'>" +
-                "</div>";
+                "</div>"; //+
+                //"<div style='height: 24px'>" +
+                //"</div>";
 
                 $("#divLiveSection").html(htmlNew);
 
@@ -1629,7 +1629,7 @@
                     <div id="divEthereumSection" class="divLive" style="text-align:center; font-size: 16px; max-width: 330px; border-radius: 0px;"></div>
                 </div>
             </div>
-            <div class="col-sm" style="text-align: left; min-width: 360px; max-width: 360px;">
+            <div class="col-sm" style="text-align: left; min-width: 360px; max-width: 360px;" hidden>
                 <div style="margin-bottom: 10px;">
                     <div id="divLiveSectionHeader_Pulsechain" style="padding-top: 8px; text-align:center; font-size: 16px;  max-width: 330px; cursor: pointer;" onclick="divLiveSection_PulsechainToggle();"><b>PULSECHAIN V3</b></div>
                     <div id="divLiveSection_Pulsechain" class="divLive" style="text-align:center; font-size: 16px; max-width: 330px; border-radius: 0px;"></div>
@@ -1642,7 +1642,7 @@
         </div>
         </div>
         <center>
-        <div style="min-width: 360px; max-width: 360px;">
+        <div style="min-width: 360px; max-width: 360px;" hidden>
             <div style="margin-bottom: 10px;">
                 <div id="divLiveSectionHeader_PulsechainTokens" style="padding-top: 8px; text-align:center; font-size: 16px;  max-width: 330px; cursor: pointer;" onclick="divLiveSection_PulsechainTokensToggle();"><b>PULSECHAIN V3</b></div>
                 <div id="divLiveSection_PulsechainTokens" class="divLive" style="text-align:center; font-size: 16px; max-width: 330px; border-radius: 0px;"></div>

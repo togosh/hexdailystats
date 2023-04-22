@@ -1,5 +1,6 @@
 const MongoDb = require('../Services/MongoDB'); 
 const TheGraph = require('../Services/TheGraph');  
+const Coingecko = require('../Services/Coingecko'); 
 const Twitter = require('../Services/Twitter');   
 const h = require('../Helpers/helpers'); 
 
@@ -396,6 +397,16 @@ async function getDailyData(day) {
         totalValueLocked = (priceUV2UV3 * stakedHEX);
       }
 
+      var priceBTC = 0;
+      var priceETH = 0;
+      try {
+        var pricesBTC = await Coingecko.getPriceHistory_Bitcoin(1); await sleep(500);
+        var pricesETH = await Coingecko.getPriceHistory_Ethereum(1); await sleep(500);
+        priceBTC = pricesBTC[0];
+        priceETH = pricesETH[0];
+      } catch (e) { log(e); }
+      
+
       // Create Full Object, Set Calculated Values
       try {
          let dailyStatPackage = {
@@ -470,6 +481,9 @@ async function getDailyData(day) {
           totalStakerCountChange:   totalStakerCountChange,
 
           totalValueLocked:         totalValueLocked,
+
+          priceBTC: priceBTC,
+          priceETH: priceETH,
         };
 
         const dailyStat = new DailyStat(dailyStatPackage);

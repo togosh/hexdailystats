@@ -1,5 +1,6 @@
 const Etherscan = require('./Etherscan'); 
 const TheGraph = require('../Services/TheGraph');  
+const Coingecko = require('../Services/Coingecko'); 
 const h = require('../Helpers/helpers'); 
 const isEmpty = h.isEmpty;
 const CONFIG = h.CONFIG; 
@@ -112,6 +113,9 @@ var DailyStatSchema = new Schema({
     totalStakerCountChange:           { type: Number, default: null },
     
     totalValueLocked:                 { type: Number, default: null },
+
+    priceBTC:                         { type: Number, default: null },
+    priceETH:                         { type: Number, default: null },
 }, {
     collection: mongoCollectionName
 });
@@ -147,6 +151,7 @@ async function getRowData() {
         ds.currentStakerCount, ds.currentStakerCountChange,
         ds.totalStakerCount, ds.totalStakerCountChange,
         ds.currentHolders, ds.currentHoldersChange,
+        ds.priceBTC, ds.priceETH
       ];
       rowDataNew.push(row);
     }
@@ -240,6 +245,9 @@ async function createRow(day){
       currentStakerCountChange:  0,
 
       totalValueLocked:        0,
+
+      priceBTC: 0,
+      priceETH: 0,
     });
 
       //await sleep(500);
@@ -329,6 +337,9 @@ async function createAllRows(){
         currentStakerCountChange:  0,
 
         totalValueLocked:        0,
+
+        priceBTC: 0,
+        priceETH: 0,
       });
 
       //await sleep(500);
@@ -1345,6 +1356,64 @@ async function create_totalStakerCountChanges(){
       } } catch (error) { log("ERROR"); log(error); }
 } 
 
+async function create_priceBTC(){
+  log("create_priceBTC");
+  var dayEnd = 1236;
+  try {
+    var pricesBTC = await Coingecko.getPriceHistory_Bitcoin(dayEnd); await sleep(500);
+    log("pricesBTC length: " + pricesBTC.length);
+
+    for (var day = 1; day <= dayEnd; day++) {
+      var rowFind = await DailyStat.findOne({currentDay: { $eq: day}});
+      if (!isEmpty(rowFind)) {
+        rowFind.priceBTC = pricesBTC[(day - 1)];
+
+        log("create_priceBTC - SAVE: " + pricesBTC[(day - 1)] + " ------ " + day);
+        rowFind.save(function (err) {
+          if (err) return log("create_priceBTC - SAVE ERROR: " + err);
+        });
+
+      } else {
+        log("create_priceBTC - MISSING DAY: " + day); 
+      }
+      
+      await sleep(200);
+    }
+  } catch (error) {
+    log("ERROR");
+    log(error);
+  }
+}
+
+async function create_priceETH(){
+  log("create_priceETH");
+  var dayEnd = 1236;
+  try {
+    var pricesETH = await Coingecko.getPriceHistory_Ethereum(dayEnd); await sleep(500);
+    log("pricesETH length: " + pricesETH.length);
+
+    for (var day = 1; day <= dayEnd; day++) {
+      var rowFind = await DailyStat.findOne({currentDay: { $eq: day}});
+      if (!isEmpty(rowFind)) {
+        rowFind.priceETH = pricesETH[(day - 1)];
+
+        log("create_priceETH - SAVE: " + pricesETH[(day - 1)] + " ------ " + day);
+        rowFind.save(function (err) {
+          if (err) return log("create_priceETH - SAVE ERROR: " + err);
+        });
+
+      } else {
+        log("create_priceETH - MISSING DAY: " + day); 
+      }
+      
+      await sleep(200);
+    }
+  } catch (error) {
+    log("ERROR");
+    log(error);
+  }
+}
+
 async function copyColumns(){
   log("copyColumns");
   try { for (var day = 1; day <= 647; day++) {
@@ -1395,6 +1464,12 @@ module.exports = {
     }
     ,create_penalties_Historical: async() => {
       return await create_penalties_Historical();
+    }
+    ,create_priceBTC: async() => {
+      return await create_priceBTC();
+    }
+    ,create_priceETH: async() => {
+      return await create_priceETH();
     }
  }
  

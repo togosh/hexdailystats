@@ -1253,6 +1253,20 @@
                             return data;
                         }
                     },
+                    { title: "Bitcoin Price (USD)", className: "text-center colpriceBTC grey" , render: function(data, type, row) {
+                            if (type === "display" || type === "filter") { 
+                                return currencyFormatterNoDecimal.format(data); 
+                            }
+                            return data;
+                        }
+                    },
+                    { title: "Ethereum Price (USD)", className: "text-center colpriceETH grey" , render: function(data, type, row) {
+                            if (type === "display" || type === "filter") { 
+                                return currencyFormatterNoDecimal.format(data); 
+                            }
+                            return data;
+                        }
+                    },
                 ],
                 drawCallback: function(settings) {
                     var pagination = $(this).closest('.dataTables_wrapper').find('.dataTables_paginate');
@@ -1550,6 +1564,9 @@
         .colTotalStakersChange      { min-width: calc(94px - 36px) !important; }
         .colCurrentHolders          { min-width: calc(96px - 36px) !important; }
         .colCurrentHoldersChange    { min-width: calc(96px - 36px) !important; }
+
+        .colpriceBTC    { min-width: calc(96px - 36px) !important; }
+        .colpriceETH    { min-width: calc(96px - 36px) !important; }
 
         a { color:black; }
 

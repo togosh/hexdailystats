@@ -219,6 +219,7 @@ async function grabData() {
   //if (!getDataRunning){ await DailyStatHandler.getDailyData(); }
   if (!getEthereumDataRUNNING){ runEthereumData(); }
   //MongoDb.create_penalties_Historical();
+  getEthereumCSV();
 }
 
 httpServer.listen(httpPort, hostname, () => { log(`Server running at http://${hostname}:${httpPort}/`);});
@@ -494,6 +495,39 @@ let test = async () => {
   //var test = await DailyStat.find({currentDay:null});
   //var test2 = test;
 }; test();
+
+cron.schedule('1 0 * * *', async () => {
+  getEthereumCSV();
+});
+
+async function getEthereumCSV(){
+  try {
+    log("getEthereumCSV()")
+
+    var pricesETH = await Coingecko.getPriceHistory_EthereumWithTime((3000 + currentDayGlobal)); await sleep(500);
+    pricesETH = pricesETH.slice(0, -1);
+
+    var pricesETHList = [];
+    var count = 1;
+    pricesETH.forEach(row => {
+        var date = new Date(Number(row[0]));
+        date.setUTCHours(0, 0, 0, 0);
+        var dateString = date.getUTCFullYear() + "-" + h.minTwoDigits(date.getUTCMonth() + 1) + "-" + h.minTwoDigits(date.getUTCDate());
+
+        var newRow = {
+          Day:        count,
+          Date:       dateString,
+          Price:      Number(row[1]),
+        }
+        pricesETHList.push(newRow);
+        count+=1;
+      });
+
+    var pricesETHCSV = h.convertCSV(pricesETHList);
+
+    fs.writeFileSync('./public/pricesETH.csv', pricesETHCSV);
+  } catch (e) { log(e); }
+}
 
 cron.schedule('15 * * * * *', async () => {
   log('**** DAILY DATA MAINTENANCE TIMER !');

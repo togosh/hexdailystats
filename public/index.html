@@ -1294,6 +1294,11 @@
                 //$('#divPools').get(0).scrollIntoView();
             });
 
+            $('#buttonFiles').click(function() { 
+                $('#divFiles').toggle();
+                //$('#divFiles').get(0).scrollIntoView();
+            });
+
             $('#buttonDark').click(function() { 
                 if( $('#styleDark').attr('disabled') == "disabled" ) {
                     $('#styleDark').removeAttr('disabled');
@@ -1947,7 +1952,7 @@
         </ul>
     </center>
     <center>
-        <button id="buttonLegend" style="width: 300px; height: 48px; border: 2px solid grey;">Legend</button>
+        <button id="buttonLegend" style="width: 300px; height: 48px; margin-bottom: 10px; border: 2px solid grey;">Legend</button>
         <ul id="divLegend" style="display: none; text-align: left; max-width: 360px; margin-bottom: 0px; margin-top: 16px;">
             <li>All Time Low: ($0.00005645)</li></br>
             <li>APY: (Daily Payout / Locked Supply * 365.25)</li></br>
@@ -1967,6 +1972,12 @@
             Day 522+ - UV2 & UV3 weighted liquidity</br>
             Day 695+ - UV2</br>
             Day 991+ - UV2 & UV3 weighted liquidity</li></br>
+        </ul>
+    </center>
+    <center>
+        <button id="buttonFiles" style="width: 300px; height: 48px; border: 2px solid grey;">Data Files</button>
+        <ul id="divFiles" style="display: none; text-align: left; max-width: 360px; margin-bottom: 0px; margin-top: 16px;">
+            <li><a href="/pricesETH.csv">Ethereum Prices</a></li></br>
         </ul>
     </center>
     

@@ -46,6 +46,20 @@ async function getPriceAllTimeHigh(){
         return prices;
     });
   }
+
+  async function getPriceHistory_EthereumWithTime(currentDayGlobal){
+    var url = "https://api.coingecko.com/api/v3/coins/ethereum/market_chart?vs_currency=usd&days=" + currentDayGlobal + "&interval=daily";
+    return await fetchRetry(url, {
+      method: 'GET',
+      highWaterMark: FETCH_SIZE,
+      headers: { 'Content-Type': 'application/json' }
+    })
+      .then(res => res.json())
+      .then(res => {
+        var prices = res.prices;
+        return prices;
+    });
+  }
   
   async function getPriceHistory_Gold(currentDayGlobal){
     var url = "https://api.coingecko.com/api/v3/coins/pax-gold/market_chart?vs_currency=usd&days=" + currentDayGlobal + "&interval=daily";
@@ -71,6 +85,9 @@ async function getPriceAllTimeHigh(){
     ,getPriceHistory_Ethereum: async (currentDayGlobal) => {
         return await getPriceHistory_Ethereum(currentDayGlobal);
     }
+    ,getPriceHistory_EthereumWithTime: async (currentDayGlobal) => {
+      return await getPriceHistory_EthereumWithTime(currentDayGlobal);
+  }
     ,getPriceHistory_Gold: async (currentDayGlobal) => {
         return await getPriceHistory_Gold(currentDayGlobal);
     }

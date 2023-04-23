@@ -92,6 +92,20 @@ var fetchRetry = require('fetch-retry')(fetch, {
     }
   });
 
+  function convertCSV(list){
+    const replacer = (key, value) => value === null ? '' : value // specify how you want to handle null values here
+    const header = Object.keys(list[0])
+    const csv = [
+      header.join(','), // header row first
+      ...list.map(row => header.map(fieldName => JSON.stringify(row[fieldName], replacer)).join(','))
+    ].join('\r\n')
+    return csv;
+  }
+
+  function minTwoDigits(n) {
+    return (n < 10 ? '0' : '') + n;
+  }
+
 module.exports = { 
     log: log
     ,sleep: sleep
@@ -123,4 +137,6 @@ module.exports = {
     ,PULSEX_CONTRACT_ADDRESS: PULSEX_CONTRACT_ADDRESS
     ,INC_CONTRACT_ADDRESS: INC_CONTRACT_ADDRESS
     ,PULSECHAIN_GAS_API: PULSECHAIN_GAS_API
+    ,convertCSV: convertCSV
+    ,minTwoDigits: minTwoDigits
  }

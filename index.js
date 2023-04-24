@@ -5,6 +5,7 @@ const Twitter = require('./Services/Twitter');
 const Etherscan = require('./Services/Etherscan'); 
 const DailyStatHandler = require('./Handlers/DailyStatHandler');
 const h = require('./Helpers/helpers'); 
+const p = require('./Helpers/prices');
 
 const fetchRetry = h.fetchRetry;
 const FETCH_SIZE = h.FETCH_SIZE;
@@ -213,13 +214,16 @@ async function buildHexSiteData(rowDataObjects){
 }
 
 async function grabData() {
+  await getAndSet_currentGlobalDay();
+
   if (!getLiveDataRUNNING){ await runLiveData(); }
   if (!getCurrencyDataRunning){ getCurrencyData(); };
   if (!getRowDataRunning){ getRowData(); }
   //if (!getDataRunning){ await DailyStatHandler.getDailyData(); }
   if (!getEthereumDataRUNNING){ runEthereumData(); }
   //MongoDb.create_penalties_Historical();
-  getEthereumCSV();
+  await getBitcoinCSV();
+  await getEthereumCSV();
 }
 
 httpServer.listen(httpPort, hostname, () => { log(`Server running at http://${hostname}:${httpPort}/`);});
@@ -526,6 +530,58 @@ async function getEthereumCSV(){
     var pricesETHCSV = h.convertCSV(pricesETHList);
 
     fs.writeFileSync('./public/pricesETH.csv', pricesETHCSV);
+  } catch (e) { log(e); }
+}
+
+async function getBitcoinCSV(){
+  try {
+    log("getBitcoinCSV()")
+
+    var prices_start = p.PRICES_BTC_START;
+    var days = (currentDayGlobal - 1237);
+
+    var pricesList = [];
+    var count = 1;
+    prices_start.every(row => {
+        var date = new Date(row[0]);
+        date.setUTCHours(0, 0, 0, 0);
+        var dateString = date.getUTCFullYear() + "-" + h.minTwoDigits(date.getUTCMonth() + 1) + "-" + h.minTwoDigits(date.getUTCDate());
+
+        var newRow = {
+          Day:        count,
+          DayLaunch:	(count + 274),
+          Date:       dateString,
+          Price:      Number(row[1]),
+        }
+        pricesList.push(newRow);
+        count+=1;
+
+        return true;
+    });
+
+    var prices_end = await Coingecko.getPriceHistory_BitcoinWithTime(days); await sleep(500);
+    prices_end = prices_end.slice(0, -1);
+
+    prices_end.every(row => {
+      var date = new Date(Number(row[0]));
+      date.setUTCHours(0, 0, 0, 0);
+      var dateString = date.getUTCFullYear() + "-" + h.minTwoDigits(date.getUTCMonth() + 1) + "-" + h.minTwoDigits(date.getUTCDate());
+
+      var newRow = {
+        Day:        count,
+        DayLaunch:	(count + 274),
+        Date:       dateString,
+        Price:      Number(row[1]),
+      }
+      pricesList.push(newRow);
+      count+=1;
+
+      return true;
+  });
+
+    var pricesCSV = h.convertCSV(pricesList);
+
+    fs.writeFileSync('./public/pricesBTC.csv', pricesCSV);
   } catch (e) { log(e); }
 }
 

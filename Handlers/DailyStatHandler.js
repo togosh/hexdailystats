@@ -219,7 +219,7 @@ let get_dailyPayoutHexTotalTshares = async (currentDay) => {
 async function getDailyData(day) {
   return new Promise(async (resolve) => {
     getDataRunning = true;
-    log("getDailyData() --- START ****************");
+    log("getDailyData() --- START **************** - getDataRunning SET TRUE: " + getDataRunning);
     try {
       await sleep(5000);
       var currentDay = day;
@@ -512,6 +512,7 @@ async function getDailyData(day) {
       log('getDailyData() ----- ERROR ---' + err.toString() + " - " + err.stack);
     } finally { 
       getDataRunning = false;
+      log("getDailyData() --- END **************** - getDataRunning SET FALSE: " + getDataRunning);
       currentDailyStat = undefined;
     }
   });

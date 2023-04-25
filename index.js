@@ -587,8 +587,7 @@ async function getBitcoinCSV(){
 }
 
 cron.schedule('15 * * * * *', async () => {
-  log('**** DAILY DATA MAINTENANCE TIMER !');
-  
+  log("**** DAILY DATA MAINTENANCE TIMER! -- getDataRunning: " + getDataRunning + " - DailyStatMaintenance: " + DailyStatMaintenance);
   if (!getDataRunning && !DailyStatMaintenance){ 
     try{
       let daysBackToCheck = 4;
@@ -602,6 +601,7 @@ cron.schedule('15 * * * * *', async () => {
         for(var key in ds[0]){
           if(key != '$op' && ds[0][key] === null){
             DailyStatMaintenance = true;
+            log("**** DAILY DATA -- DailyStatMaintenance SET TRUE: " + DailyStatMaintenance);
             await DailyStatHandler.getDailyData(i);  
             if (!getRowDataRunning){ getRowData(); }
             io.emit("currentDay", currentDayGlobal);
@@ -612,6 +612,7 @@ cron.schedule('15 * * * * *', async () => {
 
       if(latestDay > latestDailyDataCurrentDay) {
         DailyStatMaintenance = true;
+        log("**** DAILY DATA -- DailyStatMaintenance SET TRUE: " + DailyStatMaintenance);
         for (let i = latestDailyDataCurrentDay + 1; i <= latestDay; i++) { 
           await DailyStatHandler.getDailyData(i);  
           if (!getRowDataRunning){ getRowData(); }
@@ -623,6 +624,7 @@ cron.schedule('15 * * * * *', async () => {
       log('DAILY DATA MAINTENANCE TIMER () ----- ERROR ---' + err.toString() + " - " + err.stack);
     } finally { 
       DailyStatMaintenance = false;
+      log("**** DAILY DATA -- DailyStatMaintenance SET FALSE: " + DailyStatMaintenance);
     } 
   }
 });

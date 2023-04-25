@@ -220,8 +220,8 @@ async function grabData() {
   if (!getCurrencyDataRunning){ getCurrencyData(); };
   if (!getRowDataRunning){ getRowData(); }
   //if (!getDataRunning){ await DailyStatHandler.getDailyData(); }
-  if (!getEthereumDataRUNNING){ runEthereumData(); }
   //MongoDb.create_penalties_Historical();
+  if (!getEthereumDataRUNNING){ await runEthereumData(); }
   await getBitcoinCSV();
   await getEthereumCSV();
 }
@@ -499,10 +499,6 @@ let test = async () => {
   //var test = await DailyStat.find({currentDay:null});
   //var test2 = test;
 }; test();
-
-cron.schedule('1 0 * * *', async () => {
-  getEthereumCSV();
-});
 
 async function getEthereumCSV(){
   try {

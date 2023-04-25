@@ -500,6 +500,11 @@ let test = async () => {
   //var test2 = test;
 }; test();
 
+cron.schedule('10 */6 * * *', async () => {
+  await getBitcoinCSV();
+  await getEthereumCSV(); 
+});
+
 async function getEthereumCSV(){
   try {
     log("getEthereumCSV()")

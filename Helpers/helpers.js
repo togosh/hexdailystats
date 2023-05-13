@@ -17,20 +17,20 @@ const UNISWAP_V3_HEXETH = "0x9e0905249ceefffb9605e034b534544684a58be6";
 const HEX_SUBGRAPH_API_ETHEREUM = "https://api.thegraph.com/subgraphs/name/codeakk/hex";
 //const HEX_SUBGRAPH_API_ETHEREUM = "https://gateway.thegraph.com/api/" + CONFIG.subgraph.apiKey + "/subgraphs/id/3gYSyeohaa7LtM9dw2q5w2ZuKXMFJrqZQTh2EjqKy5gp";
 
-const HEX_SUBGRAPH_API_PULSECHAIN = "https://graph.v4.testnet.pulsechain.com/subgraphs/name/Codeakk/Hex";
-const PULSEX_SUBGRAPH_API_PULSECHAIN = "https://graph.v4.testnet.pulsechain.com/subgraphs/name/pulsechain/pulsex"
+const HEX_SUBGRAPH_API_PULSECHAIN = "https://graph.pulsechain.com/subgraphs/name/Codeakk/Hex";
+const PULSEX_SUBGRAPH_API_PULSECHAIN = "https://graph.pulsechain.com/subgraphs/name/pulsechain/pulsex"
 
-const PULSECHAIN_HEXPLS = "0x36ee7730b16b6afdab13ae66bf3d793df1fd17b5"; //"0xf1502a01378a28fc48a34d39cc70972366a1c879";
-const PULSECHAIN_HEXPLSX = "0xf96b8c17610f379c021ec5565e45af82aa6391b2"; //"0xe43f85e29d0f24a41ebcf297ac0452d191882642";
-const PULSECHAIN_HEXINC = "0x3869718766ae864b699565c3cb7de23cd0da652e"; //"0x5aa419fbeb298264216463398899e24fbdb62fc4";
-const PULSECHAIN_HEXUSDC = "0xe010babd7477364008e332396516f6a9bfc42985"; //"0x81ec6cff8405142548758b1e829a911bf396e4ac";
-const PULSECHAIN_HEXDAI = "0x823df8902bd1e9540812db3d2ac6cf5d6705e93b"; //"0xbe7550babe10c00a783d95511759ed6e099c7a16";
+const PULSECHAIN_HEXPLS = "0xf1f4ee610b2babb05c635f726ef8b0c568c8dc65";
+const PULSECHAIN_HEXPLSX = "";
+const PULSECHAIN_HEXINC = "";
+const PULSECHAIN_HEXUSDC = "";
+const PULSECHAIN_HEXDAI = "";
 
-const PULSECHAIN_CONTRACT_ADDRESS = "0x70499adebb11efd915e3b69e700c331778628707";
-const PULSEX_CONTRACT_ADDRESS = "0x8a810ea8B121d08342E9e7696f4a9915cBE494B7"; //"0x3b34fff74497ca21771ce9a0c11cb07490686a58";
-const INC_CONTRACT_ADDRESS = "0x6eFAfcb715F385c71d8AF763E8478FeEA6faDF63"; //"0x8a810ea8b121d08342e9e7696f4a9915cbe494b7";
+const PULSECHAIN_CONTRACT_ADDRESS = "0xa1077a294dde1b09bb078844df40758a5d0f9a27";
+const PULSEX_CONTRACT_ADDRESS = "0x95b303987a60c71504d99aa1b13b4da07b0790ab";
+const INC_CONTRACT_ADDRESS = "0x2fa878Ab3F87CC1C9737Fc071108F904c0B0C95d";
 
-const PULSECHAIN_GAS_API = "https://beacon.v4.testnet.pulsechain.com/api/v1/execution/gasnow";
+const PULSECHAIN_GAS_API = "https://beacon.pulsechain.com/api/v1/execution/gasnow";
 
 
 const log = (message) => {

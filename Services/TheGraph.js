@@ -853,10 +853,10 @@ async function getUniswapV2() {
     var totalDAI = 0;
 
     var liquidity_HEXPLS = await getPulseXPair(PULSECHAIN_HEXPLS); await sleep(500);
-    var liquidity_HEXPLSX = await getPulseXPair(PULSECHAIN_HEXPLSX); await sleep(500);
-    var liquidity_HEXINC = await getPulseXPair(PULSECHAIN_HEXINC); await sleep(500);
-    var liquidity_HEXUSDC = await getPulseXPair(PULSECHAIN_HEXUSDC); await sleep(500);
-    var liquidity_HEXDAI = await getPulseXPair(PULSECHAIN_HEXDAI); await sleep(500);
+    var liquidity_HEXPLSX = 0; //await getPulseXPair(PULSECHAIN_HEXPLSX); await sleep(500);
+    var liquidity_HEXINC = 0; //await getPulseXPair(PULSECHAIN_HEXINC); await sleep(500);
+    var liquidity_HEXUSDC = 0; //await getPulseXPair(PULSECHAIN_HEXUSDC); await sleep(500);
+    var liquidity_HEXDAI = 0; //await getPulseXPair(PULSECHAIN_HEXDAI); await sleep(500);
 
     totalHEX += liquidity_HEXPLS.HEX + 
                 liquidity_HEXPLSX.HEX + 

@@ -266,12 +266,12 @@ async function getDailyData(day) {
       let priceUV2 = priceUV3;
 
       //var {liquidityUV2_HEXUSDC, liquidityUV2_USDC} = await get_liquidityUV2USDC(currentDay);
-      liquidityUV2_HEXUSDC = 0;
-      liquidityUV2_USDC = 0;
+      liquidityUV2_HEXUSDC = 0.1;
+      liquidityUV2_USDC = 0.1;
       
       //var {liquidityUV2_HEXETH, liquidityUV2_ETH} = await get_liquidityUV2ETH(currentDay);
-      liquidityUV2_HEXETH = 0;
-      liquidityUV2_ETH = 0;
+      liquidityUV2_HEXETH = 0.1;
+      liquidityUV2_ETH = 0.1;
        
       var {liquidityUV3_HEX, liquidityUV3_USDC, liquidityUV3_ETH} = await get_liquidityUV3(blockNumber);
       
@@ -365,7 +365,7 @@ async function getDailyData(day) {
       if(priceUV2 && priceUV3 && liquidityUV2_USDC && liquidityUV2UV3_USDC && liquidityUV3_USDC){
         priceUV2UV3 = parseFloat(((priceUV2 * (liquidityUV2_USDC / liquidityUV2UV3_USDC)) + (priceUV3 * (liquidityUV3_USDC / liquidityUV2UV3_USDC))).toFixed(8));
       } else if (priceUV3 && liquidityUV2UV3_USDC && liquidityUV3_USDC) {
-        priceUV2UV3 = parseFloat(((priceUV3 * (liquidityUV3_USDC / liquidityUV2UV3_USDC))).toFixed(8));
+        priceUV2UV3 = priceUV3;
       }
       var priceChangeUV2UV3       = undefined;
       if (priceUV2UV3 && previousDailyStat.priceUV2UV3) {

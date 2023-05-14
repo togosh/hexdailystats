@@ -392,10 +392,10 @@ async function getLiveData() {
     
     //var { liquidityUV2_HEXUSDC, liquidityUV2_USDC } = await TheGraph.getUniswapV2HEXUSDC_Polling(); await sleep(1000);
     //var { liquidityUV2_HEXETH, liquidityUV2_ETH } = await TheGraph.getUniswapV2HEXETH(); await sleep(1000);
-    var liquidityUV2_HEXUSDC = 0;
-    var liquidityUV2_USDC = 0;
-    var liquidityUV2_HEXETH = 0;
-    var liquidityUV2_ETH = 0;
+    var liquidityUV2_HEXUSDC = 0.1;
+    var liquidityUV2_USDC = 0.1;
+    var liquidityUV2_HEXETH = 0.1;
+    var liquidityUV2_ETH = 0.1;
     
     var { liquidityUV3_HEX, liquidityUV3_USDC, liquidityUV3_ETH, liquidityUV3_DAI } = await TheGraph.getUniswapV3(); await sleep(1000);
     

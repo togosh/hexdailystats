@@ -254,6 +254,10 @@
                 if (Number(data.liquidityETH < 1000)){ liquidityETHString = getLiqiudityString(data.liquidityETH, 0);
                 } else { liquidityETHString = getLiqiudityString(data.liquidityETH, 1); }
 
+                var liquidityDAIString = "";
+                if (Number(data.liquidityDAI < 1000)){ liquidityDAIString = getLiqiudityString(data.liquidityDAI, 0);
+                } else { liquidityDAIString = getLiqiudityString(data.liquidityDAI, 1); }
+
                 //  var htmlNew = "<div><b>LIVE DATA</b></div>
                 var htmlNew = "<div style='padding: 0px 40px;'>" +
                 "<div style='height: 24px'>" +
@@ -290,7 +294,7 @@
                 "</div>" +
                 "<div style='height: 24px'>" +
                     "<div style='float: left;'><b>Liquidity DAI</b>&nbsp;</div>" +
-                    "<div style='float: right;'>" + getLiqiudityString(data.liquidityDAI, 1) + " DAI</div>" +
+                    "<div style='float: right;'>" + liquidityDAIString + " DAI</div>" +
                 "</div>" +
                 "<div style='height: 24px'>" +
                 "</div>";
@@ -300,7 +304,7 @@
                 var htmlNew_Pulsechain = "<div style='padding: 0px 40px;'>" +
                 "<div style='height: 24px'>" +
                     "<div style='float: left;'><b>HEX Price</b>&nbsp;</div>" +
-                    "<div style='float: right;'>" + Number(data.price_Pulsechain).toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2}) + " USD</div>" +
+                    "<div style='float: right;'>" + Number(data.price_Pulsechain).toLocaleString(undefined,{minimumFractionDigits:3, maximumFractionDigits:3}) + " USD</div>" +
                 "</div>" +
                 "<div style='height: 24px'>" +
                     "<div style='float: left;'><b>T-Share Price</b>&nbsp;</div>" +
@@ -343,23 +347,23 @@
                 var htmlNew_PulsechainPrices = "<div style='padding: 0px 40px;'>" +
                 "<div style='height: 24px'>" +
                     "<div style='float: left;'><b>PLS Price</b>&nbsp;</div>" +
-                    "<div style='float: right;'>" + Number(data.pricePLS_Pulsechain).toLocaleString(undefined,{minimumFractionDigits:4, maximumFractionDigits:4}) + " USD</div>" +
+                    "<div style='float: right;'>" + Number(data.pricePLS_Pulsechain).toLocaleString(undefined,{minimumFractionDigits:6, maximumFractionDigits:6}) + " USD</div>" +
                 "</div>" +
                 "<div style='height: 24px'>" +
                     "<div style='float: left;'><b>PRC20 Transfer</b>&nbsp;</div>" +
-                    "<div style='float: right;'>" + Number(data.erc20transfer_Pulsechain).toLocaleString(undefined,{minimumFractionDigits:7, maximumFractionDigits:7}) + " USD</div>" +
+                    "<div style='float: right;'>" + Number(data.erc20transfer_Pulsechain).toLocaleString(undefined,{minimumFractionDigits:4, maximumFractionDigits:4}) + " USD</div>" +
                 "</div>" +
                 "<div style='height: 24px'>" +
                     "<div style='float: left;'><b>PulseX Swap</b>&nbsp;</div>" +
-                    "<div style='float: right;'>" + Number(data.pulseXSwap_Pulsechain).toLocaleString(undefined,{minimumFractionDigits:7, maximumFractionDigits:7}) + " USD</div>" +
+                    "<div style='float: right;'>" + Number(data.pulseXSwap_Pulsechain).toLocaleString(undefined,{minimumFractionDigits:4, maximumFractionDigits:4}) + " USD</div>" +
                 "</div>" +
                 "<div style='height: 24px'>" +
                     "<div style='float: left;'><b>Add Liquidity</b>&nbsp;</div>" +
-                    "<div style='float: right;'>" + Number(data.addLiquidity_Pulsechain).toLocaleString(undefined,{minimumFractionDigits:7, maximumFractionDigits:7}) + " USD</div>" +
+                    "<div style='float: right;'>" + Number(data.addLiquidity_Pulsechain).toLocaleString(undefined,{minimumFractionDigits:4, maximumFractionDigits:4}) + " USD</div>" +
                 "</div>" +
                 "<div style='height: 24px'>" +
                     "<div style='float: left;'><b>Gas Price</b>&nbsp;</div>" +
-                    "<div style='float: right;'>" + Number(data.beat).toLocaleString(undefined,{minimumFractionDigits:1, maximumFractionDigits:1}) + " BEAT</div>" +
+                    "<div style='float: right;'>" + Number(data.beat).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + " BEAT</div>" +
                 "</div>";
                 $("#divLiveSection_PulsechainPrices").html(htmlNew_PulsechainPrices);
 
@@ -1651,13 +1655,13 @@
                     <div id="divEthereumSection" class="divLive" style="text-align:center; font-size: 16px; max-width: 330px; border-radius: 0px;"></div>
                 </div>
             </div>
-            <div class="col-sm" style="text-align: left; min-width: 360px; max-width: 360px;" hidden>
+            <div class="col-sm" style="text-align: left; min-width: 360px; max-width: 360px;">
                 <div style="margin-bottom: 10px;">
-                    <div id="divLiveSectionHeader_Pulsechain" style="padding-top: 8px; text-align:center; font-size: 16px;  max-width: 330px; cursor: pointer;" onclick="divLiveSection_PulsechainToggle();"><b>PULSECHAIN V4</b></div>
+                    <div id="divLiveSectionHeader_Pulsechain" style="padding-top: 8px; text-align:center; font-size: 16px;  max-width: 330px; cursor: pointer;" onclick="divLiveSection_PulsechainToggle();"><b>PULSECHAIN</b></div>
                     <div id="divLiveSection_Pulsechain" class="divLive" style="text-align:center; font-size: 16px; max-width: 330px; border-radius: 0px;"></div>
                 </div>
                 <div style="margin-bottom: 10px;">
-                    <div id="divLiveSectionHeader_PulsechainPrices" style="padding-top: 8px; text-align:center; font-size: 16px;  max-width: 330px; cursor: pointer;" onclick="divLiveSection_PulsechainPricesToggle();"><b>PULSECHAIN V4</b></div>
+                    <div id="divLiveSectionHeader_PulsechainPrices" style="padding-top: 8px; text-align:center; font-size: 16px;  max-width: 330px; cursor: pointer;" onclick="divLiveSection_PulsechainPricesToggle();"><b>PULSECHAIN</b></div>
                     <div id="divLiveSection_PulsechainPrices" class="divLive" style="text-align:center; font-size: 16px; max-width: 330px; border-radius: 0px;"></div>
                 </div>
             </div>
@@ -1666,7 +1670,7 @@
         <center>
         <div style="min-width: 360px; max-width: 360px;" hidden>
             <div style="margin-bottom: 10px;">
-                <div id="divLiveSectionHeader_PulsechainTokens" style="padding-top: 8px; text-align:center; font-size: 16px;  max-width: 330px; cursor: pointer;" onclick="divLiveSection_PulsechainTokensToggle();"><b>PULSECHAIN V4</b></div>
+                <div id="divLiveSectionHeader_PulsechainTokens" style="padding-top: 8px; text-align:center; font-size: 16px;  max-width: 330px; cursor: pointer;" onclick="divLiveSection_PulsechainTokensToggle();"><b>PULSECHAIN</b></div>
                 <div id="divLiveSection_PulsechainTokens" class="divLive" style="text-align:center; font-size: 16px; max-width: 330px; border-radius: 0px;"></div>
             </div>
         </div>
@@ -1915,6 +1919,13 @@
                 </br>
                 <li><a href="https://info.uniswap.org/#/pools/0x5c28b5f471d97f53fcf132f16f9f3c0c888c1a01">0x5c2 - DAI - UniswapV3 - 0.3% Fee</a></li></br>
                 <li><a href="https://info.uniswap.org/#/pools/0x63f7d912eae3e7a2ec19afdad0d7c7533ae0781c">0x63f - DAI - UniswapV3 - 1.0% Fee</a></li></br>
+                </br>
+                
+                <li><a href="https://app.pulsex.com/info/pool/0xf1f4ee610b2babb05c635f726ef8b0c568c8dc65">0xf1f - WPLS - PulseX</a></li></br>
+                <li><a href="https://app.pulsex.com/info/pool/0xa04620601d7dadc3bd1c99312a699ade8e6c16d2">0xa04 - PLSX - PulseX</a></li></br>
+                <li><a href="https://app.pulsex.com/info/pool/0x1a4d79eb757ffcddf38ff25850de28d624f65398">0x1a4 - INC  - PulseX</a></li></br>
+                <li><a href="https://app.pulsex.com/info/pool/0x6f1747370b1cacb911ad6d4477b718633db328c8">0x6f1 - DAI  - PulseX</a></li></br>
+                </br>
             </ul>
         </center>
 
@@ -1931,6 +1942,7 @@
     <center>
         <button id="buttonLegendLinks" style="width: 300px; height: 48px; margin-bottom: 10px; border: 2px solid grey;">Links</button>
         <ul id="divLegendLinks" style="display: none; text-align: left; max-width: 360px; margin-bottom: 0px; margin-top: 16px;">
+            <li><a href="https://plsburn.com/" target="_blank">PLSburn.com</a></li></br>
             <li><a href="https://apphex.win/charts/" target="_blank">Apphex.win/charts</a></li></br>
             <li><a href="https://twitter.com/WhaleHEX" target="_blank">Twitter.com/WhaleHex</a></li></br>
             <li><a href="https://hex.vision/" target="_blank">Hex.vision</a></li></br>

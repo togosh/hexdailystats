@@ -21,10 +21,10 @@ const HEX_SUBGRAPH_API_PULSECHAIN = "https://graph.pulsechain.com/subgraphs/name
 const PULSEX_SUBGRAPH_API_PULSECHAIN = "https://graph.pulsechain.com/subgraphs/name/pulsechain/pulsex"
 
 const PULSECHAIN_HEXPLS = "0xf1f4ee610b2babb05c635f726ef8b0c568c8dc65";
-const PULSECHAIN_HEXPLSX = "";
-const PULSECHAIN_HEXINC = "";
+const PULSECHAIN_HEXPLSX = "0xa04620601d7dadc3bd1c99312a699ade8e6c16d2";
+const PULSECHAIN_HEXINC = "0x1a4d79eb757ffcddf38ff25850de28d624f65398";
 const PULSECHAIN_HEXUSDC = "";
-const PULSECHAIN_HEXDAI = "";
+const PULSECHAIN_HEXDAI = "0x6f1747370b1cacb911ad6d4477b718633db328c8";
 
 const PULSECHAIN_CONTRACT_ADDRESS = "0xa1077a294dde1b09bb078844df40758a5d0f9a27";
 const PULSEX_CONTRACT_ADDRESS = "0x95b303987a60c71504d99aa1b13b4da07b0790ab";

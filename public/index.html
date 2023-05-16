@@ -339,7 +339,7 @@
                     "<div style='float: right;'>" + getLiqiudityString(data.liquidityINC_Pulsechain, 1) + " INC</div>" +
                 "</div>" +
                 "<div style='height: 24px'>" +
-                    "<div style='float: left;'><b>Liquidity DAI</b>&nbsp;</div>" +
+                    "<div style='float: left;'><b>Liquidity DAI (bridge)</b>&nbsp;</div>" +
                     "<div style='float: right;'>" + getLiqiudityString(data.liquidityDAI_Pulsechain, 1) + " DAI</div>" +
                 "</div>";
                 $("#divLiveSection_Pulsechain").html(htmlNew_Pulsechain);
@@ -350,15 +350,15 @@
                     "<div style='float: right;'>" + Number(data.pricePLS_Pulsechain).toLocaleString(undefined,{minimumFractionDigits:6, maximumFractionDigits:6}) + " USD</div>" +
                 "</div>" +
                 "<div style='height: 24px'>" +
-                    "<div style='float: left;'><b>PRC20 Transfer</b>&nbsp;</div>" +
+                    "<div style='float: left;'><b>PRC20 Transfer*</b>&nbsp;</div>" +
                     "<div style='float: right;'>" + Number(data.erc20transfer_Pulsechain).toLocaleString(undefined,{minimumFractionDigits:4, maximumFractionDigits:4}) + " USD</div>" +
                 "</div>" +
                 "<div style='height: 24px'>" +
-                    "<div style='float: left;'><b>PulseX Swap</b>&nbsp;</div>" +
+                    "<div style='float: left;'><b>PulseX Swap*</b>&nbsp;</div>" +
                     "<div style='float: right;'>" + Number(data.pulseXSwap_Pulsechain).toLocaleString(undefined,{minimumFractionDigits:4, maximumFractionDigits:4}) + " USD</div>" +
                 "</div>" +
                 "<div style='height: 24px'>" +
-                    "<div style='float: left;'><b>Add Liquidity</b>&nbsp;</div>" +
+                    "<div style='float: left;'><b>Add Liquidity*</b>&nbsp;</div>" +
                     "<div style='float: right;'>" + Number(data.addLiquidity_Pulsechain).toLocaleString(undefined,{minimumFractionDigits:4, maximumFractionDigits:4}) + " USD</div>" +
                 "</div>" +
                 "<div style='height: 24px'>" +
@@ -1924,7 +1924,7 @@
                 <li><a href="https://app.pulsex.com/info/pool/0xf1f4ee610b2babb05c635f726ef8b0c568c8dc65">0xf1f - WPLS - PulseX</a></li></br>
                 <li><a href="https://app.pulsex.com/info/pool/0xa04620601d7dadc3bd1c99312a699ade8e6c16d2">0xa04 - PLSX - PulseX</a></li></br>
                 <li><a href="https://app.pulsex.com/info/pool/0x1a4d79eb757ffcddf38ff25850de28d624f65398">0x1a4 - INC  - PulseX</a></li></br>
-                <li><a href="https://app.pulsex.com/info/pool/0x6f1747370b1cacb911ad6d4477b718633db328c8">0x6f1 - DAI  - PulseX</a></li></br>
+                <li><a href="https://app.pulsex.com/info/pool/0x6f1747370b1cacb911ad6d4477b718633db328c8">0x6f1 - DAI (bridge) - PulseX</a></li></br>
                 </br>
             </ul>
         </center>

@@ -350,15 +350,15 @@
                     "<div style='float: right;'>" + Number(data.pricePLS_Pulsechain).toLocaleString(undefined,{minimumFractionDigits:6, maximumFractionDigits:6}) + " USD</div>" +
                 "</div>" +
                 "<div style='height: 24px'>" +
-                    "<div style='float: left;'><b>PRC20 Transfer*</b>&nbsp;</div>" +
+                    "<div style='float: left;'><b>PRC20 Transfer</b>&nbsp;</div>" +
                     "<div style='float: right;'>" + Number(data.erc20transfer_Pulsechain).toLocaleString(undefined,{minimumFractionDigits:4, maximumFractionDigits:4}) + " USD</div>" +
                 "</div>" +
                 "<div style='height: 24px'>" +
-                    "<div style='float: left;'><b>PulseX Swap*</b>&nbsp;</div>" +
+                    "<div style='float: left;'><b>PulseX Swap</b>&nbsp;</div>" +
                     "<div style='float: right;'>" + Number(data.pulseXSwap_Pulsechain).toLocaleString(undefined,{minimumFractionDigits:4, maximumFractionDigits:4}) + " USD</div>" +
                 "</div>" +
                 "<div style='height: 24px'>" +
-                    "<div style='float: left;'><b>Add Liquidity*</b>&nbsp;</div>" +
+                    "<div style='float: left;'><b>Add Liquidity</b>&nbsp;</div>" +
                     "<div style='float: right;'>" + Number(data.addLiquidity_Pulsechain).toLocaleString(undefined,{minimumFractionDigits:4, maximumFractionDigits:4}) + " USD</div>" +
                 "</div>" +
                 "<div style='height: 24px'>" +
@@ -370,11 +370,11 @@
                 var htmlNew_PulsechainTokens = "<div style='padding: 0px 40px;'>" +
                 "<div style='height: 24px'>" +
                     "<div style='float: left;'><b>PLSX Price</b>&nbsp;</div>" +
-                    "<div style='float: right;'>" + Number(data.pricePLSX_Pulsechain).toLocaleString(undefined,{minimumFractionDigits:3, maximumFractionDigits:3}) + " USD</div>" +
+                    "<div style='float: right;'>" + Number(data.pricePLSX_Pulsechain).toLocaleString(undefined,{minimumFractionDigits:7, maximumFractionDigits:7}) + " USD</div>" +
                 "</div>" +
                 "<div style='height: 24px'>" +
                     "<div style='float: left;'><b>INC Price</b>&nbsp;</div>" +
-                    "<div style='float: right;'>" + Number(data.priceINC_Pulsechain).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + " USD</div>" +
+                    "<div style='float: right;'>" + Number(data.priceINC_Pulsechain).toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2}) + " USD</div>" +
                 "</div>";
                 $("#divLiveSection_PulsechainTokens").html(htmlNew_PulsechainTokens);
             }
@@ -1668,7 +1668,7 @@
         </div>
         </div>
         <center>
-        <div style="min-width: 360px; max-width: 360px;" hidden>
+        <div style="min-width: 360px; max-width: 360px;">
             <div style="margin-bottom: 10px;">
                 <div id="divLiveSectionHeader_PulsechainTokens" style="padding-top: 8px; text-align:center; font-size: 16px;  max-width: 330px; cursor: pointer;" onclick="divLiveSection_PulsechainTokensToggle();"><b>PULSECHAIN</b></div>
                 <div id="divLiveSection_PulsechainTokens" class="divLive" style="text-align:center; font-size: 16px; max-width: 330px; border-radius: 0px;"></div>
@@ -2009,5 +2009,13 @@
         </a>
     </center>
 
-    <center><div style="color: white; margin-top: 20px; margin-bottom: 60px;"><a href="https://HEXpostcards.com/" target="_blank">Donation Address</a></div></center>
+    <center><div style="color: white; margin-top: 20px; margin-bottom: 20px;"><a href="https://HEXpostcards.com/" target="_blank">Donation Address</a></div></center>
+
+    <center>
+        <a href="http://plsburn.com/" target="_blank">
+            <img src="plsburn_logo.svg" style="max-width: 340px;"></img>
+        </a>
+    </center>
+
+    <div style="margin-bottom: 140px;"></div>
 </div>

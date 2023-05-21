@@ -922,6 +922,51 @@ async function getUniswapV2() {
     });
   }
 
+  async function getPulseXPairPriceAndLiquidity(pairAddress){
+    return await fetchRetry(PULSEX_SUBGRAPH_API_PULSECHAIN, {
+      method: 'POST',
+      highWaterMark: FETCH_SIZE,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: `
+      query {
+        pairHourDatas (
+          first: 1,
+          orderBy: hourStartUnix,
+          orderDirection: desc,
+          where: {pair_in: [
+            "` + pairAddress + `",
+          ]})
+        {
+          hourStartUnix
+          pair {
+            id
+            token0 {
+              id
+            }
+            token1 {
+              id
+            }
+            reserve0
+            reserve1
+            token0Price
+            token1Price
+          }
+        }
+      }` 
+      }),
+    })
+    .then(res => res.json())
+    .then(res => {
+      try {
+        var parHourData = res.data.pairHourDatas[0];
+        return parHourData.pair;
+        //return parseFloat(parseFloat(tokenDayData.priceUSD).toFixed(8));
+      } catch (e){
+        return undefined;
+      }
+    });
+  }
+
   async function getPulseXPrice(token){
     var CONTRACT = HEX_CONTRACT_ADDRESS;
     switch (token){
@@ -1602,7 +1647,10 @@ async function get_GraphData(query, network="ETHEREUM"){
 
 
 module.exports = { 
-    getPulseXPairs: async () => { 
+    getPulseXPairPriceAndLiquidity: async (pairAddress) => { 
+      return await getPulseXPairPriceAndLiquidity(pairAddress);
+    }
+    ,getPulseXPairs: async () => { 
       return await getPulseXPairs();
     }
     ,getPulseXPrice: async (token) => { 

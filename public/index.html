@@ -292,12 +292,13 @@
                     "<div style='float: left;'><b>Liquidity ETH</b>&nbsp;</div>" +
                     "<div style='float: right;'>" + liquidityETHString + " ETH</div>" +
                 "</div>" +
-                "<div style='height: 24px'>" +
+                "<div style='height: 24px' hidden>" +
                     "<div style='float: left;'><b>Liquidity DAI</b>&nbsp;</div>" +
                     "<div style='float: right;'>" + liquidityDAIString + " DAI</div>" +
-                "</div>" +
-                "<div style='height: 24px'>" +
                 "</div>";
+                // +
+                //"<div style='height: 24px'>" +
+                //"</div>";
 
                 $("#divLiveSection").html(htmlNew);
 
@@ -327,20 +328,12 @@
                     "<div style='float: right;'>" + getLiqiudityString(data.liquidityHEX_Pulsechain, 1) + " HEX</div>" +
                 "</div>" +
                 "<div style='height: 24px'>" +
+                    "<div style='float: left;'><b>Liquidity eHEX</b>&nbsp;</div>" +
+                    "<div style='float: right;'>" + getLiqiudityString(data.liquidityEHEX_Pulsechain, 1) + " HEX</div>" +
+                "</div>" +
+                "<div style='height: 24px'>" +
                     "<div style='float: left;'><b>Liquidity PLS</b>&nbsp;</div>" +
                     "<div style='float: right;'>" + getLiqiudityString(data.liquidityPLS_Pulsechain, 1) + " PLS</div>" +
-                "</div>" +
-                "<div style='height: 24px'>" +
-                    "<div style='float: left;'><b>Liquidity PLSX</b>&nbsp;</div>" +
-                    "<div style='float: right;'>" + getLiqiudityString(data.liquidityPLSX_Pulsechain, 1) + " PLSX</div>" +
-                "</div>" +
-                "<div style='height: 24px'>" +
-                    "<div style='float: left;'><b>Liquidity INC</b>&nbsp;</div>" +
-                    "<div style='float: right;'>" + getLiqiudityString(data.liquidityINC_Pulsechain, 1) + " INC</div>" +
-                "</div>" +
-                "<div style='height: 24px'>" +
-                    "<div style='float: left;'><b>Liquidity DAI (bridge)</b>&nbsp;</div>" +
-                    "<div style='float: right;'>" + getLiqiudityString(data.liquidityDAI_Pulsechain, 1) + " DAI</div>" +
                 "</div>";
                 $("#divLiveSection_Pulsechain").html(htmlNew_Pulsechain);
 
@@ -1655,7 +1648,7 @@
                     <div id="divEthereumSection" class="divLive" style="text-align:center; font-size: 16px; max-width: 330px; border-radius: 0px;"></div>
                 </div>
             </div>
-            <div class="col-sm" style="text-align: left; min-width: 360px; max-width: 360px;" hidden>
+            <div class="col-sm" style="text-align: left; min-width: 360px; max-width: 360px;">
                 <div style="margin-bottom: 10px;">
                     <div id="divLiveSectionHeader_Pulsechain" style="padding-top: 8px; text-align:center; font-size: 16px;  max-width: 330px; cursor: pointer;" onclick="divLiveSection_PulsechainToggle();"><b>PULSECHAIN</b></div>
                     <div id="divLiveSection_Pulsechain" class="divLive" style="text-align:center; font-size: 16px; max-width: 330px; border-radius: 0px;"></div>
@@ -1668,7 +1661,7 @@
         </div>
         </div>
         <center>
-        <div style="min-width: 360px; max-width: 360px;" hidden>
+        <div style="min-width: 360px; max-width: 360px;">
             <div style="margin-bottom: 10px;">
                 <div id="divLiveSectionHeader_PulsechainTokens" style="padding-top: 8px; text-align:center; font-size: 16px;  max-width: 330px; cursor: pointer;" onclick="divLiveSection_PulsechainTokensToggle();"><b>PULSECHAIN</b></div>
                 <div id="divLiveSection_PulsechainTokens" class="divLive" style="text-align:center; font-size: 16px; max-width: 330px; border-radius: 0px;"></div>
@@ -1922,9 +1915,7 @@
                 </br>
                 
                 <li><a href="https://app.pulsex.com/info/pool/0xf1f4ee610b2babb05c635f726ef8b0c568c8dc65">0xf1f - WPLS - PulseX</a></li></br>
-                <li><a href="https://app.pulsex.com/info/pool/0xa04620601d7dadc3bd1c99312a699ade8e6c16d2">0xa04 - PLSX - PulseX</a></li></br>
-                <li><a href="https://app.pulsex.com/info/pool/0x1a4d79eb757ffcddf38ff25850de28d624f65398">0x1a4 - INC  - PulseX</a></li></br>
-                <li><a href="https://app.pulsex.com/info/pool/0x6f1747370b1cacb911ad6d4477b718633db328c8">0x6f1 - DAI (bridge) - PulseX</a></li></br>
+                <li><a href="https://app.pulsex.com/info/pool/0x1da059091d5fe9f2d3781e0fda238bb109fc6218">0x1da - eHEX - PulseX</a></li></br>
                 </br>
             </ul>
         </center>
@@ -1943,6 +1934,7 @@
         <button id="buttonLegendLinks" style="width: 300px; height: 48px; margin-bottom: 10px; border: 2px solid grey;">Links</button>
         <ul id="divLegendLinks" style="display: none; text-align: left; max-width: 360px; margin-bottom: 0px; margin-top: 16px;">
             <li><a href="https://plsburn.com/" target="_blank">PLSburn.com</a></li></br>
+            <li><a href="https://dexscreener.com/pulsechain" target="_blank">DEXscreener.com/pulsechain</a></li></br>
             <li><a href="https://apphex.win/charts/" target="_blank">Apphex.win/charts</a></li></br>
             <li><a href="https://twitter.com/WhaleHEX" target="_blank">Twitter.com/WhaleHex</a></li></br>
             <li><a href="https://hex.vision/" target="_blank">Hex.vision</a></li></br>

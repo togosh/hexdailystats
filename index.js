@@ -386,16 +386,16 @@ async function getLiveData() {
   try {
   if (!getDataRunning){
     ///////////////////////////////// ETHEREUM NETWORK
-    //var priceUV2 = await TheGraph.getUniswapV2HEXDailyPrice(); await sleep(1000);
+    var priceUV2 = await TheGraph.getUniswapV2HEXDailyPrice(); await sleep(1000);
     var priceUV3 = await TheGraph.getUniswapV3HEXDailyPrice(); await sleep(1000);
-    var priceUV2 = priceUV3;
+    //var priceUV2 = priceUV3;
     
-    //var { liquidityUV2_HEXUSDC, liquidityUV2_USDC } = await TheGraph.getUniswapV2HEXUSDC_Polling(); await sleep(1000);
-    //var { liquidityUV2_HEXETH, liquidityUV2_ETH } = await TheGraph.getUniswapV2HEXETH(); await sleep(1000);
-    var liquidityUV2_HEXUSDC = 0.1;
-    var liquidityUV2_USDC = 0.1;
-    var liquidityUV2_HEXETH = 0.1;
-    var liquidityUV2_ETH = 0.1;
+    var { liquidityUV2_HEXUSDC, liquidityUV2_USDC } = await TheGraph.getUniswapV2HEXUSDC_Polling(); await sleep(1000);
+    var { liquidityUV2_HEXETH, liquidityUV2_ETH } = await TheGraph.getUniswapV2HEXETH(); await sleep(1000);
+    //var liquidityUV2_HEXUSDC = 0.1;
+    //var liquidityUV2_USDC = 0.1;
+    //var liquidityUV2_HEXETH = 0.1;
+    //var liquidityUV2_ETH = 0.1;
     
     var { liquidityUV3_HEX, liquidityUV3_USDC, liquidityUV3_ETH, liquidityUV3_DAI } = await TheGraph.getUniswapV3(); await sleep(1000);
     
@@ -404,9 +404,9 @@ async function getLiveData() {
     var liquidityUV2UV3_ETH  = parseInt(liquidityUV2_ETH + liquidityUV3_ETH);
     var liquidityUV2UV3_DAI = parseInt(liquidityUV3_DAI);
 
-    //var priceUV2UV3 = parseFloat(((priceUV2 * (liquidityUV2_USDC / liquidityUV2UV3_USDC)) + 
-    //(priceUV3 * (liquidityUV3_USDC / liquidityUV2UV3_USDC))).toFixed(8));
-    var priceUV2UV3 = priceUV3;
+    var priceUV2UV3 = parseFloat(((priceUV2 * (liquidityUV2_USDC / liquidityUV2UV3_USDC)) + 
+    (priceUV3 * (liquidityUV3_USDC / liquidityUV2UV3_USDC))).toFixed(8));
+    //var priceUV2UV3 = priceUV3;
     
     var tshareRateHEX = await TheGraph.get_shareRateChange(); await sleep(500);
     tshareRateHEX = parseFloat(tshareRateHEX);
@@ -424,12 +424,21 @@ async function getLiveData() {
     /////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////// PULSECHAIN NETWORK
 
-    var priceHEX_PulseX_Pulsechain = await TheGraph.getPulseXPrice("HEX"); await sleep(1000);
-    var pricePLS_PulseX_Pulsechain = await TheGraph.getPulseXPrice("PULSECHAIN"); await sleep(1000);
-    var pricePLSX_PulseX_Pulsechain = await TheGraph.getPulseXPrice("PULSEX"); await sleep(1000);
-    var priceINC_PulseX_Pulsechain = await TheGraph.getPulseXPrice("INC"); await sleep(1000);
+    var PLSpair = await TheGraph.getPulseXPairPriceAndLiquidity(h.PULSECHAIN_WPLSDAI); await sleep(1000);
+    var pricePLS_PulseX_Pulsechain = PLSpair.token1Price;
 
-    var liquidity_Pulsechain = await TheGraph.getPulseXPairs(); await sleep(500);
+    var HEXpair = await TheGraph.getPulseXPairPriceAndLiquidity(h.PULSECHAIN_HEXPLS); await sleep(1000);
+    var priceHEX_PulseX_Pulsechain = HEXpair.token1Price * pricePLS_PulseX_Pulsechain;
+
+    var EHEXpair = await TheGraph.getPulseXPairPriceAndLiquidity(h.PULSECHAIN_HEXEHEX); await sleep(1000);
+    //var priceEHEX_PulseX_Pulsechain = EHEXpair.token0Price * priceHEX_PulseX_Pulsechain;
+
+    var PLSXpair = await TheGraph.getPulseXPairPriceAndLiquidity(h.PULSECHAIN_WPLSPLSX); await sleep(1000);
+    var pricePLSX_PulseX_Pulsechain = PLSXpair.token1Price * pricePLS_PulseX_Pulsechain;
+    
+    var INCpair = await TheGraph.getPulseXPairPriceAndLiquidity(h.PULSECHAIN_WPLSINC); await sleep(1000);
+    var priceINC_PulseX_Pulsechain = INCpair.token1Price * pricePLS_PulseX_Pulsechain;
+    
 
     var tshareRateHEX_Pulsechain = await TheGraph.get_shareRateChange("PULSECHAIN"); await sleep(500);
     tshareRateHEX_Pulsechain = parseFloat(tshareRateHEX_Pulsechain);
@@ -470,12 +479,9 @@ async function getLiveData() {
       tsharePrice_Pulsechain: tshareRateUSD_Pulsechain,
       tshareRateHEX_Pulsechain: tshareRateHEX_Pulsechain,
 
-      liquidityHEX_Pulsechain: liquidity_Pulsechain.HEX,
-      liquidityPLS_Pulsechain: liquidity_Pulsechain.PLS,
-      liquidityPLSX_Pulsechain: liquidity_Pulsechain.PLSX,
-      liquidityINC_Pulsechain: liquidity_Pulsechain.INC,
-      liquidityUSDC_Pulsechain: liquidity_Pulsechain.USDC,
-      liquidityDAI_Pulsechain: liquidity_Pulsechain.DAI,
+      liquidityHEX_Pulsechain: (Number(HEXpair.reserve0) + Number(EHEXpair.reserve0)),
+      liquidityPLS_Pulsechain: HEXpair.reserve1,
+      liquidityEHEX_Pulsechain: EHEXpair.reserve1,
 
       penaltiesHEX_Pulsechain: penaltiesHEX_Pulsechain,
       payoutPerTshare_Pulsechain: payoutPerTshare_Pulsechain,

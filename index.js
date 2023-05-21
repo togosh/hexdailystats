@@ -386,16 +386,16 @@ async function getLiveData() {
   try {
   if (!getDataRunning){
     ///////////////////////////////// ETHEREUM NETWORK
-    var priceUV2 = await TheGraph.getUniswapV2HEXDailyPrice(); await sleep(1000);
+    //var priceUV2 = await TheGraph.getUniswapV2HEXDailyPrice(); await sleep(1000);
     var priceUV3 = await TheGraph.getUniswapV3HEXDailyPrice(); await sleep(1000);
-    //var priceUV2 = priceUV3;
+    var priceUV2 = priceUV3;
     
-    var { liquidityUV2_HEXUSDC, liquidityUV2_USDC } = await TheGraph.getUniswapV2HEXUSDC_Polling(); await sleep(1000);
-    var { liquidityUV2_HEXETH, liquidityUV2_ETH } = await TheGraph.getUniswapV2HEXETH(); await sleep(1000);
-    //var liquidityUV2_HEXUSDC = 0.1;
-    //var liquidityUV2_USDC = 0.1;
-    //var liquidityUV2_HEXETH = 0.1;
-    //var liquidityUV2_ETH = 0.1;
+    //var { liquidityUV2_HEXUSDC, liquidityUV2_USDC } = await TheGraph.getUniswapV2HEXUSDC_Polling(); await sleep(1000);
+    //var { liquidityUV2_HEXETH, liquidityUV2_ETH } = await TheGraph.getUniswapV2HEXETH(); await sleep(1000);
+    var liquidityUV2_HEXUSDC = 0.1;
+    var liquidityUV2_USDC = 0.1;
+    var liquidityUV2_HEXETH = 0.1;
+    var liquidityUV2_ETH = 0.1;
     
     var { liquidityUV3_HEX, liquidityUV3_USDC, liquidityUV3_ETH, liquidityUV3_DAI } = await TheGraph.getUniswapV3(); await sleep(1000);
     
@@ -404,9 +404,9 @@ async function getLiveData() {
     var liquidityUV2UV3_ETH  = parseInt(liquidityUV2_ETH + liquidityUV3_ETH);
     var liquidityUV2UV3_DAI = parseInt(liquidityUV3_DAI);
 
-    var priceUV2UV3 = parseFloat(((priceUV2 * (liquidityUV2_USDC / liquidityUV2UV3_USDC)) + 
-    (priceUV3 * (liquidityUV3_USDC / liquidityUV2UV3_USDC))).toFixed(8));
-    //var priceUV2UV3 = priceUV3;
+    //var priceUV2UV3 = parseFloat(((priceUV2 * (liquidityUV2_USDC / liquidityUV2UV3_USDC)) + 
+    //(priceUV3 * (liquidityUV3_USDC / liquidityUV2UV3_USDC))).toFixed(8));
+    var priceUV2UV3 = priceUV3;
     
     var tshareRateHEX = await TheGraph.get_shareRateChange(); await sleep(500);
     tshareRateHEX = parseFloat(tshareRateHEX);

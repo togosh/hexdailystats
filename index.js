@@ -253,8 +253,8 @@ async function grabData() {
   if (!getEthereumDataRUNNING){ await runEthereumData(); }
   //if (!getCurrencyDataRunning){ getCurrencyData(); };
   getRowData();
-  if (!DailyStatHandler_ETHEREUM.getDataRunning){ await DailyStatHandler_ETHEREUM.getDailyData(); }
-  if (!DailyStatHandler_PULSECHAIN.getDataRunning){ await DailyStatHandler_PULSECHAIN.getDailyData(); }
+  //if (!DailyStatHandler_ETHEREUM.getDataRunning){ await DailyStatHandler_ETHEREUM.getDailyData(); }
+  //if (!DailyStatHandler_PULSECHAIN.getDataRunning){ await DailyStatHandler_PULSECHAIN.getDailyData(); }
   await getBitcoinCSV();
   await getEthereumCSV();
 }

@@ -248,7 +248,6 @@ module.exports = class DailyStatHandler {
         } else if (this.network == h.PULSECHAIN && pricePulseX) {
           roiMultiplierFromATL = 0; //(pricePulseX / HEX_PRICE_ALLTIMELOW);
         }
-        
         var totalValueLocked = 0;
         if (priceUV2UV3) {
           totalValueLocked = (priceUV2UV3 * stakedHEX);
@@ -388,7 +387,7 @@ module.exports = class DailyStatHandler {
           dailyStat.save(async function (err) {
             if (err) log(err); 
             else{
-              if (CONFIG.twitter.enabled && currentDayGlobal == newDay && this.network == h.ETHEREUM) {
+              if (CONFIG.twitter.enabled && currentDayGlobal == newDay) {
                 //Twitter.tweet(dailyStatPackage); await sleep(30000); ////////////// TODO setup Twitter constructor
                 //Twitter.tweetBshare(dailyStatPackage);
               }

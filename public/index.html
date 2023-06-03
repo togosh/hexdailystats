@@ -78,16 +78,24 @@
         var currencyFormatterPriceThree = new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD', minimumFractionDigits: 3});
         var currencyFormatterPriceFour = new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD', minimumFractionDigits: 4});
         var currencyFormatterPriceFive = new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD', minimumFractionDigits: 5});
+        var currencyFormatterPriceSix = new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD', minimumFractionDigits: 6});
         var currencyFormatterPrice = new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD', minimumFractionDigits: 4});
         var currencyFormatterNoDecimal = new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0});
 
         var rowData = "";
+        var rowData_PULSECHAIN = "";
+
+        var table = undefined;
+        var table_PULSECHAIN = undefined;
+
         var liveData = "";
         var ethereumData = "";
+
         var currencyRates = undefined;
         var currencyCode = "USD";
+
         var calculatorOutputValue = 0;
-        var table = undefined;
+        
 
         const sleep = (ms) => {
             return new Promise(resolve => setTimeout(resolve, ms));
@@ -139,6 +147,7 @@
         const arraysEqual = (a1, a2) => 
             a1.length === a2.length && a1.every((o, idx) => objectsEqual(o, a2[idx]));
 
+
         socket.on('rowData', function (data) {
             if (data && !arraysEqual(rowData, data)) {
                 try {
@@ -185,6 +194,56 @@
                     console.log("SOCKET ON rowData - ERROR - " + error.toString());
                 } finally {
                     rowData = data; 
+                }
+            }
+        });
+
+        socket.on('rowData_PULSECHAIN', function (data) {
+            if (data && !arraysEqual(rowData_PULSECHAIN, data)) {
+                try {
+                    console.log(new Date().toISOString() + " - " + "rowData_PULSECHAIN updated");
+                    //console.log("rowData_PULSECHAIN -----");
+                    //console.log(rowData_PULSECHAIN);
+                    //console.log("data ------");
+                    //console.log(data);
+                    
+                    //createChart(data); ////////// TODO
+
+                    if (table_PULSECHAIN) {
+                        console.log("ROWDATA HANDLER ---- TABLE EXISTS, ADD ROW");
+                        console.log(data[0]);
+
+                        console.log("NEWEST DAY: " + data[0][0] + " - CLIENT DAY: " + rowData[0][0]);
+
+                        if (rowData[0][0] < data[0][0]){
+
+                            var daysMissing = (data[0][0] - rowData[0][0]);
+                            console.log("daysMissing: " + daysMissing);
+
+                            var orderIndexes = table_PULSECHAIN.colReorder.order();
+                            console.log("colOrder: " + table_PULSECHAIN.colReorder.order());
+
+                            for (var x = daysMissing; x > 0; x--){
+                                var row = data[(x - 1)];
+                                var rowOrdered = orderIndexes.map(i => row[i]);
+                                console.log("x: " + x);
+                                console.log(rowOrdered);
+                                table_PULSECHAIN.row.add(rowOrdered);
+                            }
+                            console.log("DRAW ");
+                            table_PULSECHAIN.draw(); 
+                        }
+                    } else {
+                        console.log("ROWDATA HANDLER ---- CREATE TABLE");
+                        table_PULSECHAIN = createDataTable_PULSECHAIN(data); 
+                        //table.row.add($('<tr><td colspan="4"><button id="buttonLoadMore" onClick="function call(){ socket.emit(\'sendLatestData\'); };call()" style="width: 300px; height: 48px; margin-bottom: 10px; border: 2px solid grey;">Load More</button></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td><td style="display:none"></td></tr>'));
+                        table_PULSECHAIN.draw(); 
+                        console.log("STARTING ORDER: " + table_PULSECHAIN.colReorder.order());
+                    }
+                } catch (error) {
+                    console.log("SOCKET ON rowData - ERROR - " + error.toString());
+                } finally {
+                    rowData_PULSECHAIN = data; 
                 }
             }
         });
@@ -344,15 +403,15 @@
                 "</div>" +
                 "<div style='height: 24px'>" +
                     "<div style='float: left;'><b>PRC20 Transfer</b>&nbsp;</div>" +
-                    "<div style='float: right;'>" + Number(data.erc20transfer_Pulsechain).toLocaleString(undefined,{minimumFractionDigits:4, maximumFractionDigits:4}) + " USD</div>" +
+                    "<div style='float: right;'>" + Number(data.erc20transfer_Pulsechain).toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2}) + " USD</div>" +
                 "</div>" +
                 "<div style='height: 24px'>" +
                     "<div style='float: left;'><b>PulseX Swap</b>&nbsp;</div>" +
-                    "<div style='float: right;'>" + Number(data.pulseXSwap_Pulsechain).toLocaleString(undefined,{minimumFractionDigits:4, maximumFractionDigits:4}) + " USD</div>" +
+                    "<div style='float: right;'>" + Number(data.pulseXSwap_Pulsechain).toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2}) + " USD</div>" +
                 "</div>" +
                 "<div style='height: 24px'>" +
                     "<div style='float: left;'><b>Add Liquidity</b>&nbsp;</div>" +
-                    "<div style='float: right;'>" + Number(data.addLiquidity_Pulsechain).toLocaleString(undefined,{minimumFractionDigits:4, maximumFractionDigits:4}) + " USD</div>" +
+                    "<div style='float: right;'>" + Number(data.addLiquidity_Pulsechain).toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2}) + " USD</div>" +
                 "</div>" +
                 "<div style='height: 24px'>" +
                     "<div style='float: left;'><b>Gas Price</b>&nbsp;</div>" +
@@ -1272,6 +1331,430 @@
             });
         }
 
+        function createDataTable_PULSECHAIN(data) {
+            return $('#dataTable_PULSECHAIN').on('draw.dt', function () {
+                $("#loadercontainer_PULSECHAIN").css("display","none");
+            }).DataTable({
+                destroy: true,
+                data: data,
+                scrollX: true,
+                scrollCollapse: true,
+                order: [[ 0, "desc" ]],
+                dom: 'Brtip',
+                stateSave: true,
+                stateDuration: 0,
+                colReorder: {
+                    realtime: false
+                },
+                deferRender: true,
+                initComplete: function (settings) {
+                    $('table thead tr th').each(function () {
+                        var $th = $(this);
+                        var text = $(this).text()
+                        if (text == "Minted Inflation (HEX)") {
+                            $th.attr('title', 'Difference in Total Supply');
+                        } else if (text == "Locked Supply GA (HEX)") {
+                            $th.attr('title', 'Miners Good Accounted but not Ended, Subset of Locked Supply');
+                        } else if (text == "Avg Mining Length (Years)") {
+                            $th.attr('title', 'Weighted by HEX Locked');
+                        } else if (text == "APY Rate (Rewards + EES Penalties)") {
+                            $th.attr('title', '(Daily Payout / Locked Supply) * 365.25');
+                        } else if (text == "ROI Multiplier from All Time Low") {
+                            $th.attr('title', 'All Time Low Price: $0.00005645');
+                        } else if (text == "Locked Supply GA (HEX)") {
+                            $th.attr('title', 'Miners Good Accounted but not Ended, Subset of Locked Supply');
+                        } else if (text == "Total Holders") {
+                            $th.attr('title', 'All holders past and present');
+                        } else if (text == "Total Miners") {
+                            $th.attr('title', 'All miners past and present');
+                        }  else if (text == "Current Miners") {
+                            $th.attr('title', 'Unique active miners (not ended and not good accounted)');
+                        } else if (text == "Payout Per T-Share (HEX)") {
+                            $th.attr('title', '(((Circulating Supply + Locked Supply) * 10000 / 100448995) + (Penalties / 2)) / Tshares');
+                        } else if (text == "Total Value Locked (USD)") {
+                            $th.attr('title', '(Price * Locked Supply)');
+                        } 
+                    });
+                },
+                buttons: [
+                    { extend: 'colvis', text: 'Columns', }, //columns: ":not(':first')"
+                    {
+                        extend: 'colvisGroup',
+                        text: 'Hide all',
+                        hide: ':visible'
+                    },
+                    {
+                        extend: 'colvisGroup',
+                        text: 'Show all',
+                        show: ':hidden'
+                    },
+                     
+                    {
+                        extend: "csvHtml5",
+                        exportOptions: { orthogonal: "exportcsv", columns: ':visible' },
+                        filename: function() { var d = new Date();
+                            return "HEXDailyStats_PulseChain_" + d.toISOString().slice(0,10).replace(/-/g,"") + "_" + d.toISOString().slice(11,18).replace(/-/g,""); }
+                    },
+                    {
+                        extend: "excelHtml5",
+                        exportOptions: { orthogonal: "exportxls", columns: ':visible' },
+                        filename: function() { var d = new Date();
+                            return "HEXDailyStats_PulseChain_" + d.toISOString().slice(0,10).replace(/-/g,"") + "_" + d.toISOString().slice(11,18).replace(/-/g,""); }
+                    },
+                    {
+                        text: 'API',
+                        action: function ( e, dt, node, config ) {
+                            window.open('https://gist.github.com/togosh/5ff8a9a51740f30c96b3ee013e44b798', '_blank');
+                            //window.location.href = 'https://gist.github.com/togosh/5ff8a9a51740f30c96b3ee013e44b798';
+                        }
+                    },
+                    'pageLength',
+                    {
+                        text: 'Reset',
+                        action: function ( e, dt, node, config ) {
+                            if (table) { 
+                                table.colReorder.reset();
+                            }
+                        }
+                    }
+                ],
+                lengthMenu: [
+                    [ 10, 15, 25, 50, 100, -1 ],
+                    [ '10 rows', '15 rows', '25 rows', '50 rows', '100 rows', 'Show all' ]
+                ],
+                fixedColumns: {
+                    leftColumns: 1
+                },
+                autoWidth: false,
+                columns: [
+                    { title: "Day", className: "text-center grey" },
+                    { title: "Date", className: "text-center colDate grey", render: function (data, type, row) {
+                            if (type === "display" || type === "filter") { 
+                                var date = new Date(data);
+                                date.setDate(date.getDate() - 1);
+                                var month = date.getUTCMonth() + 1;
+                                return (month.toString().length > 1 ? month : "0" + month) + "/" + date.getUTCDate() + "/" + date.getUTCFullYear().toString().substr(-2);
+                            }
+                            return data;
+                        }
+                    },
+                    { title: "Price (USD)", className: "text-center colPrice grey" , render: function(data, type, row) {
+                            if (type === "display" || type === "filter") { 
+                                //if ((Number(data) * 1000) < 1) {
+                                //    return currencyFormatterPriceFive.format(data);
+                                //} else 
+                                //if ((Number(data) * 100) < 1) {
+                                //    return currencyFormatterPriceFive.format(data);
+                                //} else if ((Number(data) * 10) < 1) {
+                                //    return currencyFormatterPriceFour.format(data);
+                                //}
+                                return currencyFormatterPriceFive.format(data); }
+                            return data;
+                        }
+                    },
+                    { title: "Price Change % (USD)", className: "text-center colPriceChange grey" , render: function(data, type, row) {
+                            if (type === "display" || type === "filter") { 
+                                if (data < 0) { return '<div class="red-negative">' + Number(data/100).toLocaleString(undefined,{style: 'percent', minimumFractionDigits:1}) + '</div>'; }
+                                return Number(data/100).toLocaleString(undefined,{style: 'percent', minimumFractionDigits:1}); } 
+                            return data;
+                        }
+                    },
+                    { title: "ROI Multiplier from All Time Low", className: "text-center colROI teal" , render: function(data, type, row) {
+                            if (type === "display" || type === "filter") {
+                                return Number(data).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + "x";
+                            }
+                            return data;
+                        }
+                    },
+
+                    { title: "Payout Per T-Share (HEX)", className: "text-center colPayoutPerTshare pink", render: function(data, type, row) {
+                            if (type === "display" || type === "filter") { 
+                                return Number(data).toLocaleString(undefined,{minimumFractionDigits:3}); } 
+                            return data;
+                        } 
+                    },
+                    { title: "T-Share Price (USD)", className: "text-center colTsharePrice pink" , render: function(data, type, row) {
+                            if (type === "display" || type === "filter") { 
+                                return currencyFormatterNoDecimal.format(data); 
+                            }
+                            return data;
+                        }
+                    },
+                    { title: "T-Share Rate (HEX)", className: "text-center colTshareRate pink" , render: function(data, type, row) {
+                            if (type === "display" || type === "filter") { 
+                                return Number(data).toLocaleString(undefined,{minimumFractionDigits:1, maximumFractionDigits:1}); }
+                            return data;
+                        }
+                    },
+                    { title: "Increase in  T-Share Rate (HEX)", className: "text-center colTshareRateIncrease blue" , render: function(data, type, row) {
+                            if (type === "display" || type === "filter") { 
+                                return Number(data).toLocaleString(undefined,{minimumFractionDigits:1, maximumFractionDigits:1}); }
+                            return data;
+                        }
+                    },
+
+                    { title: "Avg Mining Length (Years)", className: "text-center colAvgStakeLength purple", render: function(data, type, row) {
+                            if (type === "display" || type === "filter") { 
+                                return Number(data).toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2}); } 
+                            return data;
+                        } 
+                    },
+                    { title: "APY Rate (Rewards + EES Penalties)", className: "text-center colAPYRate purple" , render: function(data, type, row) {
+                            if (type === "display" || type === "filter") { 
+                                return Number(data/100).toLocaleString(undefined,{style: 'percent', minimumFractionDigits:2}); } 
+                            return data;
+                        }
+                    },
+
+                    { title: "Liquidity Pool (HEX)", className: "text-center colLiquidity_HEX grey" , render: function(data, type, row) {
+                            if (type === "display" || type === "filter") { 
+                                return Number(data).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}); }
+                            return data;
+                        }
+                    },
+                    { title: "Liquidity Pool (eHEX)", className: "text-center colLiquidity_USDC grey" , render: function(data, type, row) {
+                            if (type === "display" || type === "filter") { 
+                                return Number(data).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}); }
+                            return data;
+                        }
+                    },
+                    { title: "Liquidity Pool (PLS)", className: "text-center colLiquidity_ETH grey" , render: function(data, type, row) {
+                            if (type === "display" || type === "filter") { 
+                                return Number(data).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}); }
+                            return data;
+                        }
+                    },
+
+                    { title: "Total Value Locked (USD)", className: "text-center colTotalValueLocked teal" , render: function(data, type, row) {
+                            if (type === "display" || type === "filter") { 
+                                var { amount, symbol } = nFormatter(data, 2);
+                                return "$" + Number(amount).toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2}) + symbol; }
+                            return data;
+                        }
+                    },
+                    { title: "Market Cap (USD)", className: "text-center colMarketcap grey" , render: function(data, type, row) {
+                            if (type === "display" || type === "filter") { 
+                                var { amount, symbol } = nFormatter(data, 2);
+                                return "$" + Number(amount).toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2}) + symbol; }
+                            return data;
+                        }
+                    },
+                    { title: "T-Share Market Cap (USD)", className: "text-center colTshareMarketcap pink" , render: function(data, type, row) {
+                            if (type === "display" || type === "filter") { 
+                                var { amount, symbol } = nFormatter(data, 2);
+                                return "$" + Number(amount).toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2}) + symbol; }
+                            return data;
+                        }
+                    },
+
+                    { title: "T-Shares (SHARES)", className: "text-center colTshares grey" , render: function(data, type, row) {
+                            if (type === "display" || type === "filter") { 
+                                return Number(data).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) }
+                            return data;
+                        }
+                    },
+                    { title: "Change in T-Shares (SHARES)", className: "text-center colTsharesChange blue" , render: function(data, type, row) {
+                            if (type === "display" || type === "filter") {
+                                if (data < 0) { 
+                                    return '<div class="red-negative">' + "(" + Math.abs(Number(data)).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + ")" + '</div>';
+                                } 
+                                return Number(data).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}); 
+                            }
+                            return data;
+                        }
+                    },
+
+                    { title: "Total Supply (HEX)", className: "text-center colTotalSupply grey" , render: function(data, type, row) {
+                            if (type === "display" || type === "filter") { 
+                                return Number(data).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}); }
+                            return data;
+                        }
+                    },
+                    { title: "Minted Inflation (HEX)", className: "text-center colMintedInflation teal" , render: function(data, type, row) {
+                            if (type === "display" || type === "filter") {
+                                if (data < 0) { 
+                                    return '<div class="red-negative">' + "(" + Math.abs(Number(data)).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + ")" + '</div>';
+                                } 
+                                return Number(data).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}); 
+                            }
+                            return data;
+                        }
+                    },
+                    
+                    { title: "Circulating Supply (HEX)", className: "text-center colCirculatingSupply grey" , render: function(data, type, row) {
+                            if (type === "display" || type === "filter") { 
+                                return Number(data).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}); }
+                            return data;
+                        }
+                    },
+                    { title: "Change in Circulating Supply (HEX)", className: "text-center colCirculatingSupplyChange blue" , render: function(data, type, row) {
+                            if (type === "display" || type === "filter") {
+                                if (data < 0) { 
+                                    return '<div class="red-negative">' + "(" + Math.abs(Number(data)).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + ")" + '</div>';
+                                } 
+                                return Number(data).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}); 
+                            }
+                            return data;
+                        }
+                    },
+                    { title: "Locked Supply (HEX)", className: "text-center colStakedSupply grey" , render: function(data, type, row) {
+                            if (type === "display" || type === "filter") { 
+                                return Number(data).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}); }
+                            return data;
+                        }
+                    },
+                    { title: "Change in Locked Supply (HEX)", className: "text-center colStakedSupplyChange blue" , render: function(data, type, row) {
+                            if (type === "display" || type === "filter") {
+                                if (data < 0) { 
+                                    return '<div class="red-negative">' + "(" + Math.abs(Number(data)).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + ")" + '</div>';
+                                } 
+                                return Number(data).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}); 
+                            }
+                            return data;
+                        }
+                    },
+                    { title: "Locked Supply GA (HEX)", className: "text-center colStakedSupplyGA grey" , render: function(data, type, row) {
+                            if (type === "display" || type === "filter") { 
+                                return Number(data).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}); }
+                            return data;
+                        }
+                    },
+                    { title: "Change in Locked Supply GA (HEX)", className: "text-center colStakedSupplyGAChange blue" , render: function(data, type, row) {
+                            if (type === "display" || type === "filter") {
+                                if (data < 0) { 
+                                    return '<div class="red-negative">' + "(" + Math.abs(Number(data)).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + ")" + '</div>';
+                                } 
+                                return Number(data).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}); 
+                            }
+                            return data;
+                        }
+                    },
+                    { title: "Locked % of Coins", className: "text-center colStakedPercent grey" , render: function(data, type, row) {
+                            if (type === "display" || type === "filter") { 
+                                return Number(data/100).toLocaleString(undefined,{style: 'percent', minimumFractionDigits:2}); } 
+                            return data;
+                        }
+                    },
+
+                    { title: "Payout (HEX)", className: "text-center colPayout grey" , render: function(data, type, row) {
+                            if (type === "display" || type === "filter") { 
+                                return Number(data).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}); }
+                            return data;
+                        }
+                    },
+                    { title: "Penalties (HEX)", className: "text-center colPenalties grey" , render: function(data, type, row) {
+                            if (type === "display" || type === "filter") { 
+                                return Number(data).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}); }
+                            return data;
+                        }
+                    },
+                    { title: "Total Holders", className: "text-center colTotalHolders grey" , render: function(data, type, row) {
+                            if (type === "display" || type === "filter") { 
+                                return Number(data).toLocaleString(); }
+                            return data;
+                        }
+                    },
+                    { title: "Change in Total Holders", className: "text-center colTotalHoldersChange blue" , render: function(data, type, row) {
+                            if (type === "display" || type === "filter") {
+                                if (data < 0) { 
+                                    return "(" + Math.abs(Number(data)).toLocaleString() + ")";
+                                } 
+                                return Number(data).toLocaleString(); 
+                            }
+                            return data;
+                        }
+                    },
+                    { title: "Current Miners", className: "text-center colCurrentStakers purple" , render: function(data, type, row) {
+                            if (type === "display" || type === "filter") { 
+                                return Number(data).toLocaleString(); }
+                            return data;
+                        }
+                    },
+                    { title: "Change in Current Miners", className: "text-center colCurrentStakersChange blue" , render: function(data, type, row) {
+                            if (type === "display" || type === "filter") {
+                                if (data < 0) { 
+                                    return '<div class="red-negative">' + "(" + Math.abs(Number(data)).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + ")" + '</div>';
+                                } 
+                                return Number(data).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}); 
+                            }
+                            return data;
+                        }
+                    },
+                    { title: "Total Miners", className: "text-center colTotalStakers purple" , render: function(data, type, row) {
+                            if (type === "display" || type === "filter") { 
+                                return Number(data).toLocaleString(); }
+                            return data;
+                        }
+                    },
+                    { title: "Change in Total Miners", className: "text-center colTotalStakersChange blue" , render: function(data, type, row) {
+                            if (type === "display" || type === "filter") {
+                                if (data < 0) { 
+                                    return '<div class="red-negative">' + "(" + Math.abs(Number(data)).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + ")" + '</div>';
+                                } 
+                                return Number(data).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}); 
+                            }
+                            return data;
+                        }
+                    },
+                    { title: "Current Holders", className: "text-center colCurrentHolders purple" , render: function(data, type, row) {
+                            if (type === "display" || type === "filter") { 
+                                return Number(data).toLocaleString(); }
+                            return data;
+                        }
+                    },
+                    { title: "Change in Current Holders", className: "text-center colCurrentHoldersChange blue" , render: function(data, type, row) {
+                            if (type === "display" || type === "filter") {
+                                if (data < 0) { 
+                                    return '<div class="red-negative">' + "(" + Math.abs(Number(data)).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}) + ")" + '</div>';
+                                } 
+                                return Number(data).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}); 
+                            }
+                            return data;
+                        }
+                    },
+                    { title: "Bitcoin Price (USD)", className: "text-center colpriceBTC grey" , render: function(data, type, row) {
+                            if (type === "display" || type === "filter") { 
+                                return currencyFormatterNoDecimal.format(data); 
+                            }
+                            return data;
+                        }
+                    },
+                    { title: "Ethereum Price (USD)", className: "text-center colpriceETH grey" , render: function(data, type, row) {
+                            if (type === "display" || type === "filter") { 
+                                return currencyFormatterNoDecimal.format(data); 
+                            }
+                            return data;
+                        }
+                    },
+                    { title: "PLS Price (USD)", className: "text-center colpriceETH grey" , render: function(data, type, row) {
+                            if (type === "display" || type === "filter") { 
+                                return currencyFormatterPriceSix.format(data); 
+                            }
+                            return data;
+                        }
+                    },
+                    { title: "PLSX Price (USD)", className: "text-center colpriceETH grey" , render: function(data, type, row) {
+                            if (type === "display" || type === "filter") { 
+                                return currencyFormatterPriceSix.format(data); 
+                            }
+                            return data;
+                        }
+                    },
+                    { title: "INC Price (USD)", className: "text-center colpriceETH grey" , render: function(data, type, row) {
+                            if (type === "display" || type === "filter") { 
+                                return currencyFormatter.format(data); 
+                            }
+                            return data;
+                        }
+                    },
+                ],
+                drawCallback: function(settings) {
+                    var pagination = $(this).closest('.dataTables_wrapper').find('.dataTables_paginate');
+                    pagination.toggle(this.api().page.info().pages > 1);
+                }
+            });
+        }
+
         $(document).ready(function() {
             $(window).resize( function () {
                 if (table) { table.columns.adjust().draw(); }
@@ -1910,9 +2393,9 @@
                 <li><a href="https://info.uniswap.org/#/pools/0x82743c07bf3be4d55876f87bca6cce5f84429bd0">0x827 - WETH - UniswapV3 - 1.0% Fee</a></li></br>
                 <li><a href="https://v2.info.uniswap.org/pair/0x55d5c232d921b9eaa6b37b5845e439acd04b4dba">0x55d - WETH - UniswapV2 - 0.3% Fee</a></li></br>
                 </br>
-                <li><a href="https://info.uniswap.org/#/pools/0x5c28b5f471d97f53fcf132f16f9f3c0c888c1a01">0x5c2 - DAI - UniswapV3 - 0.3% Fee</a></li></br>
+                <!--<li><a href="https://info.uniswap.org/#/pools/0x5c28b5f471d97f53fcf132f16f9f3c0c888c1a01">0x5c2 - DAI - UniswapV3 - 0.3% Fee</a></li></br>
                 <li><a href="https://info.uniswap.org/#/pools/0x63f7d912eae3e7a2ec19afdad0d7c7533ae0781c">0x63f - DAI - UniswapV3 - 1.0% Fee</a></li></br>
-                </br>
+                </br>-->
                 
                 <li><a href="https://app.pulsex.com/info/pool/0xf1f4ee610b2babb05c635f726ef8b0c568c8dc65">0xf1f - WPLS - PulseX</a></li></br>
                 <li><a href="https://app.pulsex.com/info/pool/0x1da059091d5fe9f2d3781e0fda238bb109fc6218">0x1da - eHEX - PulseX</a></li></br>
@@ -1922,7 +2405,18 @@
 
         <div id="tablecontainer"><table id="dataTable" class="display" width="100%" data-page-length='10'></table></div>
         <div id="loadercontainer">
-        <div class="d-flex justify-content-center text-secondary" id="loader">
+            <div class="d-flex justify-content-center text-secondary" id="loader">
+                <div class="spinner-border" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
+            </div>
+        </div>
+
+        <br/>
+
+        <div id="tablecontainer_PULSECHAIN"><table id="dataTable_PULSECHAIN" class="display" width="100%" data-page-length='10'></table></div>
+        <div id="loadercontainer_PULSECHAIN">
+            <div class="d-flex justify-content-center text-secondary" id="loader">
                 <div class="spinner-border" role="status">
                     <span class="sr-only">Loading...</span>
                 </div>
@@ -1940,7 +2434,6 @@
             <li><a href="https://hex.vision/" target="_blank">Hex.vision</a></li></br>
             <li><a href="http://hexfire.io/" target="_blank">HEXFIRE.io</a></li></br>
             <li><a href="https://hexbase.de/service/" target="_blank">hexbase.de/service</a></li></br>
-            <li><a href="https://uniswap.vision/?ticker=UniswapV2:HEXUSDC&interval=1D" target="_blank">Uniswap.vision</a></li></br>
             <li><a href="https://lookintohex.com/" target="_blank">LookIntoHex.com</a></li></br>
             <li><a href="https://hexgraphs.com/" target="_blank">HexGraphs.com</a></li></br>
             <li><a href="https://whalesonly.com/charts" target="_blank">WhalesOnly.com/charts</a></li></br>

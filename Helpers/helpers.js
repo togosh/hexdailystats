@@ -14,11 +14,18 @@ const UNISWAP_V2_HEXETH = "0x55d5c232d921b9eaa6b37b5845e439acd04b4dba";
 const UNISWAP_V3_HEXUSDC = "0x69d91b94f0aaf8e8a2586909fa77a5c2c89818d5";
 const UNISWAP_V3_HEXETH = "0x9e0905249ceefffb9605e034b534544684a58be6";
 
+const UNISWAP_V1_API = "https://api.thegraph.com/subgraphs/name/graphprotocol/uniswap";
+const UNISWAP_V2_API = "https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2";
+const UNISWAP_V3_API = "https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3";
+
 const HEX_SUBGRAPH_API_ETHEREUM = "https://api.thegraph.com/subgraphs/name/codeakk/hex";
 //const HEX_SUBGRAPH_API_ETHEREUM = "https://gateway.thegraph.com/api/" + CONFIG.subgraph.apiKey + "/subgraphs/id/3gYSyeohaa7LtM9dw2q5w2ZuKXMFJrqZQTh2EjqKy5gp";
 
 const HEX_SUBGRAPH_API_PULSECHAIN = "https://graph.pulsechain.com/subgraphs/name/Codeakk/Hex";
 const PULSEX_SUBGRAPH_API_PULSECHAIN = "https://graph.pulsechain.com/subgraphs/name/pulsechain/pulsex"
+
+const BLOCK_SUBGRAPH_API_ETHEREUM = "https://api.thegraph.com/subgraphs/name/blocklytics/ethereum-blocks";
+const BLOCK_SUBGRAPH_API_PULSECHAIN = "https://graph.pulsechain.com/subgraphs/name/pulsechain/blocks";
 
 const PULSECHAIN_HEXPLS = "0xf1f4ee610b2babb05c635f726ef8b0c568c8dc65";
 const PULSECHAIN_HEXEHEX = "0x1da059091d5fe9f2d3781e0fda238bb109fc6218";
@@ -29,9 +36,12 @@ const PULSECHAIN_WPLSINC = "0xf808bb6265e9ca27002c0a04562bf50d4fe37eaa";
 const PULSECHAIN_CONTRACT_ADDRESS = "0xa1077a294dde1b09bb078844df40758a5d0f9a27";
 const PULSEX_CONTRACT_ADDRESS = "0x95b303987a60c71504d99aa1b13b4da07b0790ab";
 const INC_CONTRACT_ADDRESS = "0x2fa878ab3f87cc1c9737fc071108f904c0b0c95d";
+const EHEX_CONTRACT_ADDRESS = "0x57fde0a71132198bbec939b98976993d8d89d225";
 
 const PULSECHAIN_GAS_API = "https://beacon.pulsechain.com/api/v1/execution/gasnow";
 
+const ETHEREUM = "ETHEREUM";
+const PULSECHAIN = "PULSECHAIN";
 
 const log = (message) => {
     console.log(new Date().toISOString() + ", " + message);
@@ -125,9 +135,14 @@ module.exports = {
     ,UNISWAP_V2_HEXETH: UNISWAP_V2_HEXETH
     ,UNISWAP_V3_HEXUSDC: UNISWAP_V3_HEXUSDC
     ,UNISWAP_V3_HEXETH: UNISWAP_V3_HEXETH
+    ,UNISWAP_V1_API: UNISWAP_V1_API
+    ,UNISWAP_V2_API: UNISWAP_V2_API
+    ,UNISWAP_V3_API: UNISWAP_V3_API
     ,HEX_SUBGRAPH_API_ETHEREUM: HEX_SUBGRAPH_API_ETHEREUM
     ,HEX_SUBGRAPH_API_PULSECHAIN: HEX_SUBGRAPH_API_PULSECHAIN
     ,PULSEX_SUBGRAPH_API_PULSECHAIN: PULSEX_SUBGRAPH_API_PULSECHAIN
+    ,BLOCK_SUBGRAPH_API_ETHEREUM: BLOCK_SUBGRAPH_API_ETHEREUM
+    ,BLOCK_SUBGRAPH_API_PULSECHAIN: BLOCK_SUBGRAPH_API_PULSECHAIN
     ,PULSECHAIN_HEXPLS: PULSECHAIN_HEXPLS
     ,PULSECHAIN_HEXEHEX: PULSECHAIN_HEXEHEX
     ,PULSECHAIN_WPLSDAI: PULSECHAIN_WPLSDAI
@@ -136,7 +151,10 @@ module.exports = {
     ,PULSECHAIN_CONTRACT_ADDRESS: PULSECHAIN_CONTRACT_ADDRESS
     ,PULSEX_CONTRACT_ADDRESS: PULSEX_CONTRACT_ADDRESS
     ,INC_CONTRACT_ADDRESS: INC_CONTRACT_ADDRESS
+    ,EHEX_CONTRACT_ADDRESS: EHEX_CONTRACT_ADDRESS
     ,PULSECHAIN_GAS_API: PULSECHAIN_GAS_API
+    ,ETHEREUM: ETHEREUM
+    ,PULSECHAIN: PULSECHAIN
     ,convertCSV: convertCSV
     ,minTwoDigits: minTwoDigits
  }

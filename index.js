@@ -1,4 +1,4 @@
-const MongoDb = require('./Services/MongoDB'); 
+const MongoDB = require('./Services/MongoDB'); 
 const TheGraph = require('./Services/TheGraph'); 
 const Coingecko = require('./Services/Coingecko'); 
 const Twitter = require('./Services/Twitter'); 
@@ -14,6 +14,17 @@ const log = h.log;
 const CONFIG = h.CONFIG; 
 var DEBUG = CONFIG.debug;
 
+
+const TheGraph_ETHEREUM = new TheGraph(h.ETHEREUM);
+const TheGraph_PULSECHAIN = new TheGraph(h.PULSECHAIN);
+
+const MongoDB_ETHEREUM = new MongoDB(h.ETHEREUM);
+const MongoDB_PULSECHAIN = new MongoDB(h.PULSECHAIN);
+
+const DailyStatHandler_ETHEREUM = new DailyStatHandler(h.ETHEREUM);
+const DailyStatHandler_PULSECHAIN = new DailyStatHandler(h.PULSECHAIN);
+
+
 const http = require('http');
 require('es6-promise').polyfill();
  
@@ -22,88 +33,65 @@ const path = require('path');
 const fs = require('fs');
 const https = require('https');
 const schedule = require('node-schedule');
+var cron = require('node-cron');
 var cors = require('cors');
 
 const { JSDOM } = require( "jsdom" );
 const { window } = new JSDOM( "" );
 const $ = require( "jquery" )( window );
 
-var getRowData = async () => {
-  returnPackage = await MongoDb.getRowData(); 
-  
-  rowData = returnPackage.rowData;
-  rowDataObjects = returnPackage.rowDataObjects;
 
-  hexSiteData = await buildHexSiteData(rowDataObjects); 
-  io.emit("rowData", rowData);
-}
-
-var cron = require('node-cron');
-var rowData = undefined;
-var rowDataObjects = undefined;
-var getDataRunning = DailyStatHandler.getDataRunning;
-var DailyStatMaintenance = false;
-var getRowDataRunning = MongoDb.getRowDataRunning;
-var connections = {};
 var hexPrice = '';
-var currentDayGlobal = DailyStatHandler.currentDayGlobal;
-var getLiveDataRUNNING = false;
+var connections = {};
+
+var currentDayGlobal = 0;
+var getAndSet_currentGlobalDay_Running = false;
+
 var liveData = undefined;
+var getLiveDataRUNNING = false;
+
+var ethereumData = undefined;
+var getEthereumDataRUNNING = false;
+
 var currencyRates = undefined;
 var getCurrencyDataRunning = false;
-var getAndSet_currentGlobalDay_Running = false;
+
+
+var DailyStatMaintenance_ETHEREUM = false;
+var DailyStatMaintenance_PULSECHAIN = false;
+
+
+var rowData = undefined;
+var rowData_PULSECHAIN = undefined;
+
+var rowDataObjects = undefined;
+var rowDataObjects_PULSECHAIN = undefined;
+
 var hexSiteData = undefined;
-var getEthereumDataRUNNING = false;
-var ethereumData = undefined;
-var DailyStat = MongoDb.DailyStat;
-var Connection = MongoDb.Connection;
 
-let getMongoData = async () => { 
-  getRowDataPackage = await MongoDb.getRowData();
-  rowData = getRowDataPackage.rowData;
-  rowDataObjects = getRowDataPackage.rowDataObjects;
-}; getMongoData();
-var hostname = CONFIG.hostname;
-if (DEBUG){ hostname = '127.0.0.1'; }
 
-var httpPort = 80; 
-if (DEBUG){ httpPort = 3000; }
-const httpsPort = 443;
+async function getRowData() {
+  if (!MongoDB_ETHEREUM.getRowDataRunning){
+    returnPackage = await MongoDB_ETHEREUM.getRowData(); 
+    
+    rowData = returnPackage.rowData;
+    rowDataObjects = returnPackage.rowDataObjects;
 
-var httpsOptions = undefined;
-if(!DEBUG){ httpsOptions = {
-	cert: fs.readFileSync(CONFIG.https.cert),
-	ca: fs.readFileSync(CONFIG.https.ca),
-	key: fs.readFileSync(CONFIG.https.key)
-};}
+    hexSiteData = await buildHexSiteData(rowDataObjects); 
+    io.emit("rowData", rowData);
+  }
 
-const app = express();
+  if (!MongoDB_PULSECHAIN.getRowDataRunning){
+    returnPackage_PULSECHAIN = await MongoDB_PULSECHAIN.getRowData(); 
+    
+    rowData_PULSECHAIN = returnPackage_PULSECHAIN.rowData;
+    rowDataObjects_PULSECHAIN = returnPackage_PULSECHAIN.rowDataObjects;
+
+    io.emit("rowData_PULSECHAIN", rowData_PULSECHAIN);
+  }
+}; getRowData();
 
 const getAndSet_currentGlobalDayThrottled = throttle(getAndSet_currentGlobalDay, 30000);
-
-app.use(function(req, res, next) {
-	try {
-	if (!DEBUG && req.path === "/" && req.ip){
-		connections[req.ip] = Date.now();
-
-		const connection = new Connection({ 
-			created: Date.now(),
-			ipaddress: req.ip
-		});
-
-		connection.save(function (err) {
-			if (err) return log(err);
-		});
-	}
-	} catch (error) {
-		log('APP ----- Connection ' + error);
-	}
-
-  if (!getAndSet_currentGlobalDay_Running && !getDataRunning && !getLiveDataRUNNING) { getAndSet_currentGlobalDayThrottled() }
-  //if (!getRowDataRunning){ getRowData(); }
-
-	next();
-});
 
 async function getAndSet_currentGlobalDay(){
   getAndSet_currentGlobalDay_Running = true;
@@ -123,6 +111,47 @@ async function getAndSet_currentGlobalDay(){
   }
   await sleep(1000);
 }
+
+
+var hostname = CONFIG.hostname;
+if (DEBUG){ hostname = '127.0.0.1'; }
+
+var httpPort = 80; 
+if (DEBUG){ httpPort = 3000; }
+const httpsPort = 443;
+
+var httpsOptions = undefined;
+if(!DEBUG){ httpsOptions = {
+	cert: fs.readFileSync(CONFIG.https.cert),
+	ca: fs.readFileSync(CONFIG.https.ca),
+	key: fs.readFileSync(CONFIG.https.key)
+};}
+
+const app = express();
+
+app.use(function(req, res, next) {
+	try {
+	if (!DEBUG && req.path === "/" && req.ip){
+		connections[req.ip] = Date.now();
+
+		const connection = new MongoDB_ETHEREUM.connection({
+			created: Date.now(),
+			ipaddress: req.ip
+		});
+
+		MongoDB_ETHEREUM.connection.save(function (err) {
+			if (err) return log(err);
+		});
+	}
+	} catch (error) {
+		log('APP ----- Connection ' + error);
+	}
+
+  if (!getAndSet_currentGlobalDay_Running && !DailyStatHandler_ETHEREUM.getDataRunning && !getLiveDataRUNNING) { getAndSet_currentGlobalDayThrottled() }
+  //if (!getRowDataRunning){ getRowData(); }
+
+	next();
+});
 
 const httpServer = http.createServer(app);
 var httpsServer = undefined;
@@ -147,6 +176,10 @@ app.get("/" + CONFIG.urls.grabdata, function (req, res) {
 
 app.get('/fulldata', cors(), function (req, res) {
   if (rowDataObjects) { res.send(JSON.parse(JSON.stringify(rowDataObjects))); } else {res.status(404).send({ error: "fullData not populated yet" });};
+});
+
+app.get('/fulldatapulsechain', cors(), function (req, res) {
+  if (rowDataObjects_PULSECHAIN) { res.send(JSON.parse(JSON.stringify(rowDataObjects_PULSECHAIN))); } else {res.status(404).send({ error: "fullDataPulseChain not populated yet" });};
 });
 
 app.get('/livedata', cors(), function (req, res) {
@@ -219,9 +252,10 @@ async function grabData() {
   if (!getLiveDataRUNNING){ await runLiveData(); }
   if (!getCurrencyDataRunning){ getCurrencyData(); };
   if (!getRowDataRunning){ getRowData(); }
-  //if (!getDataRunning){ await DailyStatHandler.getDailyData(); }
-  //MongoDb.create_penalties_Historical();
   if (!getEthereumDataRUNNING){ await runEthereumData(); }
+  getRowData();
+  if (!DailyStatHandler_ETHEREUM.getDataRunning){ await DailyStatHandler_ETHEREUM.getDailyData(); }
+  if (!DailyStatHandler_PULSECHAIN.getDataRunning){ await DailyStatHandler_PULSECHAIN.getDailyData(); }
   await getBitcoinCSV();
   await getEthereumCSV();
 }
@@ -240,13 +274,17 @@ if(DEBUG){ io = require('socket.io')(httpServer);
 io.on('connection', (socket) => {
 	log('SOCKET -- ************* CONNECTED: ' + socket.id + ' *************');
 	if (rowData){ socket.emit("rowData", rowData); }; //rowData.slice(0, 49)); };
-  //if (!getDataRunning){ DailyStatHandler.getDailyData(); }
-  //if (!getRowDataRunning){ getRowData(); }
+  if (rowData_PULSECHAIN) { socket.emit("rowData_PULSECHAIN", rowData_PULSECHAIN); }
+  //if (DailyStatHandler_ETHEREUM.getDataRunning){ await DailyStatHandler_ETHEREUM.getDailyData(); }
+  //if (DailyStatHandler_PULSECHAIN.getDataRunning){ await DailyStatHandler_PULSECHAIN.getDailyData(); }
+  //getRowData();
   socket.emit("hexPrice", hexPrice);
   socket.emit("currentDay", currentDayGlobal);
   socket.emit("liveData", liveData);
   socket.emit("currencyRates", currencyRates);
   socket.emit("ethereumData", ethereumData);
+
+  //MongoDB_PULSECHAIN.create_roiMultiplierFromATLs();
 
   /*
   socket.on("sendLatestData", () => {
@@ -260,6 +298,7 @@ io.on('connection', (socket) => {
     socket.emit('rowData', rowData.slice(0, 49)); 
   });
 });
+
 
 async function getCurrencyData() {
   log("getCurrencyData() - START");
@@ -320,7 +359,7 @@ var jobCurrencyRates = schedule.scheduleJob("0 */3 * * *", function() {
 async function runEthereumData() {
   try {
   await sleep(300);
-  if (!getDataRunning && !getEthereumDataRUNNING){
+  if (!getEthereumDataRUNNING){
     var ethereumDataNew = await getEthereumData();
     //console.log(ethereumDataNew);
     if (ethereumDataNew && (JSON.stringify(ethereumDataNew) !== JSON.stringify(ethereumData))){
@@ -339,7 +378,7 @@ async function getEthereumData() {
   getEthereumDataRUNNING = true;
   log("getEthereumData()");
   try {
-  if (!getDataRunning){
+  if (!DailyStatHandler_ETHEREUM.getDataRunning){
     var price = await Etherscan.getEthereumPrice(); await sleep(2000);
     var {low, average, high} = await Etherscan.getGas(); await sleep(1000);
     
@@ -361,7 +400,7 @@ async function getEthereumData() {
 async function runLiveData() {
   try {
   await sleep(300);
-  if (!getDataRunning && !getLiveDataRUNNING){
+  if (!DailyStatHandler_ETHEREUM.getDataRunning && !DailyStatHandler_PULSECHAIN.getDataRunning && !getLiveDataRUNNING){
     var liveDataNew = await getLiveData();
     //console.log(liveDataNew);
     if (liveDataNew && (JSON.stringify(liveDataNew) !== JSON.stringify(liveData))){
@@ -384,20 +423,20 @@ async function getLiveData() {
   getLiveDataRUNNING = true;
   log("getLiveData()");
   try {
-  if (!getDataRunning){
+  if (!DailyStatHandler_ETHEREUM.getDataRunning && !DailyStatHandler_PULSECHAIN.getDataRunning){
     ///////////////////////////////// ETHEREUM NETWORK
-    //var priceUV2 = await TheGraph.getUniswapV2HEXDailyPrice(); await sleep(1000);
-    var priceUV3 = await TheGraph.getUniswapV3HEXDailyPrice(); await sleep(1000);
+    //var priceUV2 = await TheGraph_ETHEREUM.getUniswapV2HEXDailyPrice(); await sleep(1000);
+    var priceUV3 = await TheGraph_ETHEREUM.getUniswapV3HEXDailyPrice(); await sleep(1000);
     var priceUV2 = priceUV3;
     
-    //var { liquidityUV2_HEXUSDC, liquidityUV2_USDC } = await TheGraph.getUniswapV2HEXUSDC_Polling(); await sleep(1000);
-    //var { liquidityUV2_HEXETH, liquidityUV2_ETH } = await TheGraph.getUniswapV2HEXETH(); await sleep(1000);
-    var liquidityUV2_HEXUSDC = 0.1;
-    var liquidityUV2_USDC = 0.1;
-    var liquidityUV2_HEXETH = 0.1;
-    var liquidityUV2_ETH = 0.1;
+    //var { liquidityUV2_HEXUSDC, liquidityUV2_USDC } = await TheGraph_ETHEREUM.getUniswapV2HEXUSDC_Polling(); await sleep(1000);
+    //var { liquidityUV2_HEXETH, liquidityUV2_ETH } = await TheGraph_ETHEREUM.getUniswapV2HEXETH(); await sleep(1000);
+    var liquidityUV2_HEXUSDC = 0;
+    var liquidityUV2_USDC = 0;
+    var liquidityUV2_HEXETH = 0;
+    var liquidityUV2_ETH = 0;
     
-    var { liquidityUV3_HEX, liquidityUV3_USDC, liquidityUV3_ETH, liquidityUV3_DAI } = await TheGraph.getUniswapV3(); await sleep(1000);
+    var { liquidityUV3_HEX, liquidityUV3_USDC, liquidityUV3_ETH, liquidityUV3_DAI } = await TheGraph_ETHEREUM.getUniswapV3(); await sleep(1000);
     
     var liquidityUV2UV3_HEX = parseInt(liquidityUV2_HEXUSDC + liquidityUV2_HEXETH + liquidityUV3_HEX);
     var liquidityUV2UV3_USDC = parseInt(liquidityUV2_USDC + liquidityUV3_USDC);
@@ -408,12 +447,12 @@ async function getLiveData() {
     //(priceUV3 * (liquidityUV3_USDC / liquidityUV2UV3_USDC))).toFixed(8));
     var priceUV2UV3 = priceUV3;
     
-    var tshareRateHEX = await TheGraph.get_shareRateChange(); await sleep(500);
+    var tshareRateHEX = await TheGraph_ETHEREUM.get_shareRateChange(); await sleep(500);
     tshareRateHEX = parseFloat(tshareRateHEX);
     var tshareRateUSD = parseFloat((tshareRateHEX * priceUV2UV3).toFixed(4));
 
     if (liquidityUV2_HEXUSDC == 0 || liquidityUV2_USDC == 0 || liquidityUV2_HEXETH == 0 || liquidityUV2_ETH == 0) {
-      return undefined;
+      //return undefined;
     }
 
     var { circulatingHEX, stakedHEX, totalTshares, penaltiesHEX } = await Etherscan.getGlobalInfo(); await sleep(500);
@@ -424,27 +463,53 @@ async function getLiveData() {
     /////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////// PULSECHAIN NETWORK
 
-    var PLSpair = await TheGraph.getPulseXPairPriceAndLiquidity(h.PULSECHAIN_WPLSDAI); await sleep(1000);
-    var pricePLS_PulseX_Pulsechain = PLSpair.token1Price;
+    var PLSpair = await TheGraph_PULSECHAIN.getPulseXPairPriceAndLiquidity(h.PULSECHAIN_WPLSDAI); await sleep(1000);
+    var pricePLS_PulseX_Pulsechain = 0; 
+    if (PLSpair && PLSpair.token1Price){ 
+      pricePLS_PulseX_Pulsechain = PLSpair.token1Price; 
+    }
 
-    var HEXpair = await TheGraph.getPulseXPairPriceAndLiquidity(h.PULSECHAIN_HEXPLS); await sleep(1000);
-    var priceHEX_PulseX_Pulsechain = HEXpair.token1Price * pricePLS_PulseX_Pulsechain;
+    var HEXpair = await TheGraph_PULSECHAIN.getPulseXPairPriceAndLiquidity(h.PULSECHAIN_HEXPLS); await sleep(1000);
+    var priceHEX_PulseX_Pulsechain = 0; 
+    if (HEXpair && HEXpair.token1Price){ 
+      priceHEX_PulseX_Pulsechain = HEXpair.token1Price * pricePLS_PulseX_Pulsechain;
+    }
 
-    var EHEXpair = await TheGraph.getPulseXPairPriceAndLiquidity(h.PULSECHAIN_HEXEHEX); await sleep(1000);
+    var EHEXpair = await TheGraph_PULSECHAIN.getPulseXPairPriceAndLiquidity(h.PULSECHAIN_HEXEHEX); await sleep(1000);
     //var priceEHEX_PulseX_Pulsechain = EHEXpair.token0Price * priceHEX_PulseX_Pulsechain;
 
-    var PLSXpair = await TheGraph.getPulseXPairPriceAndLiquidity(h.PULSECHAIN_WPLSPLSX); await sleep(1000);
-    var pricePLSX_PulseX_Pulsechain = PLSXpair.token1Price * pricePLS_PulseX_Pulsechain;
+    var PLSXpair = await TheGraph_PULSECHAIN.getPulseXPairPriceAndLiquidity(h.PULSECHAIN_WPLSPLSX); await sleep(1000);
+    var pricePLSX_PulseX_Pulsechain = 0; 
+    if (PLSXpair && PLSXpair.token1Price){ 
+      pricePLSX_PulseX_Pulsechain = PLSXpair.token1Price * pricePLS_PulseX_Pulsechain;
+    }
     
-    var INCpair = await TheGraph.getPulseXPairPriceAndLiquidity(h.PULSECHAIN_WPLSINC); await sleep(1000);
-    var priceINC_PulseX_Pulsechain = INCpair.token1Price * pricePLS_PulseX_Pulsechain;
+    var INCpair = await TheGraph_PULSECHAIN.getPulseXPairPriceAndLiquidity(h.PULSECHAIN_WPLSINC); await sleep(1000);
+    var priceINC_PulseX_Pulsechain = 0; 
+    if (INCpair && PLSXpair.token1Price){ 
+      priceINC_PulseX_Pulsechain = INCpair.token1Price * pricePLS_PulseX_Pulsechain;
+    }
     
+    var liquidityHEX_Pulsechain = 0;
+    if (HEXpair && EHEXpair){
+      liquidityHEX_Pulsechain = (Number(HEXpair.reserve0) + Number(EHEXpair.reserve0))
+    }
+    var liquidityPLS_Pulsechain = 0;
+    if (HEXpair){
+      liquidityPLS_Pulsechain = HEXpair.reserve1;
+    }
+    var liquidityEHEX_Pulsechain = 0;
+    if (EHEXpair){
+      liquidityEHEX_Pulsechain = EHEXpair.reserve1;
+    }
 
-    var tshareRateHEX_Pulsechain = await TheGraph.get_shareRateChange("PULSECHAIN"); await sleep(500);
+    var tshareRateHEX_Pulsechain = await TheGraph_PULSECHAIN.get_shareRateChange(); await sleep(500);
     tshareRateHEX_Pulsechain = parseFloat(tshareRateHEX_Pulsechain);
     var tshareRateUSD_Pulsechain = parseFloat((tshareRateHEX_Pulsechain * priceHEX_PulseX_Pulsechain).toFixed(4));
 
-    var globalInfo = await TheGraph.get_globalInfo("PULSECHAIN"); await sleep(500);
+    var globalInfo = await TheGraph_PULSECHAIN.get_globalInfo(); await sleep(500);
+    //console.log("globalInfo");
+    //console.log(globalInfo);
 
     var circulatingHEX_Pulsechain = globalInfo[0].totalHeartsinCirculation / 100000000;
     var stakedHEX_Pulsechain = globalInfo[0].lockedHeartsTotal / 100000000;
@@ -479,9 +544,9 @@ async function getLiveData() {
       tsharePrice_Pulsechain: tshareRateUSD_Pulsechain,
       tshareRateHEX_Pulsechain: tshareRateHEX_Pulsechain,
 
-      liquidityHEX_Pulsechain: (Number(HEXpair.reserve0) + Number(EHEXpair.reserve0)),
-      liquidityPLS_Pulsechain: HEXpair.reserve1,
-      liquidityEHEX_Pulsechain: EHEXpair.reserve1,
+      liquidityHEX_Pulsechain: liquidityHEX_Pulsechain,
+      liquidityPLS_Pulsechain: liquidityPLS_Pulsechain,
+      liquidityEHEX_Pulsechain: liquidityEHEX_Pulsechain,
 
       penaltiesHEX_Pulsechain: penaltiesHEX_Pulsechain,
       payoutPerTshare_Pulsechain: payoutPerTshare_Pulsechain,
@@ -506,8 +571,8 @@ async function getLiveData() {
 }
 
 let test = async () => {
-  //await MongoDb.updateOneColumn(756, "tshareRateHEX", null);
-  //var test = await DailyStat.find({currentDay:null});
+  //await MongoDb_ETHEREUM.updateOneColumn(756, "tshareRateHEX", null);
+  //var test = await MongoDb_ETHEREUM.dailyStat.find({currentDay:null});
   //var test2 = test;
 }; test();
 
@@ -597,24 +662,29 @@ async function getBitcoinCSV(){
   } catch (e) { log(e); }
 }
 
+
 cron.schedule('15 * * * * *', async () => {
-  log("**** DAILY DATA MAINTENANCE TIMER! -- getDataRunning: " + getDataRunning + " - DailyStatMaintenance: " + DailyStatMaintenance);
-  if (!getDataRunning && !DailyStatMaintenance){ 
+  log("**** DAILY DATA MAINTENANCE TIMER! -- getDataRunning: " + DailyStatHandler_ETHEREUM.getDataRunning + " --- DailyStatMaintenance_ETHEREUM: " + DailyStatMaintenance_ETHEREUM + " -- ETHEREUM");
+  if (!DailyStatHandler_ETHEREUM.getDataRunning && !DailyStatMaintenance_ETHEREUM){ 
     try{
       let daysBackToCheck = 4;
-      let latestDay = await TheGraph.get_latestDay(); 
-      let latestDailyData = await DailyStat.find().limit(daysBackToCheck).sort({currentDay:-1});
+      let latestDay = await TheGraph_ETHEREUM.get_latestDay(); 
+      let latestDailyData = await MongoDB_ETHEREUM.dailyStat.find().limit(daysBackToCheck).sort({currentDay:-1});
+      //console.log("latestDay: " +latestDay + " latestDailyData: " + latestDailyData);
       let latestDailyDataCurrentDay = latestDailyData[0].currentDay;  
       let dailyDataCurrentDayStart = latestDailyData[latestDailyData.length-1].currentDay; 
+      //console.log("latestDailyDataCurrentDay: " +latestDailyDataCurrentDay + " dailyDataCurrentDayStart: " + dailyDataCurrentDayStart);
       
       for (let i = dailyDataCurrentDayStart; i <= latestDailyDataCurrentDay; i++) {  
-        let ds = await DailyStat.find({currentDay:i});  
+        let ds = await MongoDB_ETHEREUM.dailyStat.find({currentDay:i});  
+        //console.log("ds: " + ds);
         for(var key in ds[0]){
-          if(key != '$op' && ds[0][key] === null){
-            DailyStatMaintenance = true;
-            log("**** DAILY DATA -- DailyStatMaintenance SET TRUE: " + DailyStatMaintenance);
-            await DailyStatHandler.getDailyData(i);  
-            if (!getRowDataRunning){ getRowData(); }
+          if(key != '$op' && ds[0][key] === null && key != "priceUV1" && key != "liquidityUV1_HEX" && key != "liquidityUV1_ETH"){
+            console.log("key: " + key + " value: " + ds[0][key]);
+            DailyStatMaintenance_ETHEREUM = true;
+            log("**** DAILY DATA -- getDailyData() -- DailyStatMaintenance SET TRUE: " + DailyStatMaintenance_ETHEREUM + " -- ETHEREUM");
+            await DailyStatHandler_ETHEREUM.getDailyData(i);  
+            getRowData();
             io.emit("currentDay", currentDayGlobal);
             break;
           }
@@ -622,33 +692,95 @@ cron.schedule('15 * * * * *', async () => {
       }
 
       if(latestDay > latestDailyDataCurrentDay) {
-        DailyStatMaintenance = true;
-        log("**** DAILY DATA -- DailyStatMaintenance SET TRUE: " + DailyStatMaintenance);
+        DailyStatMaintenance_ETHEREUM = true;
+        log("**** DAILY DATA -- getDailyData() 2 -- DailyStatMaintenance SET TRUE: " + DailyStatMaintenance_ETHEREUM) + " -- ETHEREUM";
         for (let i = latestDailyDataCurrentDay + 1; i <= latestDay; i++) { 
-          await DailyStatHandler.getDailyData(i);  
-          if (!getRowDataRunning){ getRowData(); }
+          await DailyStatHandler_ETHEREUM.getDailyData(i);  
+          getRowData();
           io.emit("currentDay", currentDayGlobal);
         }
       } 
     }
     catch (err) {
-      log('DAILY DATA MAINTENANCE TIMER () ----- ERROR ---' + err.toString() + " - " + err.stack);
+      log('DAILY DATA MAINTENANCE TIMER () ----- ERROR ---' + err.toString() + " - " + err.stack + " -- ETHEREUM");
     } finally { 
-      DailyStatMaintenance = false;
-      log("**** DAILY DATA -- DailyStatMaintenance SET FALSE: " + DailyStatMaintenance);
+      DailyStatMaintenance_ETHEREUM = false;
+      log("**** DAILY DATA -- DailyStatMaintenance SET FALSE: " + DailyStatMaintenance_ETHEREUM + " -- ETHEREUM");
     } 
   }
 });
 
 cron.schedule('* * 3 * * *', async () => {
-  let latestDay = await TheGraph.get_latestDay();
+  let latestDay = await TheGraph_ETHEREUM.get_latestDay();
   for(let i = 1; i <= latestDay; i++){
-    let present = await DailyStat.find({currentDay: i}).limit(1);
+    let present = await MongoDB_ETHEREUM.find({currentDay: i}).limit(1);
     if(isEmpty(present)){
-      await DailyStatHandler.getDailyData(i);  
+      await DailyStatHandler_ETHEREUM.getDailyData(i);  
     }
   }
 });
+
+
+
+cron.schedule('45 * * * * *', async () => {
+  log("**** DAILY DATA MAINTENANCE TIMER! -- getDataRunning: " + DailyStatHandler_PULSECHAIN.getDataRunning + " -- PULSECHAIN");
+  if (!DailyStatHandler_PULSECHAIN.getDataRunning && !DailyStatMaintenance_PULSECHAIN){ 
+    try{
+      let daysBackToCheck = 4;
+      let latestDay = await TheGraph_PULSECHAIN.get_latestDay(); 
+      let latestDailyData = await MongoDB_PULSECHAIN.dailyStat.find().limit(daysBackToCheck).sort({currentDay:-1});
+      //console.log("latestDay: " +latestDay + " latestDailyData: " + latestDailyData);
+      let latestDailyDataCurrentDay = latestDailyData[0].currentDay;
+      let dailyDataCurrentDayStart = latestDailyData[latestDailyData.length-1].currentDay;
+      //console.log("latestDailyDataCurrentDay: " +latestDailyDataCurrentDay + " dailyDataCurrentDayStart: " + dailyDataCurrentDayStart);
+      
+      for (let i = dailyDataCurrentDayStart; i <= latestDailyDataCurrentDay; i++) {  
+        let ds = await MongoDB_PULSECHAIN.dailyStat.find({currentDay:i});  
+        for(var key in ds[0]){
+          if(key != '$op' && ds[0][key] === null && key != "priceUV1" && key != "liquidityUV1_HEX" && key != "liquidityUV1_ETH"){
+            //console.log("key: " + key + " value: " + ds[0][key]);
+            DailyStatMaintenance_PULSECHAIN = true;
+            log("**** DAILY DATA -- getDailyData() -- DailyStatMaintenance SET TRUE: " + DailyStatMaintenance_PULSECHAIN) + " -- PULSECHAIN";
+            await DailyStatHandler_PULSECHAIN.getDailyData(i);  
+            getRowData();
+            io.emit("currentDay", currentDayGlobal);
+            break;
+          }
+        } 
+      }
+
+
+      if(latestDay > latestDailyDataCurrentDay) {
+        DailyStatMaintenance_PULSECHAIN = true;
+        log("**** DAILY DATA -- getDailyData() 2 -- DailyStatMaintenance SET TRUE: " + DailyStatMaintenance_PULSECHAIN + " -- PULSECHAIN");
+        for (let i = latestDailyDataCurrentDay + 1; i <= latestDay; i++) { 
+          await DailyStatHandler_PULSECHAIN.getDailyData(i);  
+          getRowData();
+          io.emit("currentDay", currentDayGlobal);
+        }
+      } 
+    }
+    catch (err) {
+      log('DAILY DATA MAINTENANCE TIMER () ----- ERROR ---' + err.toString() + " - " + err.stack) + " -- PULSECHAIN";
+    } finally { 
+      DailyStatMaintenance_PULSECHAIN = false;
+      log("**** DAILY DATA -- DailyStatMaintenance SET FALSE: " + DailyStatMaintenance_PULSECHAIN + " -- PULSECHAIN");
+    } 
+  }
+});
+
+
+cron.schedule('* 1 3 * * *', async () => {
+  let latestDay = await TheGraph_PULSECHAIN.get_latestDay();
+  for(let i = 1; i <= latestDay; i++){
+    let present = await MongoDB_PULSECHAIN.find({currentDay: i}).limit(1);
+    if(isEmpty(present)){
+      await DailyStatHandler_PULSECHAIN.getDailyData(i);  
+    }
+  }
+});
+
+
 
 //////////////////////////////////////
 //// HELPER 

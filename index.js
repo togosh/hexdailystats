@@ -71,7 +71,7 @@ var hexSiteData = undefined;
 
 
 async function getRowData() {
-  if (!MongoDB_ETHEREUM.getRowDataRunning){
+  if (MongoDB_ETHEREUM && !MongoDB_ETHEREUM.getRowDataRunning){
     returnPackage = await MongoDB_ETHEREUM.getRowData(); 
     
     rowData = returnPackage.rowData;
@@ -81,7 +81,7 @@ async function getRowData() {
     io.emit("rowData", rowData);
   }
 
-  if (!MongoDB_PULSECHAIN.getRowDataRunning){
+  if (MongoDB_PULSECHAIN && !MongoDB_PULSECHAIN.getRowDataRunning){
     returnPackage_PULSECHAIN = await MongoDB_PULSECHAIN.getRowData(); 
     
     rowData_PULSECHAIN = returnPackage_PULSECHAIN.rowData;
@@ -250,9 +250,8 @@ async function grabData() {
   await getAndSet_currentGlobalDay();
 
   if (!getLiveDataRUNNING){ await runLiveData(); }
-  if (!getCurrencyDataRunning){ getCurrencyData(); };
-  if (!getRowDataRunning){ getRowData(); }
   if (!getEthereumDataRUNNING){ await runEthereumData(); }
+  //if (!getCurrencyDataRunning){ getCurrencyData(); };
   getRowData();
   if (!DailyStatHandler_ETHEREUM.getDataRunning){ await DailyStatHandler_ETHEREUM.getDailyData(); }
   if (!DailyStatHandler_PULSECHAIN.getDataRunning){ await DailyStatHandler_PULSECHAIN.getDailyData(); }

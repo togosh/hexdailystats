@@ -1488,12 +1488,13 @@ module.exports = class MongoDB {
 
   async create_priceBTC(){
     log("create_priceBTC" + " network: " + this.network);
-    var dayEnd = 1278;
+    var dayEnd = 1279;
     try {
       var pricesBTC = await Coingecko.getPriceHistory_BitcoinWithTime(dayEnd); await sleep(500);
       log("pricesBTC length: " + pricesBTC.length);
+      log(pricesBTC.slice(-5));
   
-      for (var day = 1254; day <= dayEnd; day++) {
+      for (var day = 1279; day <= dayEnd; day++) {
         var rowFind = await this.dailyStat.findOne({currentDay: { $eq: day}});
         if (!isEmpty(rowFind)) {
 
@@ -1527,21 +1528,25 @@ module.exports = class MongoDB {
 
   async create_priceETH(){
     log("create_priceETH" + " network: " + this.network);
-    var dayEnd = 1278;
+    var dayEnd = 1279;
     try {
       var pricesETH = await Coingecko.getPriceHistory_EthereumWithTime(dayEnd); await sleep(500);
       log("pricesETH length: " + pricesETH.length);
+      log(pricesETH.slice(-5));
   
-      for (var day = 1254; day <= dayEnd; day++) {
+      for (var day = 1279; day <= dayEnd; day++) {
         var rowFind = await this.dailyStat.findOne({currentDay: { $eq: day}});
         if (!isEmpty(rowFind)) {
 
           var startTime = 1575417600 + ((day - 2) * 86400) + 86400;
           startTime = startTime * 1000;
+          console.log("startTime")
+          console.log(startTime)
 
           var priceETH = 0;
-          var pricesFiltered = pricesETH.filter(p => (p.length == 2 && p[0] == startTime));
-          if (pricesFiltered.length == 1){
+          var pricesFiltered = pricesETH.filter(p => (p.length == 2 && 
+            ((p[0] == startTime) || (p[0] > (startTime - (3600000 * 6)) && p[0] < (startTime + (3600000 * 1))))));
+          if (pricesFiltered.length >= 1){
             priceETH = pricesFiltered[0][1];
           }
 
@@ -1557,6 +1562,64 @@ module.exports = class MongoDB {
         }
         
         await sleep(200);
+      }
+    } catch (error) {
+      log("ERROR");
+      log(error);
+    }
+  }
+
+  async create_pulseXLiquidity(){
+    log("create_pulseXLiquidity" + " network: " + this.network);
+
+    try {
+      for (var day = 1255; day <= 1279; day++) {  // 1279
+        var rowFind = await this.dailyStat.findOne({currentDay: { $eq: day}});
+        if (!isEmpty(rowFind)) {
+          //var startTime = day2Epoch + ((day - 2) * 86400) - 86400;
+          var HEXpair = await TheGraph_PULSECHAIN.getPulseXPairLiquidity(h.PULSECHAIN_HEXPLS, day); await sleep(1000);
+          var EHEXpair = await TheGraph_PULSECHAIN.getPulseXPairLiquidity(h.PULSECHAIN_HEXEHEX, day); await sleep(1000);
+
+          var liquidityPulseX_HEXEHEX = 0;
+          var liquidityPulseX_EHEX = 0;
+          if (EHEXpair && EHEXpair.reserve0 && EHEXpair.reserve1){ 
+            liquidityPulseX_HEXEHEX = EHEXpair.reserve0;
+            liquidityPulseX_EHEX = EHEXpair.reserve1;
+          }
+          var liquidityPulseX_HEXPLS = 0;
+          var liquidityPulseX_PLS = 0;
+          if (HEXpair && HEXpair.reserve0 && HEXpair.reserve1){ 
+            liquidityPulseX_HEXPLS = HEXpair.reserve0;
+            liquidityPulseX_PLS = HEXpair.reserve1;
+          }
+          var liquidityPulseX_HEX = 0;
+          if (HEXpair && HEXpair.reserve0 && EHEXpair && EHEXpair.reserve0){ 
+            liquidityPulseX_HEX = (Number(HEXpair.reserve0) + Number(EHEXpair.reserve0));
+          } else if (HEXpair && HEXpair.reserve0) {
+            liquidityPulseX_HEX = Number(HEXpair.reserve0);
+          } else if (EHEXpair && EHEXpair.reserve0) {
+            liquidityPulseX_HEX = Number(EHEXpair.reserve0);
+          }
+
+          rowFind.liquidityPulseX_HEXEHEX = liquidityPulseX_HEXEHEX;
+          rowFind.liquidityPulseX_EHEX = liquidityPulseX_EHEX;
+          rowFind.liquidityPulseX_HEXPLS = liquidityPulseX_HEXPLS;
+          rowFind.liquidityPulseX_PLS = liquidityPulseX_PLS;
+          rowFind.liquidityPulseX_HEX = liquidityPulseX_HEX;
+
+          console.log(HEXpair);
+          console.log(EHEXpair);
+  
+          log("create_pulseXLiquidity - SAVE: " + day);
+          rowFind.save(function (err) {
+            if (err) return log("create_pulseXLiquidity - SAVE ERROR: " + err);
+          });
+  
+        } else {
+          log("create_pulseXLiquidity - MISSING DAY: " + day); 
+        }
+        
+        await sleep(1000);
       }
     } catch (error) {
       log("ERROR");

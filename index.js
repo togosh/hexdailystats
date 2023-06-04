@@ -462,44 +462,28 @@ async function getLiveData() {
     /////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////// PULSECHAIN NETWORK
 
-    var PLSpair = await TheGraph_PULSECHAIN.getPulseXPairPriceAndLiquidity(h.PULSECHAIN_WPLSDAI); await sleep(1000);
-    var pricePLS_PulseX_Pulsechain = 0; 
-    if (PLSpair && PLSpair.token1Price){ 
-      pricePLS_PulseX_Pulsechain = PLSpair.token1Price; 
-    }
+    var priceHEX_PulseX_Pulsechain = await TheGraph_PULSECHAIN.getPulseXPrice("HEX"); await sleep(500);
+    var pricePLS_PulseX_Pulsechain = await TheGraph_PULSECHAIN.getPulseXPrice("PULSECHAIN"); await sleep(500);
+    var pricePLSX_PulseX_Pulsechain = await TheGraph_PULSECHAIN.getPulseXPrice("PULSEX"); await sleep(500);
+    var priceINC_PulseX_Pulsechain = await TheGraph_PULSECHAIN.getPulseXPrice("INC"); await sleep(500);
 
-    var HEXpair = await TheGraph_PULSECHAIN.getPulseXPairPriceAndLiquidity(h.PULSECHAIN_HEXPLS); await sleep(1000);
-    var priceHEX_PulseX_Pulsechain = 0; 
-    if (HEXpair && HEXpair.token1Price){ 
-      priceHEX_PulseX_Pulsechain = HEXpair.token1Price * pricePLS_PulseX_Pulsechain;
-    }
-
-    var EHEXpair = await TheGraph_PULSECHAIN.getPulseXPairPriceAndLiquidity(h.PULSECHAIN_HEXEHEX); await sleep(1000);
-    //var priceEHEX_PulseX_Pulsechain = EHEXpair.token0Price * priceHEX_PulseX_Pulsechain;
-
-    var PLSXpair = await TheGraph_PULSECHAIN.getPulseXPairPriceAndLiquidity(h.PULSECHAIN_WPLSPLSX); await sleep(1000);
-    var pricePLSX_PulseX_Pulsechain = 0; 
-    if (PLSXpair && PLSXpair.token1Price){ 
-      pricePLSX_PulseX_Pulsechain = PLSXpair.token1Price * pricePLS_PulseX_Pulsechain;
-    }
-    
-    var INCpair = await TheGraph_PULSECHAIN.getPulseXPairPriceAndLiquidity(h.PULSECHAIN_WPLSINC); await sleep(1000);
-    var priceINC_PulseX_Pulsechain = 0; 
-    if (INCpair && PLSXpair.token1Price){ 
-      priceINC_PulseX_Pulsechain = INCpair.token1Price * pricePLS_PulseX_Pulsechain;
-    }
+    var HEXPLSpair = await TheGraph_PULSECHAIN.getPulseXPairLiquidity(h.PULSECHAIN_HEXPLS); await sleep(1000);
+    var HEXEHEXpair = await TheGraph_PULSECHAIN.getPulseXPairLiquidity(h.PULSECHAIN_HEXEHEX); await sleep(1000);
+    //var PLSpair = await TheGraph_PULSECHAIN.getPulseXPairLiquidity(h.PULSECHAIN_WPLSDAI); await sleep(1000);
+    //var PLSXpair = await TheGraph_PULSECHAIN.getPulseXPairLiquidity(h.PULSECHAIN_WPLSPLSX); await sleep(1000);
+    //var INCpair = await TheGraph_PULSECHAIN.getPulseXPairLiquidity(h.PULSECHAIN_WPLSINC); await sleep(1000);
     
     var liquidityHEX_Pulsechain = 0;
-    if (HEXpair && EHEXpair){
-      liquidityHEX_Pulsechain = (Number(HEXpair.reserve0) + Number(EHEXpair.reserve0))
+    if (HEXPLSpair && HEXEHEXpair){
+      liquidityHEX_Pulsechain = (Number(HEXPLSpair.reserve0) + Number(HEXEHEXpair.reserve0))
     }
     var liquidityPLS_Pulsechain = 0;
-    if (HEXpair){
-      liquidityPLS_Pulsechain = HEXpair.reserve1;
+    if (HEXPLSpair){
+      liquidityPLS_Pulsechain = HEXPLSpair.reserve1;
     }
     var liquidityEHEX_Pulsechain = 0;
-    if (EHEXpair){
-      liquidityEHEX_Pulsechain = EHEXpair.reserve1;
+    if (HEXEHEXpair){
+      liquidityEHEX_Pulsechain = HEXEHEXpair.reserve1;
     }
 
     var tshareRateHEX_Pulsechain = await TheGraph_PULSECHAIN.get_shareRateChange(); await sleep(500);

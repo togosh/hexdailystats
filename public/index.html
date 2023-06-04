@@ -1518,7 +1518,7 @@
                             return data;
                         }
                     },
-                    { title: "Liquidity Pool (PLS)", className: "text-center colLiquidity_ETH grey" , render: function(data, type, row) {
+                    { title: "Liquidity Pool (PLS)", className: "text-center colLiquidity_PLS grey" , render: function(data, type, row) {
                             if (type === "display" || type === "filter") { 
                                 return Number(data).toLocaleString(undefined,{minimumFractionDigits:0, maximumFractionDigits:0}); }
                             return data;
@@ -2019,6 +2019,7 @@
         .colLiquidity_HEX       { min-width: calc(126px - 36px) !important; }
         .colLiquidity_USDC      { min-width: calc(104px - 36px) !important; }
         .colLiquidity_ETH       { min-width: calc(104px - 36px) !important; }
+        .colLiquidity_PLS       { min-width: calc(134px - 36px) !important; }
 
         .colTotalValueLocked    { min-width: calc(90px - 36px) !important; }
         .colMarketcap           { min-width: calc(90px - 36px) !important; }

@@ -1585,7 +1585,58 @@ module.exports = class TheGraph {
     });
   }
 
-  async getPulseXPairPriceAndLiquidity(pairAddress, day=undefined){
+  async getPulseXPairLiquidity(pairAddress, day=undefined){
+    var dateParam = "";
+    var orderDirection = "desc";
+    if (day){
+      var startTime = day2Epoch + ((day - 2) * 86400)  - 86400;
+      console.log("startTime - " + startTime);
+      dateParam = `date: ` + startTime + `,`;
+      console.log(dateParam);
+      orderDirection = "asc";
+    }
+
+    return await fetchRetry(PULSEX_SUBGRAPH_API_PULSECHAIN, {
+      method: 'POST',
+      highWaterMark: FETCH_SIZE,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: `
+      query {
+        pairDayDatas (
+          first: 1,
+          orderBy: date,
+          orderDirection: `+ orderDirection + `,
+          where: {pairAddress_in: [
+            "` + pairAddress + `",
+          ],` + dateParam +
+          `})
+        {
+          date
+          id
+          token0 {
+            id
+          }
+          token1 {
+            id
+          }
+          reserve0
+          reserve1
+        }
+      }` 
+      }),
+    })
+    .then(res => res.json())
+    .then(res => {
+      try {
+        var parDayData = res.data.pairDayDatas[0];
+        return parDayData;
+      } catch (e){
+        return undefined;
+      }
+    });
+  }
+
+  async getPulseXPairPrice(pairAddress, day=undefined){
     //var blockParam = "";
     //if(blocknumber){
     //  blockParam = `block: {number: ` + blocknumber + `},`

@@ -267,16 +267,23 @@ module.exports = class DailyStatHandler {
           startTime = startTime * 1000;
 
           var pricesBTC = await Coingecko.getPriceHistory_BitcoinWithTime(currentDay); await sleep(500);
+          console.log("pricesBTC.length: " + pricesBTC.length);
           pricesBTC = pricesBTC.filter(p => (p.length == 2 && p[0] == startTime));
+          console.log("pricesBTC filtered: ");
+          console.log(pricesBTC);
           if (pricesBTC.length == 1){
             priceBTC = pricesBTC[0][1];
           }
           var pricesETH = await Coingecko.getPriceHistory_EthereumWithTime(currentDay); await sleep(500);
-          pricesETH = pricesETH.filter(p => (p.length == 2 && p[0] == startTime));
-          if (pricesETH.length == 1){
-            priceETH = priceETH[0][1];
+          console.log("pricesETH.length: " + pricesETH.length);
+          pricesETH = pricesETH.filter(p => (p.length == 2 && 
+            ((p[0] == startTime) || (p[0] > (startTime - (3600000 * 6)) && p[0] < (startTime + (3600000 * 1))))));
+          console.log("pricesETH filtered: ");
+          console.log(pricesETH);
+          if (pricesFiltered.length >= 1){
+            priceETH = pricesETH[0][1];
           }
-        } catch (e) { log(e); }
+        } catch (e) { log("ERROR: BTC and/or ETH prices"); log(e); }
         
   
         ///////////////////////////////////////////////////////////////////
@@ -843,13 +850,13 @@ module.exports = class DailyStatHandler {
         //  pricePulseX_PLS = PLSpair.token1Price; 
         //}
 
-        var HEXpair = await TheGraph_PULSECHAIN.getPulseXPairPriceAndLiquidity(h.PULSECHAIN_HEXPLS, day); await sleep(1000);
+        var HEXpair = await TheGraph_PULSECHAIN.getPulseXPairLiquidity(h.PULSECHAIN_HEXPLS, day); await sleep(1000);
         //var pricePulseX = 0; 
         //if (HEXpair && HEXpair.token1Price){ 
         //  pricePulseX = ((HEXpair.token1Price) * pricePulseX_PLS);
         //}
 
-        var EHEXpair = await TheGraph_PULSECHAIN.getPulseXPairPriceAndLiquidity(h.PULSECHAIN_HEXEHEX, day); await sleep(1000);
+        var EHEXpair = await TheGraph_PULSECHAIN.getPulseXPairLiquidity(h.PULSECHAIN_HEXEHEX, day); await sleep(1000);
         //var pricePulseX_EHEX = 0; 
         //if (EHEXpair && EHEXpair.token0Price){
         //  pricePulseX_EHEX = ((EHEXpair.token0Price) * pricePulseX);
@@ -882,6 +889,10 @@ module.exports = class DailyStatHandler {
         var liquidityPulseX_HEX = 0;
         if (HEXpair && HEXpair.reserve0 && EHEXpair && EHEXpair.reserve0){ 
           liquidityPulseX_HEX = (Number(HEXpair.reserve0) + Number(EHEXpair.reserve0));
+        } else if (HEXpair && HEXpair.reserve0) {
+          liquidityPulseX_HEX = Number(HEXpair.reserve0);
+        } else if (EHEXpair && EHEXpair.reserve0) {
+          liquidityPulseX_HEX = Number(EHEXpair.reserve0);
         }
 
         var returnPackage = {
@@ -896,7 +907,8 @@ module.exports = class DailyStatHandler {
           liquidityPulseX_HEX: liquidityPulseX_HEX,
         };
 
-        log("*** 011a - " + returnPackage);
+        log("*** 011a - ");
+        log(returnPackage);
         
         return returnPackage;
       }

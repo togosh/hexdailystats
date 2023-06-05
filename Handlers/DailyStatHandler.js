@@ -268,7 +268,8 @@ module.exports = class DailyStatHandler {
 
           var pricesBTC = await Coingecko.getPriceHistory_BitcoinWithTime(currentDay); await sleep(500);
           console.log("pricesBTC.length: " + pricesBTC.length);
-          pricesBTC = pricesBTC.filter(p => (p.length == 2 && p[0] == startTime));
+          var pricesBTC = pricesBTC.filter(p => (p.length == 2 && 
+            ((p[0] == startTime) || (p[0] > (startTime - (3600000 * 12)) && p[0] < (startTime + (3600000 * 1))))));
           console.log("pricesBTC filtered: ");
           console.log(pricesBTC);
           if (pricesBTC.length == 1){

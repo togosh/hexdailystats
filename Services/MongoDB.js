@@ -1502,7 +1502,8 @@ module.exports = class MongoDB {
           startTime = startTime * 1000;
 
           var priceBTC = 0;
-          var pricesFiltered = pricesBTC.filter(p => (p.length == 2 && p[0] == startTime));
+          var pricesFiltered = pricesBTC.filter(p => (p.length == 2 && 
+            ((p[0] == startTime) || (p[0] > (startTime - (3600000 * 12)) && p[0] < (startTime + (3600000 * 1))))));
           if (pricesFiltered.length == 1){
             priceBTC = pricesFiltered[0][1];
           }
@@ -1545,7 +1546,7 @@ module.exports = class MongoDB {
 
           var priceETH = 0;
           var pricesFiltered = pricesETH.filter(p => (p.length == 2 && 
-            ((p[0] == startTime) || (p[0] > (startTime - (3600000 * 6)) && p[0] < (startTime + (3600000 * 1))))));
+            ((p[0] == startTime) || (p[0] > (startTime - (3600000 * 12)) && p[0] < (startTime + (3600000 * 1))))));
           if (pricesFiltered.length >= 1){
             priceETH = pricesFiltered[0][1];
           }

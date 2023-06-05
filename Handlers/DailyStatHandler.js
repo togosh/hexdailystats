@@ -280,7 +280,7 @@ module.exports = class DailyStatHandler {
             ((p[0] == startTime) || (p[0] > (startTime - (3600000 * 6)) && p[0] < (startTime + (3600000 * 1))))));
           console.log("pricesETH filtered: ");
           console.log(pricesETH);
-          if (pricesFiltered.length >= 1){
+          if (pricesETH.length >= 1){
             priceETH = pricesETH[0][1];
           }
         } catch (e) { log("ERROR: BTC and/or ETH prices"); log(e); }
